@@ -61,7 +61,19 @@
     </nav>
 
     <main class="admin-container">
-        <h1 style="margin-bottom: 30px;">إدارة الطلبات المباشرة 💼</h1>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 30px;">
+            <h1 style="margin: 0;">إدارة الطلبات المباشرة 💼</h1>
+            <div id="statsContainer" class="hidden" style="display:flex; gap:15px; align-items:center;">
+                <div
+                    style="background: var(--glass); padding: 10px 20px; border-radius: 15px; border: 1px solid var(--primary); text-align: center;">
+                    <div style="font-size: 0.75rem; color: var(--text-dim);">أرباحي الإجمالية</div>
+                    <div id="totalEarnings" style="font-size: 1.2rem; font-weight: 800; color: var(--primary);">0 جنيه
+                    </div>
+                </div>
+                <button class="auth-btn" style="background: var(--accent); padding: 12px 20px;"
+                    onclick="toggleEarningsModal()">📋 سجل أعمالي</button>
+            </div>
+        </div>
 
         <div id="accessDenied" class="hidden" style="text-align:center; padding: 50px;">
             <h2>عذراً، ليس لديك صلاحية الوصول لهذه الصفحة 🔒</h2>
@@ -73,16 +85,34 @@
                 <!-- Orders will load here -->
             </div>
         </div>
+
+        <!-- Earnings Modal -->
+        <div id="earningsModal" class="notif-overlay">
+            <div class="notif-card" style="max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+                    <h3 style="margin:0;">سجل العمليات المكتملة ✅</h3>
+                    <button class="auth-btn" style="background:none; border:none; padding:5px; min-width:auto;"
+                        onclick="toggleEarningsModal()">✖</button>
+                </div>
+                <div id="completedOrdersList" style="display:grid; gap:12px;">
+                    <!-- Completed orders will load here -->
+                </div>
+            </div>
+        </div>
     </main>
 
     <script type="module">
         import { auth, onAuthStateChanged } from './firebase-config.js';
-        import { login, logout, listenToAllOrders, updateOrderStatus, isWorker, listenToWorkers } from './app.js';
+        import { login, logout, listenToAllOrders, updateOrderStatus, isWorker, listenToWorkers, listenToWorkerCompletedOrders } from './app.js';
 
         const userInfo = document.getElementById('userInfo');
         const adminContent = document.getElementById('adminContent');
         const accessDenied = document.getElementById('accessDenied');
         const orderList = document.getElementById('orderList');
+        const statsContainer = document.getElementById('statsContainer');
+        const totalEarnings = document.getElementById('totalEarnings');
+        const completedOrdersList = document.getElementById('completedOrdersList');
+        const earningsModal = document.getElementById('earningsModal');
 
         const checkAccess = () => {
             const user = auth.currentUser;
@@ -103,7 +133,9 @@
                 if (isWorker(user.email)) {
                     adminContent.classList.remove('hidden');
                     accessDenied.classList.add('hidden');
+                    statsContainer.classList.remove('hidden');
                     loadOrders();
+                    loadEarnings(user.uid);
                 } else {
                     adminContent.classList.add('hidden');
                     accessDenied.classList.remove('hidden');
@@ -118,6 +150,10 @@
         // مزامنة العمال المستمرة
         listenToWorkers(() => checkAccess());
         onAuthStateChanged(auth, () => checkAccess());
+
+        window.toggleEarningsModal = () => {
+            earningsModal.classList.toggle('visible');
+        };
 
         window.handleLogin = login;
         window.handleLogout = logout;
@@ -180,6 +216,43 @@
                 `;
                     orderList.appendChild(card);
                 });
+            });
+        }
+
+        function loadEarnings(workerId) {
+            listenToWorkerCompletedOrders(workerId, (orders) => {
+                let total = 0;
+                completedOrdersList.innerHTML = '';
+
+                if (orders.length === 0) {
+                    completedOrdersList.innerHTML = '<p style="text-align:center; color:var(--text-dim);">لا يوجد أرباح مسجلة بعد</p>';
+                    totalEarnings.innerText = `0 جنيه`;
+                    return;
+                }
+
+                orders.forEach(order => {
+                    total += (order.totalPrice || 0);
+                    const item = document.createElement('div');
+                    item.style.cssText = 'background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;';
+
+                    const charTags = (order.characters || []).map(c => `
+                        <span style="font-size:0.75rem; background:rgba(255,255,255,0.05); padding:2px 6px; border-radius:5px;">${c.name}</span>
+                    `).join(' ');
+
+                    item.innerHTML = `
+                        <div>
+                            <div style="font-weight:bold; margin-bottom:5px;">${order.tier}</div>
+                            <div style="display:flex; flex-wrap:wrap; gap:4px;">${charTags}</div>
+                            <div style="font-size:0.75rem; color:var(--text-dim); margin-top:5px;">
+                                ${new Date(order.createdAt?.seconds * 1000).toLocaleDateString('ar-EG')}
+                            </div>
+                        </div>
+                        <div style="color:var(--primary); font-weight:bold; font-size:1.1rem;">${order.totalPrice || 0} ج.م</div>
+                    `;
+                    completedOrdersList.appendChild(item);
+                });
+
+                totalEarnings.innerText = `${total} جنيه`;
             });
         }
     </script>

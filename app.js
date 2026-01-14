@@ -315,3 +315,16 @@ export const listenToUserOrders = (uid, callback) => {
         callback(orders);
     });
 };
+
+export const listenToWorkerCompletedOrders = (workerId, callback) => {
+    const q = query(
+        collection(db, "orders"),
+        where("workerId", "==", workerId),
+        where("status", "==", "done"),
+        orderBy("createdAt", "desc")
+    );
+    return onSnapshot(q, (snapshot) => {
+        const orders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        callback(orders);
+    });
+};
