@@ -149,12 +149,17 @@ export const placeOrder = async (tier, charData) => {
     }
 
     try {
+        const TIER_PRICES = { 'Starter': 30, 'Pro': 60, 'Ultimate': 90 };
+        const pricePerChar = TIER_PRICES[tier] || 0;
         const characters = Array.isArray(charData) ? charData : [charData];
+        const totalPrice = pricePerChar * characters.length;
+
         const orderRef = await addDoc(collection(db, "orders"), {
             uid: user.uid,
             userName: user.displayName,
             userAvatar: user.photoURL,
             tier: tier,
+            totalPrice: totalPrice,
             characters: characters.map(c => ({
                 id: c.id,
                 name: c.name,

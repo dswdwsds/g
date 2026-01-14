@@ -132,6 +132,10 @@
                 orders.filter(o => o.status !== 'done' && o.status !== 'rejected').forEach(order => {
                     const card = document.createElement('div');
                     card.className = 'order-card';
+
+                    const isOwner = order.workerId === auth.currentUser?.uid;
+                    const canManage = order.status === 'waiting' || (order.status === 'working' && isOwner);
+
                     const characters = order.characters || [{ name: order.charName, image: order.charImage }];
                     const charTags = characters.map(c => `
                         <div style="display:inline-flex; align-items:center; gap:5px; background:rgba(255,255,255,0.05); padding:3px 10px; border-radius:12px; font-size:0.85rem; border:1px solid var(--glass-border);">
@@ -150,7 +154,10 @@
                             </div>
                         </div>
                         <div style="margin-bottom:10px;">
-                            <div style="font-size:0.9rem; margin-bottom:5px; color:var(--primary)">الفئة: ${order.tier}</div>
+                            <div style="font-size:0.9rem; margin-bottom:5px; color:var(--primary)">
+                                الفئة: ${order.tier} | 
+                                <span style="color:#00f2fe; font-weight:bold;">${order.totalPrice || 0} جنيه</span>
+                            </div>
                             <div style="display:flex; flex-wrap:wrap; gap:6px;">
                                 ${charTags}
                             </div>
@@ -158,15 +165,19 @@
                         <div style="color: var(--text-dim); font-size: 0.8rem;">
                             <small>📅 ${new Date(order.createdAt?.seconds * 1000).toLocaleString('ar-EG')}</small>
                         </div>
-                        ${order.workerName ? `<div style="margin-top:8px; color:var(--primary); font-size:0.8rem; font-weight:bold;">👤 المنفذ: ${order.workerName}</div>` : ''}
+                        ${order.workerName ? `
+                            <div style="margin-top:8px; color:var(--primary); font-size:0.8rem; font-weight:bold; display:flex; align-items:center; gap:5px;">
+                                👤 المنفذ: ${order.workerName}
+                                ${!isOwner && order.status === 'working' ? '<span style="color:#ff00c8; font-size:0.75rem;">(لا يمكنك التعديل)</span>' : ''}
+                            </div>
+                        ` : ''}
                     </div>
                     <div class="action-group" style="flex-shrink:0;">
                         ${order.status === 'waiting' ? `<button class="auth-btn" style="background:#4facfe" onclick="manageOrder('${order.id}', 'working')">قبول الطلب</button>` : ''}
-                        ${order.status === 'working' ? `<button class="auth-btn" style="background:#00f2fe; color:#000" onclick="manageOrder('${order.id}', 'done')">إنهاء العمل</button>` : ''}
-                        <button class="auth-btn" style="background:#ff00c8" onclick="manageOrder('${order.id}', 'rejected')">رفض</button>
+                        ${(order.status === 'working' && isOwner) ? `<button class="auth-btn" style="background:#00f2fe; color:#000" onclick="manageOrder('${order.id}', 'done')">إنهاء العمل</button>` : ''}
+                        ${canManage ? `<button class="auth-btn" style="background:#ff00c8" onclick="manageOrder('${order.id}', 'rejected')">رفض</button>` : ''}
                     </div>
                 `;
-
                     orderList.appendChild(card);
                 });
             });
