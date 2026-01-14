@@ -132,12 +132,14 @@ export const sendToDiscord = async (orderData) => {
 export const placeOrder = async (tier, charData) => {
     const user = auth.currentUser;
     if (!user) {
-        alert("Please login first!");
+        if (window.showToast) window.showToast("Please login first!", "🔑");
+        else alert("Please login first!");
         return;
     }
 
     if (!charData) {
-        alert("يرجى اختيار الشخصية أولاً!");
+        if (window.showToast) window.showToast("يرجى اختيار الشخصية أولاً!", "🗡️");
+        else alert("يرجى اختيار الشخصية أولاً!");
         return;
     }
 
@@ -167,11 +169,13 @@ export const placeOrder = async (tier, charData) => {
             await updateDoc(orderRef, { discordMessageId: discordRes.id });
         }
 
-        alert("تم ارسال الطلب بنجاح! انتقل لسجل الطلبات لمتابعة الحالة.");
+        if (window.showToast) window.showToast("تم ارسال الطلب بنجاح! تابع الحالة في سجل الطلبات.", "✅");
+        else alert("تم ارسال الطلب بنجاح! انتقل لسجل الطلبات لمتابعة الحالة.");
         return orderRef.id;
     } catch (error) {
         console.error("Order Error:", error);
-        alert("فشل في تقديم الطلب. يرجى المحاولة مرة أخرى.");
+        if (window.showToast) window.showToast("فشل في تقديم الطلب. حاول مرة أخرى.", "❌");
+        else alert("فشل في تقديم الطلب. يرجى المحاولة مرة أخرى.");
     }
 };
 
@@ -258,7 +262,8 @@ export const updateOrderStatus = async (orderId, newStatus) => {
         }
     } catch (error) {
         console.error("Update Error:", error);
-        alert("فشل تحديث الحالة.");
+        if (window.showToast) window.showToast("فشل تحديث الحالة.", "❌");
+        else alert("فشل تحديث الحالة.");
     }
 };
 

@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>One Piece Bounty Rush | Professional GS</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:;base64,iVBORw0KGgo=">
 </head>
 
 <body>
@@ -92,6 +93,21 @@
     </div>
   </div>
 
+  <!-- Custom Confirm Modal -->
+  <div id="confirmModal" class="confirm-overlay">
+    <div class="confirm-card">
+      <div id="confirmTitle" class="confirm-title">تأكيد الطلب</div>
+      <p id="confirmMsg" class="confirm-msg"></p>
+      <div class="confirm-actions">
+        <button id="confirmYes" class="confirm-btn yes">نعم، متأكد</button>
+        <button id="confirmNo" class="confirm-btn no">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
   <footer>
     <p><a href="index.html" style="color: var(--primary); text-decoration: none;">← العودة للرئيسية</a></p>
   </footer>
@@ -147,25 +163,46 @@
       const CHARACTERS = getCharacters();
       selectedChar = CHARACTERS.find(c => c.id === charId);
       closeCharModal();
-      if (confirm(`هل أنت متأكد من طلب الفئة ${selectedTier} للشخصية ${selectedChar.name}؟`)) {
+
+      showConfirm(`هل أنت متأكد من طلب الفئة ${selectedTier} للشخصية ${selectedChar.name}؟`, () => {
         placeOrder(selectedTier, selectedChar);
-      }
+      });
     };
 
     const ADMIN_EMAIL = 'abdobwd78@gmail.com';
 
-    window.orderNow = (tier) => {
-      if (!auth.currentUser) {
-        login();
-      } else {
-        placeOrder(tier);
-      }
+    // UI Helper Functions
+    window.showToast = (message, icon = 'ℹ️') => {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.innerHTML = `<span class="toast-icon">${icon}</span><span>${message}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.classList.add('removing');
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    };
+
+    window.showConfirm = (message, onConfirm) => {
+      const modal = document.getElementById('confirmModal');
+      const msg = document.getElementById('confirmMsg');
+      const yesBtn = document.getElementById('confirmYes');
+      const noBtn = document.getElementById('confirmNo');
+
+      msg.innerText = message;
+      modal.classList.add('visible');
+
+      const close = () => modal.classList.remove('visible');
+
+      yesBtn.onclick = () => { onConfirm(); close(); };
+      noBtn.onclick = close;
     };
 
     window.updateStatus = (id, status) => {
-      if (confirm(`هل أنت متأكد من تغيير حالة الطلب إلى ${status === 'working' ? 'بدء العمل' : status === 'done' ? 'إنهاء' : 'رفض'}؟`)) {
+      showConfirm(`هل أنت متأكد من تغيير حالة الطلب إلى ${status === 'working' ? 'بدء العمل' : status === 'done' ? 'إنهاء' : 'رفض'}؟`, () => {
         updateOrderStatus(id, status);
-      }
+      });
     };
 
     // نحدث اليوزر في كل مرة تتغير فيها قائمة العمال أو حالة الدخول
