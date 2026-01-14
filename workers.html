@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worker Dashboard | Professional GS</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .admin-container {
+            padding-top: 100px;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding-inline: 20px;
+        }
+
+        .order-list {
+            display: grid;
+            gap: 20px;
+        }
+
+        .order-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            padding: 20px;
+            border-radius: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .badge {
+            padding: 4px 12px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .badge.waiting {
+            background: #ecc94b;
+            color: #000;
+        }
+
+        .badge.working {
+            background: #4facfe;
+            color: #fff;
+        }
+
+        .action-group {
+            display: flex;
+            gap: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="nav-bar">
+        <div class="user-info" id="userInfo"></div>
+        <div class="logo">WORKER PANEL</div>
+    </nav>
+
+    <main class="admin-container">
+        <h1 style="margin-bottom: 30px;">إدارة الطلبات المباشرة 💼</h1>
+
+        <div id="accessDenied" class="hidden" style="text-align:center; padding: 50px;">
+            <h2>عذراً، ليس لديك صلاحية الوصول لهذه الصفحة 🔒</h2>
+            <p>يرجى التأكد من تسجيل الدخول بالإيميل المعتمد.</p>
+        </div>
+
+        <div id="adminContent" class="hidden">
+            <div class="order-list" id="orderList">
+                <!-- Orders will load here -->
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import { auth, onAuthStateChanged } from './firebase-config.js';
+        import { login, logout, listenToAllOrders, updateOrderStatus, isWorker } from './app.js';
+
+        const userInfo = document.getElementById('userInfo');
+        const adminContent = document.getElementById('adminContent');
+        const accessDenied = document.getElementById('accessDenied');
+        const orderList = document.getElementById('orderList');
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                userInfo.innerHTML = `
+                <div class="user-profile">
+                    <img src="${user.photoURL}" class="user-avatar">
+                    <span class="user-name">${user.displayName}</span>
+                    <button class="auth-btn" onclick="handleLogout()">خروج</button>
+                </div>
+            `;
+
+                if (isWorker(user.email)) {
+                    adminContent.classList.remove('hidden');
+                    accessDenied.classList.add('hidden');
+                    loadOrders();
+                } else {
+                    adminContent.classList.add('hidden');
+                    accessDenied.classList.remove('hidden');
+                }
+            } else {
+                userInfo.innerHTML = `<button class="auth-btn" onclick="handleLogin()">تسجيل دخول</button>`;
+                adminContent.classList.add('hidden');
+                accessDenied.classList.remove('hidden');
+            }
+        });
+
+        window.handleLogin = login;
+        window.handleLogout = logout;
+
+        window.manageOrder = (id, status) => {
+            updateOrderStatus(id, status);
+        };
+
+        function loadOrders() {
+            listenToAllOrders((orders) => {
+                orderList.innerHTML = '';
+                orders.filter(o => o.status !== 'done' && o.status !== 'rejected').forEach(order => {
+                    const card = document.createElement('div');
+                    card.className = 'order-card';
+                    card.innerHTML = `
+                    <div>
+                        <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+                            <img src="${order.userAvatar}" style="width:30px; height:30px; border-radius:50%">
+                            <strong>${order.userName}</strong>
+                            <span class="badge ${order.status}">${order.status === 'waiting' ? 'بانتظار العمل' : 'قيد التنفيذ'}</span>
+                        </div>
+                        <div style="color: var(--text-dim); font-size: 0.9rem;">
+                            الطلب: ${order.tier} | <small>${new Date(order.createdAt?.seconds * 1000).toLocaleString('ar-EG')}</small>
+                        </div>
+                        ${order.workerName ? `<div style="margin-top:5px; color:var(--primary); font-size:0.8rem;">👤 المنفذ: ${order.workerName}</div>` : ''}
+                    </div>
+                    <div class="action-group">
+                        ${order.status === 'waiting' ? `<button class="auth-btn" style="background:#4facfe" onclick="manageOrder('${order.id}', 'working')">قبول الطلب</button>` : ''}
+                        ${order.status === 'working' ? `<button class="auth-btn" style="background:#00f2fe; color:#000" onclick="manageOrder('${order.id}', 'done')">إنهاء العمل</button>` : ''}
+                        <button class="auth-btn" style="background:#ff00c8" onclick="manageOrder('${order.id}', 'rejected')">رفض</button>
+                    </div>
+                `;
+                    orderList.appendChild(card);
+                });
+            });
+        }
+    </script>
+</body>
+
+</html>

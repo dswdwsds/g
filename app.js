@@ -87,14 +87,38 @@ export const placeOrder = async (tier) => {
     }
 };
 
+export const WORKER_EMAILS = [
+    'abdobwd78@gmail.com', // المدير
+    // ضيف إيميلات العمال هنا
+];
+
+export const isWorker = (email) => WORKER_EMAILS.includes(email);
+
 export const updateOrderStatus = async (orderId, newStatus) => {
     try {
         const orderRef = doc(db, "orders", orderId);
-        await updateDoc(orderRef, { status: newStatus });
+        const updateData = { status: newStatus };
+
+        // إذا كان العامل هو من ينفذ، نسجل بياناته
+        if (newStatus === 'working' && auth.currentUser) {
+            updateData.workerId = auth.currentUser.uid;
+            updateData.workerName = auth.currentUser.displayName;
+            updateData.workerAvatar = auth.currentUser.photoURL;
+        }
+
+        await updateDoc(orderRef, updateData);
     } catch (error) {
         console.error("Update Error:", error);
         alert("فشل تحديث الحالة.");
     }
+};
+
+export const listenToAllOrders = (callback) => {
+    const q = query(collection(db, "orders"), orderBy("createdAt", "desc"));
+    return onSnapshot(q, (snapshot) => {
+        const orders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        callback(orders);
+    });
 };
 
 export const listenToQueue = (callback) => {

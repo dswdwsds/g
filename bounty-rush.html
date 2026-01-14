@@ -136,6 +136,17 @@
         const item = document.createElement('div');
         item.className = `queue-item ${isWorking ? 'active' : ''} ${order.uid === auth.currentUser?.uid ? 'mine' : ''}`;
 
+        let workerInfo = '';
+        if (isWorking && order.workerAvatar) {
+          workerInfo = `
+                    <div style="display:flex; align-items:center; gap:5px; font-size:0.75rem; color:var(--primary);">
+                         <span>بواسطة:</span>
+                         <img src="${order.workerAvatar}" style="width:20px; height:20px; border-radius:50%; border:1px solid var(--primary)">
+                         <span>${order.workerName.split(' ')[0]}</span>
+                    </div>
+                `;
+        }
+
         let actionButtons = '';
         if (auth.currentUser?.email === ADMIN_EMAIL) {
           actionButtons = `
@@ -148,12 +159,17 @@
         }
 
         item.innerHTML = `
-                <div style="display:flex; align-items:center; gap:10px; flex:1">
-                    <img src="${order.userAvatar}" style="width:30px; height:30px; border-radius:50%">
-                    <span>${order.userName.split(' ')[0]} - ${order.tier}</span>
+                <div style="display:flex; flex-direction:column; flex:1">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <img src="${order.userAvatar}" style="width:30px; height:30px; border-radius:50%">
+                        <span>${order.userName.split(' ')[0]} - ${order.tier}</span>
+                    </div>
+                    ${workerInfo}
                 </div>
                 ${actionButtons}
-                <span class="pos-tag">${isWorking ? '🔥 جارِ العمل' : '#' + (index + 1)}</span>
+                <span class="pos-tag" style="display:flex; flex-direction:column; align-items:flex-end;">
+                    ${isWorking ? '<span style="font-size:0.8rem">🔥 جارِ العمل</span>' : '#' + (index + 1)}
+                </span>
             `;
         queueList.appendChild(item);
       });
