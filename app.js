@@ -128,10 +128,16 @@ export const sendToDiscord = async (orderData) => {
     return await response.json();
 };
 
+
 export const placeOrder = async (tier, charData) => {
     const user = auth.currentUser;
     if (!user) {
         alert("Please login first!");
+        return;
+    }
+
+    if (!charData) {
+        alert("يرجى اختيار الشخصية أولاً!");
         return;
     }
 
@@ -143,7 +149,7 @@ export const placeOrder = async (tier, charData) => {
             tier: tier,
             charId: charData.id,
             charName: charData.name,
-            charImage: charData.image,
+            charImage: charData.image || "",
             status: "waiting",
             createdAt: serverTimestamp()
         });
@@ -154,7 +160,7 @@ export const placeOrder = async (tier, charData) => {
             userAvatar: user.photoURL,
             tier: tier,
             charName: charData.name,
-            charImage: charData.image
+            charImage: charData.image || user.photoURL
         });
 
         if (discordRes && discordRes.id) {
@@ -165,9 +171,10 @@ export const placeOrder = async (tier, charData) => {
         return orderRef.id;
     } catch (error) {
         console.error("Order Error:", error);
-        alert("Failed to place order.");
+        alert("فشل في تقديم الطلب. يرجى المحاولة مرة أخرى.");
     }
 };
+
 
 let authorizedWorkers = [];
 
