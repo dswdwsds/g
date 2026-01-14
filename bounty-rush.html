@@ -70,13 +70,23 @@
     </p>
   </div>
 
+  <!-- Notification Modal -->
+  <div id="notificationModal" class="notif-overlay">
+    <div class="notif-card">
+      <div id="notifIcon" class="notif-icon">🎉</div>
+      <h2 id="notifTitle">تهانينا!</h2>
+      <p id="notifMessage">لقد تم الانتهاء من طلبك بنجاح.</p>
+      <button class="notif-btn" onclick="closeNotification()">حسناً</button>
+    </div>
+  </div>
+
   <footer>
     <p><a href="index.html" style="color: var(--primary); text-decoration: none;">← العودة للرئيسية</a></p>
   </footer>
 
   <script type="module">
     import { auth, onAuthStateChanged } from './firebase-config.js';
-    import { login, logout, placeOrder, listenToQueue, updateOrderStatus, isWorker, listenToWorkers } from './app.js';
+    import { login, logout, placeOrder, listenToQueue, updateOrderStatus, isWorker, listenToWorkers, listenToUserOrders } from './app.js';
 
     const userInfo = document.getElementById('userInfo');
     const queueList = document.getElementById('queueList');
@@ -132,7 +142,51 @@
       if (lastOrders) renderQueue(lastOrders);
     });
 
-    onAuthStateChanged(auth, () => refreshUserUI());
+    onAuthStateChanged(auth, (user) => {
+      refreshUserUI();
+      if (user) {
+        startOrderListener(user.uid);
+      }
+    });
+
+    const notifiedOrders = new Set();
+    const startOrderListener = (uid) => {
+      listenToUserOrders(uid, (orders) => {
+        orders.forEach(order => {
+          if ((order.status === 'done' || order.status === 'rejected') && !notifiedOrders.has(order.id)) {
+            showNotification(order);
+            notifiedOrders.add(order.id);
+          }
+        });
+      });
+    };
+
+    const showNotification = (order) => {
+      const modal = document.getElementById('notificationModal');
+      const icon = document.getElementById('notifIcon');
+      const title = document.getElementById('notifTitle');
+      const msg = document.getElementById('notifMessage');
+
+      if (order.status === 'done') {
+        icon.innerText = '🎉';
+        icon.style.background = 'rgba(0, 255, 0, 0.1)';
+        icon.style.color = '#00ff00';
+        title.innerText = 'تم الانتهاء! 🚀';
+        msg.innerText = `لقد تم إكمال طلبك (${order.tier}) بنجاح. شكراً لثقتك بنا!`;
+      } else {
+        icon.innerText = '❌';
+        icon.style.background = 'rgba(255, 0, 0, 0.1)';
+        icon.style.color = '#ff4d4d';
+        title.innerText = 'تم رفض الطلب';
+        msg.innerText = `عذراً، تم رفض طلبك (${order.tier}). يرجى التواصل مع الدعم للمزيد من التفاصيل.`;
+      }
+
+      modal.classList.add('visible');
+    };
+
+    window.closeNotification = () => {
+      document.getElementById('notificationModal').classList.remove('visible');
+    };
 
     window.handleLogin = login;
     window.handleLogout = logout;

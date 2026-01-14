@@ -201,3 +201,11 @@ export const listenToQueue = (callback) => {
         }
     );
 };
+
+export const listenToUserOrders = (uid, callback) => {
+    const q = query(collection(db, "orders"), where("uid", "==", uid));
+    return onSnapshot(q, (snapshot) => {
+        const orders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        callback(orders);
+    });
+};
