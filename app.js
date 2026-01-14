@@ -1,4 +1,4 @@
-import { auth, provider, signInWithPopup, signOut, onAuthStateChanged, db, collection, addDoc, serverTimestamp, query, where, orderBy, onSnapshot, doc, updateDoc, getDoc, limit, increment, setDoc } from './firebase-config.js';
+import { auth, provider, signInWithPopup, signOut, onAuthStateChanged, db, collection, addDoc, serverTimestamp, query, where, orderBy, onSnapshot, doc, updateDoc, getDoc, limit, increment, setDoc, deleteDoc } from './firebase-config.js';
 
 const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1395038941110866010/MucgrT_399C44lfUVL79HcqR4cfwNbJlL5iG1qPmxdBF47GGbTbmkokZK6YnslmJ63wL";
 
@@ -220,13 +220,45 @@ export const listenToWorkers = (callback) => {
     });
 };
 
+const PRIMARY_OWNER = 'abdobwd78@gmail.com'; // إيميل المالك الأساسي كاحتياط
+
 export const isWorker = (email) => {
-    return authorizedStaff.some(s => s.email === email || s.id === email);
+    return authorizedStaff.some(s => s.email === email || s.id === email) || email === PRIMARY_OWNER;
 };
 
 export const getUserRole = (email) => {
     const staff = authorizedStaff.find(s => s.email === email || s.id === email);
-    return staff ? staff.role : null;
+    if (staff) return staff.role;
+    if (email === PRIMARY_OWNER) return 'owner';
+    return null;
+};
+
+// وظيفة لإضافة أو تحديث دور موظف (للمالك فقط)
+export const setStaffRole = async (email, role) => {
+    try {
+        // نستخدم الإيميل كـ ID للوثيقة في حال لم يكن لدينا UID بعد
+        const staffRef = doc(db, "staff", email);
+        await setDoc(staffRef, {
+            email: email,
+            role: role,
+            updatedAt: serverTimestamp()
+        }, { merge: true });
+        return true;
+    } catch (error) {
+        console.error("Set Role Error:", error);
+        return false;
+    }
+};
+
+// وظيفة لحذف موظف (للمالك فقط)
+export const deleteStaff = async (docId) => {
+    try {
+        await deleteDoc(doc(db, "staff", docId));
+        return true;
+    } catch (error) {
+        console.error("Delete Staff Error:", error);
+        return false;
+    }
 };
 
 export const listenToStaffStats = (email, uid, callback) => {
