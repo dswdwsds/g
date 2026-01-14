@@ -73,10 +73,24 @@
 
   <!-- Notification Modal -->
   <div id="notificationModal" class="notif-overlay">
-    <div class="notif-card">
-      <div id="notifIcon" class="notif-icon">🎉</div>
-      <h2 id="notifTitle">تهانينا!</h2>
-      <p id="notifMessage">لقد تم الانتهاء من طلبك بنجاح.</p>
+    <div class="notif-card" style="max-width: 500px; width: 95%;">
+      <h3>تم الانتهاء! 🚀</h3>
+      <p id="notifMessage">لقد تم إكمال طلبك بنجاح. شكراً لثقتك بنا!</p>
+
+      <div id="ratingContainer" class="hidden"
+        style="border-top: 1px solid var(--glass-border); margin-top: 20px; padding-top: 20px;">
+        <p style="text-align: center; margin-bottom: 10px;">قيم تجربتك معنا ⭐</p>
+        <div class="rating-stars" id="stars">
+          <span class="star" data-value="1">★</span>
+          <span class="star" data-value="2">★</span>
+          <span class="star" data-value="3">★</span>
+          <span class="star" data-value="4">★</span>
+          <span class="star" data-value="5">★</span>
+        </div>
+        <textarea id="reviewText" class="review-input" placeholder="اكتب رأيك هنا (اختياري)..." rows="3"></textarea>
+        <button class="notif-btn" id="submitRatingBtn" style="width: 100%; display: none;">إرسال التقييم</button>
+      </div>
+
       <div style="display:flex; gap:10px; margin-top:20px;">
         <button class="notif-btn" id="viewHistoryBtn" onclick="location.href='history.html'">سجل الطلبات</button>
         <button class="notif-btn" style="background: var(--glass); color: #fff;"
@@ -127,13 +141,14 @@
 
   <script type="module">
     import { auth, onAuthStateChanged } from './firebase-config.js';
-    import { login, logout, placeOrder, listenToQueue, updateOrderStatus, isWorker, listenToWorkers, listenToUserOrders, loadCharacters, getCharacters } from './app.js';
+    import { login, logout, placeOrder, listenToQueue, updateOrderStatus, isWorker, listenToWorkers, listenToUserOrders, loadCharacters, getCharacters, submitRating } from './app.js';
 
     const userInfo = document.getElementById('userInfo');
     const queueList = document.getElementById('queueList');
     const queueBrief = document.getElementById('queueBrief');
     const charGrid = document.getElementById('charGrid');
     const charModal = document.getElementById('charModal');
+    const notificationModal = document.getElementById('notificationModal'); // Added for new notification modal logic
 
     let selectedTier = null;
     let selectedChars = new Set();
@@ -324,32 +339,63 @@
       });
     };
 
+    let currentOrderIdForRating = null;
+    let selectedRatingValue = 0;
+
     const showNotification = (order) => {
       const modal = document.getElementById('notificationModal');
-      const icon = document.getElementById('notifIcon');
-      const title = document.getElementById('notifTitle');
       const msg = document.getElementById('notifMessage');
 
+      currentOrderIdForRating = order.id;
+
       if (order.status === 'done') {
-        icon.innerText = '🎉';
-        icon.style.background = 'rgba(0, 255, 0, 0.1)';
-        icon.style.color = '#00ff00';
-        title.innerText = 'تم الانتهاء! 🚀';
         msg.innerText = `لقد تم إكمال طلبك (${order.tier}) بنجاح. شكراً لثقتك بنا!`;
+        document.getElementById('ratingContainer').classList.remove('hidden');
+        setupRating();
       } else {
-        icon.innerText = '❌';
-        icon.style.background = 'rgba(255, 0, 0, 0.1)';
-        icon.style.color = '#ff4d4d';
-        title.innerText = 'تم رفض الطلب';
         msg.innerText = `عذراً، تم رفض طلبك (${order.tier}). يرجى التواصل مع الدعم للمزيد من التفاصيل.`;
+        document.getElementById('ratingContainer').classList.add('hidden');
       }
 
       modal.classList.add('visible');
     };
 
+    const setupRating = () => {
+      const stars = document.querySelectorAll('.star');
+      const submitBtn = document.getElementById('submitRatingBtn');
+      selectedRatingValue = 0;
+      submitBtn.style.display = 'none';
+      document.getElementById('reviewText').value = '';
+
+      stars.forEach(star => {
+        star.classList.remove('active');
+        star.onclick = () => {
+          selectedRatingValue = parseInt(star.dataset.value);
+          stars.forEach((s, i) => {
+            if (i < selectedRatingValue) s.classList.add('active');
+            else s.classList.remove('active');
+          });
+          submitBtn.style.display = 'block';
+        };
+      });
+
+      submitBtn.onclick = async () => {
+        if (selectedRatingValue === 0) return;
+        const review = document.getElementById('reviewText').value;
+        const success = await submitRating(currentOrderIdForRating, selectedRatingValue, review);
+        if (success) {
+          showToast("تم إرسال تقييمك بنجاح! شكراً لك.", "⭐");
+          document.getElementById('ratingContainer').classList.add('hidden');
+        } else {
+          showToast("فشل في إرسال التقييم.", "❌");
+        }
+      };
+    };
+
     window.closeNotification = () => {
       document.getElementById('notificationModal').classList.remove('visible');
     };
+
 
     window.handleLogin = login;
     window.handleLogout = logout;
