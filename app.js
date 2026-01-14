@@ -49,11 +49,12 @@ export const sendToDiscord = async (orderData) => {
         ]
     };
 
-    await fetch(DISCORD_WEBHOOK, {
+    const response = await fetch(DISCORD_WEBHOOK + "?wait=true", {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
     });
+    return await response.json();
 };
 
 export const placeOrder = async (tier) => {
@@ -73,12 +74,16 @@ export const placeOrder = async (tier) => {
             createdAt: serverTimestamp()
         });
 
-        await sendToDiscord({
+        const discordRes = await sendToDiscord({
             orderId: orderRef.id,
             userName: user.displayName,
             userAvatar: user.photoURL,
             tier: tier
         });
+
+        if (discordRes && discordRes.id) {
+            await updateDoc(orderRef, { discordMessageId: discordRes.id });
+        }
 
         alert("Order placed successfully! Check your queue position.");
     } catch (error) {
@@ -98,38 +103,50 @@ export const listenToWorkers = (callback) => {
 
 export const isWorker = (email) => authorizedWorkers.includes(email);
 
-export const sendStatusUpdateToDiscord = async (orderData, newStatus) => {
-    let statusText = "";
+export const updateDiscordMessage = async (orderData, newStatus) => {
+    if (!orderData.discordMessageId) return;
+
+    let statusText = "بانتظار البدء... ⏳";
     let color = 0x00f2fe;
+    let title = "🚀 وصل طلب تلفيل جديد!";
 
     if (newStatus === 'working') {
-        statusText = `✅ **تم قبول الطلب وبدء العمل!**\n👤 المنفذ: ${orderData.workerName}`;
+        statusText = `🔥 جارِ العمل بواسطة: ${orderData.workerName}`;
         color = 0x4facfe;
+        title = "⚡ جاري تنفيذ الطلب الآن!";
     } else if (newStatus === 'done') {
-        statusText = `🎉 **تم الانتهاء من الحساب بنجاح!**`;
+        statusText = `✅ تم الانتهاء بنجاح!`;
         color = 0x00ff00;
+        title = "🎉 تم إكمال الطلب!";
     } else if (newStatus === 'rejected') {
-        statusText = `❌ **عذراً، تم رفض الطلب.**`;
+        statusText = `❌ تم رفض الطلب`;
         color = 0xff00c8;
+        title = "🚫 الطلب مرفوض";
     }
 
     const payload = {
-        content: `🔄 **تحديث للطلب #${orderData.orderId || orderData.id}**`,
         embeds: [{
-            title: "تحديث حالة الطلب",
-            description: statusText,
+            title: title,
             color: color,
             fields: [
-                { name: "👤 العميل", value: orderData.userName, inline: true },
-                { name: "💎 الفئة", value: orderData.tier, inline: true }
+                { name: "👤 اسم العميل", value: orderData.userName, inline: true },
+                { name: "💎 نوع الطلب (الفئة)", value: orderData.tier, inline: true },
+                { name: "🆔 رقم الطلب", value: `\`${orderData.id}\`` },
+                { name: "⏳ الحالة الحالية", value: statusText }
             ],
+            thumbnail: { url: orderData.userAvatar },
             footer: { text: "نظام Professional GS لإدارة الطلبات" },
             timestamp: new Date().toISOString()
         }]
     };
 
-    await fetch(DISCORD_WEBHOOK, {
-        method: 'POST',
+    // إخفاء الأزرار إذا اكتمل الطلب أو رُفض
+    if (newStatus === 'done' || newStatus === 'rejected') {
+        payload.components = [];
+    }
+
+    await fetch(`${DISCORD_WEBHOOK}/messages/${orderData.discordMessageId}`, {
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
     });
@@ -149,11 +166,11 @@ export const updateOrderStatus = async (orderId, newStatus) => {
 
         await updateDoc(orderRef, updateData);
 
-        // جلب بيانات الطلب لإرسال التحديث للديسكورد
+        // جلب بيانات الطلب لتحديث رسالة الديسكورد
         const snapshot = await getDoc(orderRef);
         if (snapshot.exists()) {
             const orderData = { id: orderId, ...snapshot.data() };
-            await sendStatusUpdateToDiscord(orderData, newStatus);
+            await updateDiscordMessage(orderData, newStatus);
         }
     } catch (error) {
         console.error("Update Error:", error);
