@@ -228,7 +228,7 @@
             });
 
             // الاستماع لسجل الطلبات لعرضها في المودال
-            listenToWorkerCompletedOrders(workerId, (orders) => {
+            listenToWorkerCompletedOrders(uid, (orders) => {
                 completedOrdersList.innerHTML = '';
 
                 if (orders.length === 0) {
