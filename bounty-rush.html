@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>One Piece Bounty Rush | Professional GS</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <nav class="nav-bar">
+    <div class="user-info" id="userInfo">
+      <!-- Auth Content -->
+    </div>
+    <div class="logo" style="font-family: var(--font-en); font-weight: 800; color: var(--primary);">PRO GS</div>
+  </nav>
+
+  <header class="hero" style="padding-top: 120px;">
+    <h1>One Piece Bounty Rush</h1>
+    <p>نقدم خدمة رفع مستوى الشخصيات بسرعة فائقة وضمان كامل ضد أي خلل.</p>
+  </header>
+
+  <section class="queue-container" id="queueDashboard" class="hidden">
+    <div class="queue-card">
+      <span class="queue-status-tag">Live Queue 🔴</span>
+      <h2 style="margin-bottom: 5px;">طابور الانتظار المباشر</h2>
+      <p id="queueBrief" style="color: var(--text-dim); font-size: 0.9rem;">بانتظار جلب البيانات...</p>
+
+      <div class="queue-list" id="queueList">
+        <!-- Queue items will appear here -->
+      </div>
+    </div>
+  </section>
+
+  <section class="character-tiers">
+    <div class="tier-card">
+      <span class="tier-stars">⭐⭐</span>
+      <h3>Starter Tier</h3>
+      <span class="tier-price">30<span class="tier-currency"> SAR</span></span>
+      <p>رفع سريع للمستوى الأساسي</p>
+      <button class="auth-btn" style="margin-top:20px; width: 100%;" onclick="orderNow('Starter')">طلب هذه
+        الفئة</button>
+    </div>
+
+    <div class="tier-card" style="border-color: var(--primary);">
+      <span class="tier-stars">⭐⭐⭐</span>
+      <h3>Pro Tier</h3>
+      <span class="tier-price">60<span class="tier-currency"> SAR</span></span>
+      <p>تحسين كبير لنقاط الشخصية</p>
+      <button class="auth-btn" style="margin-top:20px; width: 100%;" onclick="orderNow('Pro')">طلب هذه الفئة</button>
+    </div>
+
+    <div class="tier-card">
+      <span class="tier-stars">⭐⭐⭐⭐</span>
+      <h3>Ultimate Tier</h3>
+      <span class="tier-price">90<span class="tier-currency"> SAR</span></span>
+      <p>الوصول للحد الأقصى من القوة</p>
+      <button class="auth-btn" style="margin-top:20px; width: 100%;" onclick="orderNow('Ultimate')">طلب هذه
+        الفئة</button>
+    </div>
+  </section>
+
+  <div style="text-align: center; margin-bottom: 100px;">
+    <p class="note">
+      🛡️ العملية آمنة تماماً وتتم عبر خبراء متخصصين.
+      <br>
+      ⚠️ إخلاء مسؤولية: نحن جهة خارجية ولا نتبع شركة Bandai Namco.
+    </p>
+  </div>
+
+  <footer>
+    <p><a href="index.html" style="color: var(--primary); text-decoration: none;">← العودة للرئيسية</a></p>
+  </footer>
+
+  <script type="module">
+    import { auth, onAuthStateChanged } from './firebase-config.js';
+    import { login, logout, placeOrder, listenToQueue } from './app.js';
+
+    const userInfo = document.getElementById('userInfo');
+    const queueList = document.getElementById('queueList');
+    const queueBrief = document.getElementById('queueBrief');
+
+    window.orderNow = (tier) => {
+      if (!auth.currentUser) {
+        login();
+      } else {
+        placeOrder(tier);
+      }
+    };
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        userInfo.innerHTML = `
+                <div class="user-profile">
+                    <img src="${user.photoURL}" class="user-avatar">
+                    <span class="user-name">${user.displayName}</span>
+                    <button class="auth-btn" onclick="handleLogout()">خروج</button>
+                </div>
+            `;
+      } else {
+        userInfo.innerHTML = `<button class="auth-btn" onclick="handleLogin()">تسجيل دخول بجوجل</button>`;
+      }
+    });
+
+    window.handleLogin = login;
+    window.handleLogout = logout;
+
+    listenToQueue((orders) => {
+      queueList.innerHTML = '';
+      if (orders.length === 0) {
+        queueBrief.innerText = "لا يوجد أحد في الطابور حالياً. كن الأول!";
+        return;
+      }
+
+      const myOrderIndex = orders.findIndex(o => o.uid === auth.currentUser?.uid);
+      if (myOrderIndex !== -1) {
+        queueBrief.innerText = myOrderIndex === 0 ? "أنت الأن في مرحلة التنفيذ! 🚀" : `أنت في المركز #${myOrderIndex + 1}، يوجد ${myOrderIndex} قبلك.`;
+      } else {
+        queueBrief.innerText = `يوجد حالياً ${orders.length} طلبات في الطابور.`;
+      }
+
+      orders.forEach((order, index) => {
+        const item = document.createElement('div');
+        item.className = `queue-item ${index === 0 ? 'active' : ''} ${order.uid === auth.currentUser?.uid ? 'mine' : ''}`;
+        item.innerHTML = `
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <img src="${order.userAvatar}" style="width:30px; height:30px; border-radius:50%">
+                    <span>${order.userName.split(' ')[0]} - ${order.tier}</span>
+                </div>
+                <span class="pos-tag">#${index + 1}</span>
+            `;
+        queueList.appendChild(item);
+      });
+    });
+  </script>
+</body>
+
+</html>

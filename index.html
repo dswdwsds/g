@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Services | خدمات الألعاب الاحترافية</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <nav class="nav-bar">
+        <div class="user-info" id="userInfo">
+            <!-- Auth Content -->
+        </div>
+        <div class="logo" style="font-family: var(--font-en); font-weight: 800; color: var(--primary);">PRO GS</div>
+    </nav>
+
+    <main class="container" style="padding-top: 80px;">
+        <header class="hero">
+            <h1>Professional GS</h1>
+            <p>ارفع مستواك في الألعاب بسرعة وأمان مع خدماتنا المتخصصة والمتميزة.</p>
+        </header>
+
+        <section class="services">
+            <a href="bounty-rush.html" class="service-card">
+                <h2>Bounty Rush</h2>
+                <p>خدمات تلفيل حسابات ونقاط الشخصيات لأعلى مستويات التحمل والقوة.</p>
+                <span>استكشف الخدمة ←</span>
+            </a>
+
+            <a href="#" class="service-card" style="opacity: 0.5; pointer-events: none;">
+                <h2>قريباً..</h2>
+                <p>خدمات جديدة قادمة لمجموعة واسعة من الألعاب العالمية.</p>
+                <span>قريباً جداً</span>
+            </a>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2026 Professional Game Services. All rights reserved.</p>
+    </footer>
+
+    <script type="module">
+        import { auth, onAuthStateChanged } from './firebase-config.js';
+        import { login, logout } from './app.js';
+
+        const userInfo = document.getElementById('userInfo');
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                userInfo.innerHTML = `
+                <div class="user-profile">
+                    <img src="${user.photoURL}" class="user-avatar">
+                    <span class="user-name">${user.displayName}</span>
+                    <button class="auth-btn" onclick="handleLogout()">خروج</button>
+                </div>
+            `;
+            } else {
+                userInfo.innerHTML = `<button class="auth-btn" id="loginBtn">تسجيل دخول</button>`;
+                document.getElementById('loginBtn').onclick = login;
+            }
+        });
+
+        window.handleLogout = logout;
+    </script>
+
+</body>
+
+</html>
