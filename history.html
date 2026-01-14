@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سجل طلباتي | Professional GS</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <nav class="nav-bar">
+        <div class="user-info" id="userInfo">
+            <!-- Auth Content -->
+        </div>
+        <div class="logo" style="font-family: var(--font-en); font-weight: 800; color: var(--primary);">PRO GS</div>
+    </nav>
+
+    <header class="hero" style="padding-top: 120px;">
+        <h1 style="font-family: var(--font-ar);">سجل طلباتي 📋</h1>
+        <p>هنا يمكنك متابعة جميع طلباتك السابقة والحالية</p>
+    </header>
+
+    <section class="queue-container" style="max-width: 1000px;">
+        <div class="queue-card">
+            <h2 style="margin-bottom: 20px;">طلباتي</h2>
+            <div id="historyList" class="queue-list">
+                <!-- Orders will appear here -->
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p><a href="bounty-rush.html" style="color: var(--primary); text-decoration: none;">← العودة للطلبات</a></p>
+    </footer>
+
+    <script type="module">
+        import { auth, onAuthStateChanged } from './firebase-config.js';
+        import { login, logout, listenToUserOrders, isWorker, listenToWorkers } from './app.js';
+
+        const userInfo = document.getElementById('userInfo');
+        const historyList = document.getElementById('historyList');
+
+        const ADMIN_EMAIL = 'abdobwd78@gmail.com';
+
+        const refreshUserUI = () => {
+            const user = auth.currentUser;
+            if (user) {
+                const isWorkerUser = isWorker(user.email);
+                const workerBadge = isWorkerUser ? '<span class="worker-badge">Staff 🛡️</span>' : '';
+                const workersLink = (isWorkerUser || user.email === ADMIN_EMAIL)
+                    ? '<a href="workers.html" class="dropdown-item">⚙️ لوحة التحكم</a>'
+                    : '';
+
+                userInfo.innerHTML = `
+                <div class="user-dropdown">
+                    <div class="user-profile">
+                        <img src="${user.photoURL}" class="user-avatar">
+                        <span class="user-name">${user.displayName} ${workerBadge}</span>
+                    </div>
+                    <div class="dropdown-menu">
+                        <a href="history.html" class="dropdown-item">📋 طلباتي</a>
+                        ${workersLink}
+                        <a href="#" class="dropdown-item" onclick="handleLogout()">🚪 تسجيل الخروج</a>
+                    </div>
+                </div>
+            `;
+            } else {
+                userInfo.innerHTML = `<button class="auth-btn" onclick="handleLogin()">تسجيل دخول بجوجل</button>`;
+            }
+        };
+
+        listenToWorkers(() => refreshUserUI());
+
+        onAuthStateChanged(auth, (user) => {
+            refreshUserUI();
+            if (user) {
+                loadHistory(user.uid);
+            } else {
+                window.location.href = 'bounty-rush.html';
+            }
+        });
+
+        window.handleLogin = login;
+        window.handleLogout = logout;
+
+        const loadHistory = (uid) => {
+            listenToUserOrders(uid, (orders) => {
+                historyList.innerHTML = '';
+                if (orders.length === 0) {
+                    historyList.innerHTML = '<p style="text-align:center; color: var(--text-dim);">لا توجد طلبات بعد</p>';
+                    return;
+                }
+
+                orders.sort((a, b) => {
+                    const aTime = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
+                    const bTime = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
+                    return bTime - aTime;
+                });
+
+                orders.forEach(order => {
+                    const item = document.createElement('div');
+                    item.className = `queue-item ${order.status === 'working' ? 'active' : ''} ${order.status === 'done' ? 'done' : ''}`;
+
+                    const statusMap = {
+                        'waiting': '⏳ بانتظار البدء',
+                        'working': '🔥 جارِ العمل',
+                        'done': '✅ مكتمل',
+                        'rejected': '❌ مرفوض'
+                    };
+
+                    const date = order.createdAt?.toDate ? new Date(order.createdAt.toDate()).toLocaleDateString('ar-EG') : 'غير معروف';
+
+                    item.innerHTML = `
+                    <div style="display:flex; flex-direction:column; flex:1; gap:8px">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            ${order.charImage ? `<img src="${order.charImage}" style="width:40px; height:40px; border-radius:50%; border:2px solid var(--primary)">` : ''}
+                            <div>
+                                <div style="font-weight:700">${order.charName || order.tier}</div>
+                                <div style="font-size:0.8rem; color:var(--text-dim)">${date}</div>
+                            </div>
+                        </div>
+                        ${order.workerName ? `<div style="font-size:0.75rem; color:var(--primary)">بواسطة: ${order.workerName}</div>` : ''}
+                    </div>
+                    <span class="pos-tag" style="display:flex; flex-direction:column; align-items:flex-end;">
+                        ${statusMap[order.status] || order.status}
+                    </span>
+                `;
+                    historyList.appendChild(item);
+                });
+            });
+        };
+    </script>
+</body>
+
+</html>

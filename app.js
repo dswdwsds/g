@@ -12,6 +12,76 @@ export const login = async () => {
 
 export const logout = () => signOut(auth);
 
+
+
+// Load characters from JSON file
+let CHARACTERS = [];
+export const loadCharacters = async () => {
+    try {
+        const response = await fetch('./characters.json');
+        CHARACTERS = await response.json();
+        return CHARACTERS;
+    } catch (error) {
+        console.error("Error loading characters:", error);
+        return [];
+    }
+};
+
+// Export getter for CHARACTERS
+export const getCharacters = () => CHARACTERS;
+
+// Submit rating for completed order
+export const submitRating = async (orderId, rating, review) => {
+    try {
+        const orderRef = doc(db, "orders", orderId);
+        await updateDoc(orderRef, {
+            rating: rating,
+            review: review || "",
+            ratedAt: serverTimestamp()
+        });
+        return true;
+    } catch (error) {
+        console.error("Rating Error:", error);
+        return false;
+    }
+};
+
+// Send chat message
+export const sendMessage = async (orderId, message) => {
+    try {
+        const user = auth.currentUser;
+        if (!user) return false;
+
+        await addDoc(collection(db, "messages"), {
+            orderId: orderId,
+            senderId: user.uid,
+            senderName: user.displayName,
+            senderAvatar: user.photoURL,
+            text: message,
+            timestamp: serverTimestamp()
+        });
+        return true;
+    } catch (error) {
+        console.error("Chat Error:", error);
+        return false;
+    }
+};
+
+// Listen to chat messages for an order
+export const listenToMessages = (orderId, callback) => {
+    const q = query(
+        collection(db, "messages"),
+        where("orderId", "==", orderId),
+        orderBy("timestamp", "asc")
+    );
+    return onSnapshot(q, (snapshot) => {
+        const messages = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        callback(messages);
+    });
+};
+
+
+
 export const sendToDiscord = async (orderData) => {
     const payload = {
         content: `📦 **طلب جديد من ${orderData.userName}!**`,
@@ -20,28 +90,29 @@ export const sendToDiscord = async (orderData) => {
             color: 0x00f2fe,
             fields: [
                 { name: "👤 اسم العميل", value: orderData.userName, inline: true },
-                { name: "💎 نوع الطلب (الفئة)", value: orderData.tier, inline: true },
+                { name: "🗡️ الشخصية", value: orderData.charName, inline: true },
+                { name: "💎 الفئة (Tier)", value: orderData.tier, inline: true },
                 { name: "🆔 رقم الطلب", value: `\`${orderData.orderId}\`` },
-                { name: "⏳ الحالة الحالية", value: "بانتظار البدء... ⏳" }
+                { name: "⏳ الحالة الحالية", value: "بانتظار الدفع أو البدء... ⏳" }
             ],
-            thumbnail: { url: orderData.userAvatar },
+            thumbnail: { url: orderData.charImage || orderData.userAvatar },
             footer: { text: "نظام Professional GS لإدارة الطلبات" },
             timestamp: new Date().toISOString()
         }],
         components: [
             {
-                type: 1, // Action Row
+                type: 1,
                 components: [
                     {
-                        type: 2, // Button
+                        type: 2,
                         label: "بدء العمل ️🛠️",
-                        style: 1, // Primary (Blue)
+                        style: 1,
                         custom_id: `start_${orderData.orderId}`
                     },
                     {
                         type: 2,
                         label: "رفض الطلب ❌",
-                        style: 4, // Danger (Red)
+                        style: 4,
                         custom_id: `reject_${orderData.orderId}`
                     }
                 ]
@@ -57,7 +128,7 @@ export const sendToDiscord = async (orderData) => {
     return await response.json();
 };
 
-export const placeOrder = async (tier) => {
+export const placeOrder = async (tier, charData) => {
     const user = auth.currentUser;
     if (!user) {
         alert("Please login first!");
@@ -70,6 +141,9 @@ export const placeOrder = async (tier) => {
             userName: user.displayName,
             userAvatar: user.photoURL,
             tier: tier,
+            charId: charData.id,
+            charName: charData.name,
+            charImage: charData.image,
             status: "waiting",
             createdAt: serverTimestamp()
         });
@@ -78,14 +152,17 @@ export const placeOrder = async (tier) => {
             orderId: orderRef.id,
             userName: user.displayName,
             userAvatar: user.photoURL,
-            tier: tier
+            tier: tier,
+            charName: charData.name,
+            charImage: charData.image
         });
 
         if (discordRes && discordRes.id) {
             await updateDoc(orderRef, { discordMessageId: discordRes.id });
         }
 
-        alert("Order placed successfully! Check your queue position.");
+        alert("تم ارسال الطلب بنجاح! انتقل لسجل الطلبات لمتابعة الحالة.");
+        return orderRef.id;
     } catch (error) {
         console.error("Order Error:", error);
         alert("Failed to place order.");

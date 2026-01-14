@@ -80,17 +80,77 @@
     </div>
   </div>
 
+  <!-- Character Selection Modal -->
+  <div id="charModal" class="notif-overlay">
+    <div class="notif-card" style="max-width: 800px; width: 95%;">
+      <h3>اختر الشخصية التي تريد تلفيلها 🗡️</h3>
+      <div id="charGrid" class="char-grid">
+        <!-- Characters will be injected here -->
+      </div>
+      <button class="notif-btn" style="background: var(--glass); color: #fff; margin-top: 20px;"
+        onclick="closeCharModal()">إلغاء</button>
+    </div>
+  </div>
+
   <footer>
     <p><a href="index.html" style="color: var(--primary); text-decoration: none;">← العودة للرئيسية</a></p>
   </footer>
 
   <script type="module">
     import { auth, onAuthStateChanged } from './firebase-config.js';
-    import { login, logout, placeOrder, listenToQueue, updateOrderStatus, isWorker, listenToWorkers, listenToUserOrders } from './app.js';
+    import { login, logout, placeOrder, listenToQueue, updateOrderStatus, isWorker, listenToWorkers, listenToUserOrders, loadCharacters, getCharacters } from './app.js';
 
     const userInfo = document.getElementById('userInfo');
     const queueList = document.getElementById('queueList');
     const queueBrief = document.getElementById('queueBrief');
+    const charGrid = document.getElementById('charGrid');
+    const charModal = document.getElementById('charModal');
+
+    let selectedTier = null;
+    let selectedChar = null;
+
+    // Load characters on page load
+    loadCharacters().then(() => {
+      console.log('Characters loaded:', getCharacters().length);
+    });
+
+    window.orderNow = (tier) => {
+      if (!auth.currentUser) {
+        login();
+        return;
+      }
+      selectedTier = tier;
+      openCharModal();
+    };
+
+    const openCharModal = () => {
+      const CHARACTERS = getCharacters();
+      charGrid.innerHTML = CHARACTERS.map(char => `
+        <div class="char-item" onclick="selectChar('${char.id}')">
+          <div style="width:80px; height:80px; border-radius:50%; border:2px solid var(--glass-border); background: linear-gradient(135deg, var(--primary), var(--accent)); display:flex; align-items:center; justify-content:center; margin:0 auto 10px;">
+            <span style="font-size:1.5rem;">${char.stars === 5 ? '🌟' : '⭐'.repeat(char.stars)}</span>
+          </div>
+          <div class="char-info">
+            <div class="char-name">${char.name}</div>
+            <div class="char-meta">${char.stars}★ | ${char.role}</div>
+          </div>
+        </div>
+      `).join('');
+      charModal.classList.add('visible');
+    };
+
+    window.closeCharModal = () => {
+      charModal.classList.remove('visible');
+    };
+
+    window.selectChar = (charId) => {
+      const CHARACTERS = getCharacters();
+      selectedChar = CHARACTERS.find(c => c.id === charId);
+      closeCharModal();
+      if (confirm(`هل أنت متأكد من طلب الفئة ${selectedTier} للشخصية ${selectedChar.name}؟`)) {
+        placeOrder(selectedTier, selectedChar);
+      }
+    };
 
     const ADMIN_EMAIL = 'abdobwd78@gmail.com';
 
@@ -125,6 +185,7 @@
                         <span class="user-name">${user.displayName} ${workerBadge}</span>
                     </div>
                     <div class="dropdown-menu">
+                        <a href="history.html" class="dropdown-item">📋 طلباتي</a>
                         ${workersLink}
                         <a href="#" class="dropdown-item" onclick="handleLogout()">🚪 تسجيل الخروج</a>
                     </div>
