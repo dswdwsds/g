@@ -84,7 +84,7 @@
   <!-- Character Selection Modal -->
   <div id="charModal" class="notif-overlay">
     <div class="notif-card" style="max-width: 800px; width: 95%;">
-      <h3>اختر الشخصية التي تريد تلفيلها 🗡️</h3>
+      <h3>اختر الشخصية التي تريد تلفيلها (<span id="modalStars"></span>) 🗡️</h3>
       <div id="charGrid" class="char-grid">
         <!-- Characters will be injected here -->
       </div>
@@ -134,6 +134,7 @@
     let selectedTier = null;
     let selectedChars = new Set();
     const TIER_PRICES = { 'Starter': 30, 'Pro': 60, 'Ultimate': 90 };
+    const TIER_STARS = { 'Starter': 2, 'Pro': 3, 'Ultimate': 4 };
 
     // Load characters on page load
     loadCharacters().then(() => {
@@ -152,17 +153,31 @@
 
     const openCharModal = () => {
       const CHARACTERS = getCharacters();
-      charGrid.innerHTML = CHARACTERS.map(char => `
-        <div class="char-item" id="char-${char.id}" onclick="toggleChar('${char.id}')">
-          <div style="width:80px; height:80px; border-radius:50%; border:2px solid var(--glass-border); background: linear-gradient(135deg, var(--primary), var(--accent)); display:flex; align-items:center; justify-content:center; margin:0 auto 10px;">
-            <span style="font-size:1.5rem;">${char.stars === 5 ? '🌟' : '⭐'.repeat(char.stars)}</span>
+      const requiredStars = TIER_STARS[selectedTier];
+      const filteredChars = CHARACTERS.filter(char => char.stars === requiredStars);
+
+      document.getElementById('modalStars').innerText = `${requiredStars} نجوم`;
+
+      if (filteredChars.length === 0) {
+        charGrid.innerHTML = `
+          <div style="grid-column: 1/-1; padding: 40px; text-align: center; color: var(--text-dim);">
+            <div style="font-size: 3rem; margin-bottom: 20px;">🔍</div>
+            <p>عذراً، لا يوجد شخصيات فئة ${requiredStars} في قاعدة البيانات حالياً.</p>
           </div>
-          <div class="char-info">
-            <div class="char-name">${char.name}</div>
-            <div class="char-meta">${char.stars}★ | ${char.role}</div>
+        `;
+      } else {
+        charGrid.innerHTML = filteredChars.map(char => `
+          <div class="char-item" id="char-${char.id}" onclick="toggleChar('${char.id}')">
+            <div style="width:80px; height:80px; border-radius:50%; border:2px solid var(--glass-border); background: linear-gradient(135deg, var(--primary), var(--accent)); display:flex; align-items:center; justify-content:center; margin:0 auto 10px;">
+              <span style="font-size:1.5rem;">${char.stars === 5 ? '🌟' : '⭐'.repeat(char.stars)}</span>
+            </div>
+            <div class="char-info">
+              <div class="char-name">${char.name}</div>
+              <div class="char-meta">${char.stars}★ | ${char.role}</div>
+            </div>
           </div>
-        </div>
-      `).join('');
+        `).join('');
+      }
       updateSelectionUI();
       charModal.classList.add('visible');
     };
