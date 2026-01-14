@@ -161,7 +161,7 @@
 
   <script type="module">
     import { auth, onAuthStateChanged } from './firebase-config.js';
-    import { login, logout, placeOrder, listenToQueue, updateOrderStatus, isWorker, listenToWorkers, listenToUserOrders, loadCharacters, getCharacters, submitRating } from './app.js';
+    import { login, logout, placeOrder, updateOrderStatus, listenToQueue, listenToUserOrders, listenToWorkers, getUserRole, submitRating } from './app.js';
 
     const userInfo = document.getElementById('userInfo');
     const queueList = document.getElementById('queueList');
@@ -264,8 +264,6 @@
     };
 
 
-    const ADMIN_EMAIL = 'abdobwd78@gmail.com';
-
     // UI Helper Functions
     window.showToast = (message, icon = 'ℹ️') => {
       const container = document.getElementById('toastContainer');
@@ -304,9 +302,10 @@
     const refreshUserUI = () => {
       const user = auth.currentUser;
       if (user) {
-        const isWorkerUser = isWorker(user.email);
-        const workerBadge = isWorkerUser ? '<span class="worker-badge">Staff 🛡️</span>' : '';
-        const workersLink = (isWorkerUser || user.email === ADMIN_EMAIL)
+        const userRole = getUserRole(user.email);
+        const isStaff = !!userRole;
+        const workerBadge = isStaff ? `<span class="worker-badge">${userRole === 'admin' ? 'Admin 👑' : 'Staff 🛡️'}</span>` : '';
+        const workersLink = isStaff
           ? '<a href="workers.html" class="dropdown-item">⚙️ لوحة التحكم</a>'
           : '';
 

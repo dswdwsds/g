@@ -192,16 +192,29 @@ export const placeOrder = async (tier, charData) => {
 };
 
 
-let authorizedWorkers = [];
+let authorizedStaff = [];
 
 export const listenToWorkers = (callback) => {
     return onSnapshot(collection(db, "staff"), (snapshot) => {
-        authorizedWorkers = snapshot.docs.map(doc => doc.id); // نستخدم الـ Document ID كإيميل
-        if (callback) callback(authorizedWorkers);
+        authorizedStaff = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        if (callback) callback(authorizedStaff);
     });
 };
 
-export const isWorker = (email) => authorizedWorkers.includes(email);
+export const isWorker = (email) => authorizedStaff.some(s => s.email === email);
+
+export const getUserRole = (email) => {
+    const staff = authorizedStaff.find(s => s.email === email);
+    return staff ? staff.role : null;
+};
+
+export const listenToStaffStats = (uid, callback) => {
+    return onSnapshot(doc(db, "staff", uid), (doc) => {
+        if (doc.exists()) {
+            callback({ id: doc.id, ...doc.data() });
+        }
+    });
+};
 
 export const updateDiscordMessage = async (orderData, newStatus) => {
     if (!orderData.discordMessageId) return;
@@ -262,7 +275,6 @@ export const updateOrderStatus = async (orderId, newStatus) => {
         const orderRef = doc(db, "orders", orderId);
         const updateData = { status: newStatus };
 
-        // إذا كان العامل هو من ينفذ، نسجل بياناته
         if (newStatus === 'working' && auth.currentUser) {
             updateData.workerId = auth.currentUser.uid;
             updateData.workerName = auth.currentUser.displayName;
@@ -271,10 +283,35 @@ export const updateOrderStatus = async (orderId, newStatus) => {
 
         await updateDoc(orderRef, updateData);
 
-        // جلب بيانات الطلب لتحديث رسالة الديسكورد
+        // جلب بيانات الطلب
         const snapshot = await getDoc(orderRef);
         if (snapshot.exists()) {
             const orderData = { id: orderId, ...snapshot.data() };
+
+            // إذا اكتمل الطلب، نحدث أرباح الموظف في مجموعة staff
+            if (newStatus === 'done' && orderData.workerId) {
+                // نبحث عن وثيقة الموظف باستخدام الـ UID كـ ID للوثيقة 
+                // أو نبحث بالإيميل إذا لم نكن متأكدين من الـ ID
+                const staffQuery = query(collection(db, "staff"), where("email", "==", auth.currentUser.email));
+                const staffSnapshot = await getDoc(doc(db, "staff", auth.currentUser.uid));
+
+                if (staffSnapshot.exists()) {
+                    await updateDoc(doc(db, "staff", auth.currentUser.uid), {
+                        totalEarnings: increment(orderData.totalPrice || 0)
+                    });
+                } else {
+                    // إذا لم يكن الـ ID هو الـ UID، نبحث بالإيميل
+                    const q = query(collection(db, "staff"), where("email", "==", auth.currentUser.email));
+                    const qSnapshot = await onSnapshot(q, async (s) => {
+                        if (!s.empty) {
+                            await updateDoc(doc(db, "staff", s.docs[0].id), {
+                                totalEarnings: increment(orderData.totalPrice || 0)
+                            });
+                        }
+                    });
+                }
+            }
+
             await updateDiscordMessage(orderData, newStatus);
         }
     } catch (error) {

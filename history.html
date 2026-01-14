@@ -37,19 +37,19 @@
 
     <script type="module">
         import { auth, onAuthStateChanged } from './firebase-config.js';
-        import { login, logout, listenToUserOrders, isWorker, listenToWorkers } from './app.js';
+        import { login, logout, listenToUserOrders, isWorker, listenToWorkers, getUserRole } from './app.js';
 
         const userInfo = document.getElementById('userInfo');
         const historyList = document.getElementById('historyList');
 
-        const ADMIN_EMAIL = 'abdobwd78@gmail.com';
 
         const refreshUserUI = () => {
             const user = auth.currentUser;
             if (user) {
-                const isWorkerUser = isWorker(user.email);
-                const workerBadge = isWorkerUser ? '<span class="worker-badge">Staff 🛡️</span>' : '';
-                const workersLink = (isWorkerUser || user.email === ADMIN_EMAIL)
+                const userRole = getUserRole(user.email);
+                const isStaff = !!userRole;
+                const workerBadge = isStaff ? `<span class="worker-badge">${userRole === 'admin' ? 'Admin 👑' : 'Staff 🛡️'}</span>` : '';
+                const workersLink = isStaff
                     ? '<a href="workers.html" class="dropdown-item">⚙️ لوحة التحكم</a>'
                     : '';
 

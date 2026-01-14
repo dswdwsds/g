@@ -103,7 +103,7 @@
 
     <script type="module">
         import { auth, onAuthStateChanged } from './firebase-config.js';
-        import { login, logout, listenToAllOrders, updateOrderStatus, isWorker, listenToWorkers, listenToWorkerCompletedOrders } from './app.js';
+        import { login, logout, listenToAllOrders, updateOrderStatus, isWorker, listenToWorkers, listenToWorkerCompletedOrders, listenToStaffStats } from './app.js';
 
         const userInfo = document.getElementById('userInfo');
         const adminContent = document.getElementById('adminContent');
@@ -220,18 +220,23 @@
         }
 
         function loadEarnings(workerId) {
+            // الاستماع لإحصائيات الموظف مباشرة من مستنده
+            listenToStaffStats(workerId, (stats) => {
+                if (stats) {
+                    totalEarnings.innerText = `${stats.totalEarnings || 0} جنيه`;
+                }
+            });
+
+            // الاستماع لسجل الطلبات لعرضها في المودال
             listenToWorkerCompletedOrders(workerId, (orders) => {
-                let total = 0;
                 completedOrdersList.innerHTML = '';
 
                 if (orders.length === 0) {
                     completedOrdersList.innerHTML = '<p style="text-align:center; color:var(--text-dim);">لا يوجد أرباح مسجلة بعد</p>';
-                    totalEarnings.innerText = `0 جنيه`;
                     return;
                 }
 
                 orders.forEach(order => {
-                    total += (order.totalPrice || 0);
                     const item = document.createElement('div');
                     item.style.cssText = 'background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;';
 
@@ -257,8 +262,6 @@
                     `;
                     completedOrdersList.appendChild(item);
                 });
-
-                totalEarnings.innerText = `${total} جنيه`;
             });
         }
     </script>
