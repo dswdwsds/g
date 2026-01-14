@@ -1,4 +1,4 @@
-import { auth, provider, signInWithPopup, signOut, onAuthStateChanged, db, collection, addDoc, serverTimestamp, query, where, orderBy, onSnapshot, doc, updateDoc, getDoc, limit } from './firebase-config.js';
+import { auth, provider, signInWithPopup, signOut, onAuthStateChanged, db, collection, addDoc, serverTimestamp, query, where, orderBy, onSnapshot, doc, updateDoc, getDoc, limit, increment, setDoc } from './firebase-config.js';
 
 const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1395038941110866010/MucgrT_399C44lfUVL79HcqR4cfwNbJlL5iG1qPmxdBF47GGbTbmkokZK6YnslmJ63wL";
 
@@ -34,11 +34,30 @@ export const getCharacters = () => CHARACTERS;
 export const submitRating = async (orderId, rating, review) => {
     try {
         const orderRef = doc(db, "orders", orderId);
+        const snapshot = await getDoc(orderRef);
+
+        if (!snapshot.exists()) return false;
+        const orderData = snapshot.data();
+
+        // 1. Update order document
         await updateDoc(orderRef, {
             rating: rating,
             review: review || "",
             ratedAt: serverTimestamp()
         });
+
+        // 2. Add to dedicated comments collection
+        await addDoc(collection(db, "comments"), {
+            orderId: orderId,
+            uid: orderData.uid,
+            userName: orderData.userName,
+            userAvatar: orderData.userAvatar,
+            rating: rating,
+            review: review || "",
+            tier: orderData.tier,
+            createdAt: serverTimestamp()
+        });
+
         return true;
     } catch (error) {
         console.error("Rating Error:", error);
@@ -201,15 +220,21 @@ export const listenToWorkers = (callback) => {
     });
 };
 
-export const isWorker = (email) => authorizedStaff.some(s => s.email === email);
+export const isWorker = (email) => {
+    return authorizedStaff.some(s => s.email === email || s.id === email);
+};
 
 export const getUserRole = (email) => {
-    const staff = authorizedStaff.find(s => s.email === email);
+    const staff = authorizedStaff.find(s => s.email === email || s.id === email);
     return staff ? staff.role : null;
 };
 
-export const listenToStaffStats = (uid, callback) => {
-    return onSnapshot(doc(db, "staff", uid), (doc) => {
+export const listenToStaffStats = (email, uid, callback) => {
+    // نحدد الـ ID الصحيح للوثيقة (سواء كان إيميلاً أو UID)
+    const staff = authorizedStaff.find(s => s.email === email || s.id === email);
+    const docId = staff ? staff.id : uid;
+
+    return onSnapshot(doc(db, "staff", docId), (doc) => {
         if (doc.exists()) {
             callback({ id: doc.id, ...doc.data() });
         }
@@ -288,27 +313,25 @@ export const updateOrderStatus = async (orderId, newStatus) => {
         if (snapshot.exists()) {
             const orderData = { id: orderId, ...snapshot.data() };
 
-            // إذا اكتمل الطلب، نحدث أرباح الموظف في مجموعة staff
+            // --- Robust Staff Upsert Logic ---
             if (newStatus === 'done' && orderData.workerId) {
-                // نبحث عن وثيقة الموظف باستخدام الـ UID كـ ID للوثيقة 
-                // أو نبحث بالإيميل إذا لم نكن متأكدين من الـ ID
-                const staffQuery = query(collection(db, "staff"), where("email", "==", auth.currentUser.email));
-                const staffSnapshot = await getDoc(doc(db, "staff", auth.currentUser.uid));
+                // نبحث أولاً إذا كان هناك وثيقة مسجلة بالإيميل (النظام القديم) أو بالـ UID
+                const existingStaff = authorizedStaff.find(s => s.email === auth.currentUser.email || s.id === auth.currentUser.email);
+                const staffDocId = existingStaff ? existingStaff.id : auth.currentUser.uid;
+                const staffRef = doc(db, "staff", staffDocId);
+                const userRole = getUserRole(auth.currentUser.email) || 'staff';
 
-                if (staffSnapshot.exists()) {
-                    await updateDoc(doc(db, "staff", auth.currentUser.uid), {
-                        totalEarnings: increment(orderData.totalPrice || 0)
-                    });
-                } else {
-                    // إذا لم يكن الـ ID هو الـ UID، نبحث بالإيميل
-                    const q = query(collection(db, "staff"), where("email", "==", auth.currentUser.email));
-                    const qSnapshot = await onSnapshot(q, async (s) => {
-                        if (!s.empty) {
-                            await updateDoc(doc(db, "staff", s.docs[0].id), {
-                                totalEarnings: increment(orderData.totalPrice || 0)
-                            });
-                        }
-                    });
+                try {
+                    // تحديث/إنشاء الوثيقة - سيقوم بإضافة totalEarnings تلقائياً للوثائق القديمة
+                    await setDoc(staffRef, {
+                        email: auth.currentUser.email,
+                        name: auth.currentUser.displayName,
+                        totalEarnings: increment(orderData.totalPrice || 0),
+                        role: userRole,
+                        lastActive: serverTimestamp()
+                    }, { merge: true });
+                } catch (err) {
+                    console.error("Staff Sync Error:", err);
                 }
             }
 
@@ -368,10 +391,9 @@ export const listenToWorkerCompletedOrders = (workerId, callback) => {
 
 export const listenToRecentReviews = (callback) => {
     const q = query(
-        collection(db, "orders"),
-        where("rating", ">", 0),
+        collection(db, "comments"),
         orderBy("rating", "desc"),
-        orderBy("ratedAt", "desc"),
+        orderBy("createdAt", "desc"),
         limit(10)
     );
     return onSnapshot(q, (snapshot) => {

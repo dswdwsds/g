@@ -135,7 +135,7 @@
                     accessDenied.classList.add('hidden');
                     statsContainer.classList.remove('hidden');
                     loadOrders();
-                    loadEarnings(user.uid);
+                    loadEarnings(user.email, user.uid);
                 } else {
                     adminContent.classList.add('hidden');
                     accessDenied.classList.remove('hidden');
@@ -219,9 +219,9 @@
             });
         }
 
-        function loadEarnings(workerId) {
+        function loadEarnings(email, uid) {
             // الاستماع لإحصائيات الموظف مباشرة من مستنده
-            listenToStaffStats(workerId, (stats) => {
+            listenToStaffStats(email, uid, (stats) => {
                 if (stats) {
                     totalEarnings.innerText = `${stats.totalEarnings || 0} جنيه`;
                 }
