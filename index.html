@@ -44,24 +44,30 @@
 
     <script type="module">
         import { auth, onAuthStateChanged } from './firebase-config.js';
-        import { login, logout } from './app.js';
+        import { login, logout, isWorker, listenToWorkers } from './app.js';
 
         const userInfo = document.getElementById('userInfo');
 
-        onAuthStateChanged(auth, (user) => {
+        const refreshUserUI = () => {
+            const user = auth.currentUser;
             if (user) {
+                const workerBadge = isWorker(user.email) ? '<span class="worker-badge">Staff 🛡️</span>' : '';
                 userInfo.innerHTML = `
                 <div class="user-profile">
                     <img src="${user.photoURL}" class="user-avatar">
-                    <span class="user-name">${user.displayName}</span>
+                    <span class="user-name">${user.displayName} ${workerBadge}</span>
                     <button class="auth-btn" onclick="handleLogout()">خروج</button>
                 </div>
             `;
             } else {
                 userInfo.innerHTML = `<button class="auth-btn" id="loginBtn">تسجيل دخول</button>`;
-                document.getElementById('loginBtn').onclick = login;
+                const btn = document.getElementById('loginBtn');
+                if (btn) btn.onclick = login;
             }
-        });
+        };
+
+        listenToWorkers(() => refreshUserUI());
+        onAuthStateChanged(auth, () => refreshUserUI());
 
         window.handleLogout = logout;
     </script>

@@ -76,13 +76,13 @@
 
   <script type="module">
     import { auth, onAuthStateChanged } from './firebase-config.js';
-    import { login, logout, placeOrder, listenToQueue, updateOrderStatus } from './app.js';
+    import { login, logout, placeOrder, listenToQueue, updateOrderStatus, isWorker, listenToWorkers } from './app.js';
 
     const userInfo = document.getElementById('userInfo');
     const queueList = document.getElementById('queueList');
     const queueBrief = document.getElementById('queueBrief');
 
-    const ADMIN_EMAIL = 'abdobwd78@gmail.com'; // بريدك الإلكتروني كمدير
+    const ADMIN_EMAIL = 'abdobwd78@gmail.com';
 
     window.orderNow = (tier) => {
       if (!auth.currentUser) {
@@ -98,31 +98,46 @@
       }
     };
 
-    onAuthStateChanged(auth, (user) => {
+    // نحدث اليوزر في كل مرة تتغير فيها قائمة العمال أو حالة الدخول
+    const refreshUserUI = () => {
+      const user = auth.currentUser;
       if (user) {
+        const workerBadge = isWorker(user.email) ? '<span class="worker-badge">Staff 🛡️</span>' : '';
         userInfo.innerHTML = `
                 <div class="user-profile">
                     <img src="${user.photoURL}" class="user-avatar">
-                    <span class="user-name">${user.displayName}</span>
+                    <span class="user-name">${user.displayName} ${workerBadge}</span>
                     <button class="auth-btn" onclick="handleLogout()">خروج</button>
                 </div>
             `;
       } else {
         userInfo.innerHTML = `<button class="auth-btn" onclick="handleLogin()">تسجيل دخول بجوجل</button>`;
       }
+    };
+
+    // البدء بمزامنة العمال
+    listenToWorkers(() => {
+      refreshUserUI();
+      // إذا كان هناك قائمة انتظار مفتوحة، نعيد عرضها لتظهر أزرار الإدارة إذا كان أدمن
+      if (lastOrders) renderQueue(lastOrders);
     });
+
+    onAuthStateChanged(auth, () => refreshUserUI());
 
     window.handleLogin = login;
     window.handleLogout = logout;
 
-    listenToQueue((orders) => {
+    let lastOrders = null;
+    function renderQueue(orders) {
+      lastOrders = orders;
       queueList.innerHTML = '';
       if (orders.length === 0) {
         queueBrief.innerText = "لا يوجد أحد في الطابور حالياً. كن الأول!";
         return;
       }
 
-      const myOrderIndex = orders.findIndex(o => o.uid === auth.currentUser?.uid);
+      const user = auth.currentUser;
+      const myOrderIndex = orders.findIndex(o => o.uid === user?.uid);
       if (myOrderIndex !== -1) {
         queueBrief.innerText = myOrderIndex === 0 && orders[0].status === 'working'
           ? "أنت الأن في مرحلة التنفيذ! 🚀"
@@ -134,7 +149,7 @@
       orders.forEach((order, index) => {
         const isWorking = order.status === 'working';
         const item = document.createElement('div');
-        item.className = `queue-item ${isWorking ? 'active' : ''} ${order.uid === auth.currentUser?.uid ? 'mine' : ''}`;
+        item.className = `queue-item ${isWorking ? 'active' : ''} ${order.uid === user?.uid ? 'mine' : ''}`;
 
         let workerInfo = '';
         if (isWorking && order.workerAvatar) {
@@ -148,7 +163,8 @@
         }
 
         let actionButtons = '';
-        if (auth.currentUser?.email === ADMIN_EMAIL) {
+        // المدير هو صاحب الإيميل الأساسي أو أي شخص مضاف في الـ staff (كعامل)
+        if (user?.email === ADMIN_EMAIL || isWorker(user?.email)) {
           actionButtons = `
                     <div style="display:flex; gap:5px; margin-right:10px;">
                         ${order.status === 'waiting' ? `<button class="auth-btn" style="padding:4px 8px; font-size:11px; background:#4facfe" onclick="updateStatus('${order.id}', 'working')">بدء</button>` : ''}
@@ -173,7 +189,9 @@
             `;
         queueList.appendChild(item);
       });
-    });
+    }
+
+    listenToQueue(renderQueue);
   </script>
 </body>
 

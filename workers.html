@@ -77,14 +77,15 @@
 
     <script type="module">
         import { auth, onAuthStateChanged } from './firebase-config.js';
-        import { login, logout, listenToAllOrders, updateOrderStatus, isWorker } from './app.js';
+        import { login, logout, listenToAllOrders, updateOrderStatus, isWorker, listenToWorkers } from './app.js';
 
         const userInfo = document.getElementById('userInfo');
         const adminContent = document.getElementById('adminContent');
         const accessDenied = document.getElementById('accessDenied');
         const orderList = document.getElementById('orderList');
 
-        onAuthStateChanged(auth, (user) => {
+        const checkAccess = () => {
+            const user = auth.currentUser;
             if (user) {
                 userInfo.innerHTML = `
                 <div class="user-profile">
@@ -107,7 +108,11 @@
                 adminContent.classList.add('hidden');
                 accessDenied.classList.remove('hidden');
             }
-        });
+        };
+
+        // مزامنة العمال المستمرة
+        listenToWorkers(() => checkAccess());
+        onAuthStateChanged(auth, () => checkAccess());
 
         window.handleLogin = login;
         window.handleLogout = logout;

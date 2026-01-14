@@ -391,6 +391,20 @@ body::after {
     display: none !important;
 }
 
+.worker-badge {
+    background: linear-gradient(45deg, var(--accent), var(--primary));
+    color: #000;
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 6px;
+    margin-right: 8px;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
 footer {
     text-align: center;
     padding: 60px 20px;

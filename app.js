@@ -87,12 +87,16 @@ export const placeOrder = async (tier) => {
     }
 };
 
-export const WORKER_EMAILS = [
-    'abdobwd78@gmail.com', // المدير
-    // ضيف إيميلات العمال هنا
-];
+let authorizedWorkers = [];
 
-export const isWorker = (email) => WORKER_EMAILS.includes(email);
+export const listenToWorkers = (callback) => {
+    return onSnapshot(collection(db, "staff"), (snapshot) => {
+        authorizedWorkers = snapshot.docs.map(doc => doc.id); // نستخدم الـ Document ID كإيميل
+        if (callback) callback(authorizedWorkers);
+    });
+};
+
+export const isWorker = (email) => authorizedWorkers.includes(email);
 
 export const updateOrderStatus = async (orderId, newStatus) => {
     try {
