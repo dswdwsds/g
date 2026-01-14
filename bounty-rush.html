@@ -77,7 +77,11 @@
       <div id="notifIcon" class="notif-icon">🎉</div>
       <h2 id="notifTitle">تهانينا!</h2>
       <p id="notifMessage">لقد تم الانتهاء من طلبك بنجاح.</p>
-      <button class="notif-btn" onclick="closeNotification()">حسناً</button>
+      <div style="display:flex; gap:10px; margin-top:20px;">
+        <button class="notif-btn" id="viewHistoryBtn" onclick="location.href='history.html'">سجل الطلبات</button>
+        <button class="notif-btn" style="background: var(--glass); color: #fff;"
+          onclick="closeNotification()">حسناً</button>
+      </div>
     </div>
   </div>
 
@@ -218,13 +222,12 @@
 
       showConfirm(`هل أنت متأكد من طلب الفئة ${selectedTier} لـ ${selectedChars.size} شخصيات (${names})؟ بقيمة إجمالية ${TIER_PRICES[selectedTier] * selectedChars.size} جنيه؟`, async () => {
         closeCharModal();
-        showToast("جاري معالجة الطلبات...", "⏳");
+        showToast("جاري معالجة الطلب...", "⏳");
 
-        for (const char of selectedData) {
-          await placeOrder(selectedTier, char);
-        }
+        await placeOrder(selectedTier, selectedData);
       });
     };
+
 
     const ADMIN_EMAIL = 'abdobwd78@gmail.com';
 
@@ -304,13 +307,18 @@
       }
     });
 
-    const notifiedOrders = new Set();
+    // تحميل الطلبات التي تم عرض إشعارات لها من localStorage
+    const savedNotifs = localStorage.getItem('notifiedOrders');
+    const notifiedOrders = new Set(savedNotifs ? JSON.parse(savedNotifs) : []);
+
     const startOrderListener = (uid) => {
       listenToUserOrders(uid, (orders) => {
         orders.forEach(order => {
           if ((order.status === 'done' || order.status === 'rejected') && !notifiedOrders.has(order.id)) {
             showNotification(order);
             notifiedOrders.add(order.id);
+            // حفظ الحالة في localStorage
+            localStorage.setItem('notifiedOrders', JSON.stringify(Array.from(notifiedOrders)));
           }
         });
       });
@@ -381,11 +389,22 @@
                 `;
         }
 
+        const characters = order.characters || [{ name: order.charName, image: order.charImage }];
+        const charTags = characters.map(c => `
+          <div style="display:inline-flex; align-items:center; gap:5px; background:rgba(255,255,255,0.05); padding:2px 8px; border-radius:10px; font-size:0.8rem;">
+            ${c.image ? `<img src="${c.image}" style="width:16px; height:16px; border-radius:50%">` : '🗡️'}
+            <span>${c.name}</span>
+          </div>
+        `).join(' ');
+
         item.innerHTML = `
                 <div style="display:flex; flex-direction:column; flex:1">
-                    <div style="display:flex; align-items:center; gap:10px;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <img src="${order.userAvatar}" style="width:30px; height:30px; border-radius:50%">
-                        <span>${order.userName.split(' ')[0]} - ${order.tier}</span>
+                        <strong>${order.userName.split(' ')[0]} - ${order.tier}</strong>
+                    </div>
+                    <div style="display:flex; flex-wrap:wrap; gap:5px; margin-right:40px;">
+                        ${charTags}
                     </div>
                     ${workerInfo}
                 </div>

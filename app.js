@@ -83,6 +83,10 @@ export const listenToMessages = (orderId, callback) => {
 
 
 export const sendToDiscord = async (orderData) => {
+    const charNames = Array.isArray(orderData.characters)
+        ? orderData.characters.map(c => c.name).join('، ')
+        : orderData.charName;
+
     const payload = {
         content: `📦 **طلب جديد من ${orderData.userName}!**`,
         embeds: [{
@@ -90,12 +94,12 @@ export const sendToDiscord = async (orderData) => {
             color: 0x00f2fe,
             fields: [
                 { name: "👤 اسم العميل", value: orderData.userName, inline: true },
-                { name: "🗡️ الشخصية", value: orderData.charName, inline: true },
+                { name: "🗡️ الشخصيات", value: charNames, inline: true },
                 { name: "💎 الفئة (Tier)", value: orderData.tier, inline: true },
                 { name: "🆔 رقم الطلب", value: `\`${orderData.orderId}\`` },
                 { name: "⏳ الحالة الحالية", value: "بانتظار الدفع أو البدء... ⏳" }
             ],
-            thumbnail: { url: orderData.charImage || orderData.userAvatar },
+            thumbnail: { url: orderData.characters?.[0]?.image || orderData.charImage || orderData.userAvatar },
             footer: { text: "نظام Professional GS لإدارة الطلبات" },
             timestamp: new Date().toISOString()
         }],
@@ -129,6 +133,7 @@ export const sendToDiscord = async (orderData) => {
 };
 
 
+
 export const placeOrder = async (tier, charData) => {
     const user = auth.currentUser;
     if (!user) {
@@ -137,21 +142,24 @@ export const placeOrder = async (tier, charData) => {
         return;
     }
 
-    if (!charData) {
+    if (!charData || (Array.isArray(charData) && charData.length === 0)) {
         if (window.showToast) window.showToast("يرجى اختيار الشخصية أولاً!", "🗡️");
         else alert("يرجى اختيار الشخصية أولاً!");
         return;
     }
 
     try {
+        const characters = Array.isArray(charData) ? charData : [charData];
         const orderRef = await addDoc(collection(db, "orders"), {
             uid: user.uid,
             userName: user.displayName,
             userAvatar: user.photoURL,
             tier: tier,
-            charId: charData.id,
-            charName: charData.name,
-            charImage: charData.image || "",
+            characters: characters.map(c => ({
+                id: c.id,
+                name: c.name,
+                image: c.image || ""
+            })),
             status: "waiting",
             createdAt: serverTimestamp()
         });
@@ -161,8 +169,7 @@ export const placeOrder = async (tier, charData) => {
             userName: user.displayName,
             userAvatar: user.photoURL,
             tier: tier,
-            charName: charData.name,
-            charImage: charData.image || user.photoURL
+            characters: characters
         });
 
         if (discordRes && discordRes.id) {
@@ -212,17 +219,22 @@ export const updateDiscordMessage = async (orderData, newStatus) => {
         title = "🚫 الطلب مرفوض";
     }
 
+    const charNames = Array.isArray(orderData.characters)
+        ? orderData.characters.map(c => c.name).join('، ')
+        : orderData.charName;
+
     const payload = {
         embeds: [{
             title: title,
             color: color,
             fields: [
                 { name: "👤 اسم العميل", value: orderData.userName, inline: true },
+                { name: "🗡️ الشخصيات", value: charNames, inline: true },
                 { name: "💎 نوع الطلب (الفئة)", value: orderData.tier, inline: true },
                 { name: "🆔 رقم الطلب", value: `\`${orderData.id}\`` },
                 { name: "⏳ الحالة الحالية", value: statusText }
             ],
-            thumbnail: { url: orderData.userAvatar },
+            thumbnail: { url: orderData.characters?.[0]?.image || orderData.userAvatar },
             footer: { text: "نظام Professional GS لإدارة الطلبات" },
             timestamp: new Date().toISOString()
         }]

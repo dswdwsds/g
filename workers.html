@@ -132,24 +132,41 @@
                 orders.filter(o => o.status !== 'done' && o.status !== 'rejected').forEach(order => {
                     const card = document.createElement('div');
                     card.className = 'order-card';
+                    const characters = order.characters || [{ name: order.charName, image: order.charImage }];
+                    const charTags = characters.map(c => `
+                        <div style="display:inline-flex; align-items:center; gap:5px; background:rgba(255,255,255,0.05); padding:3px 10px; border-radius:12px; font-size:0.85rem; border:1px solid var(--glass-border);">
+                            ${c.image ? `<img src="${c.image}" style="width:18px; height:18px; border-radius:50%">` : '🗡️'}
+                            <span>${c.name}</span>
+                        </div>
+                    `).join(' ');
+
                     card.innerHTML = `
-                    <div>
-                        <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
-                            <img src="${order.userAvatar}" style="width:30px; height:30px; border-radius:50%">
-                            <strong>${order.userName}</strong>
-                            <span class="badge ${order.status}">${order.status === 'waiting' ? 'بانتظار العمل' : 'قيد التنفيذ'}</span>
+                    <div style="flex:1">
+                        <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+                            <img src="${order.userAvatar}" style="width:35px; height:35px; border-radius:50%; border:2px solid var(--primary)">
+                            <div>
+                                <strong>${order.userName}</strong>
+                                <span class="badge ${order.status}" style="margin-right:10px;">${order.status === 'waiting' ? 'بانتظار العمل' : 'قيد التنفيذ'}</span>
+                            </div>
                         </div>
-                        <div style="color: var(--text-dim); font-size: 0.9rem;">
-                            الطلب: ${order.tier} | <small>${new Date(order.createdAt?.seconds * 1000).toLocaleString('ar-EG')}</small>
+                        <div style="margin-bottom:10px;">
+                            <div style="font-size:0.9rem; margin-bottom:5px; color:var(--primary)">الفئة: ${order.tier}</div>
+                            <div style="display:flex; flex-wrap:wrap; gap:6px;">
+                                ${charTags}
+                            </div>
                         </div>
-                        ${order.workerName ? `<div style="margin-top:5px; color:var(--primary); font-size:0.8rem;">👤 المنفذ: ${order.workerName}</div>` : ''}
+                        <div style="color: var(--text-dim); font-size: 0.8rem;">
+                            <small>📅 ${new Date(order.createdAt?.seconds * 1000).toLocaleString('ar-EG')}</small>
+                        </div>
+                        ${order.workerName ? `<div style="margin-top:8px; color:var(--primary); font-size:0.8rem; font-weight:bold;">👤 المنفذ: ${order.workerName}</div>` : ''}
                     </div>
-                    <div class="action-group">
+                    <div class="action-group" style="flex-shrink:0;">
                         ${order.status === 'waiting' ? `<button class="auth-btn" style="background:#4facfe" onclick="manageOrder('${order.id}', 'working')">قبول الطلب</button>` : ''}
                         ${order.status === 'working' ? `<button class="auth-btn" style="background:#00f2fe; color:#000" onclick="manageOrder('${order.id}', 'done')">إنهاء العمل</button>` : ''}
                         <button class="auth-btn" style="background:#ff00c8" onclick="manageOrder('${order.id}', 'rejected')">رفض</button>
                     </div>
                 `;
+
                     orderList.appendChild(card);
                 });
             });

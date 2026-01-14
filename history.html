@@ -112,18 +112,28 @@
 
                     const date = order.createdAt?.toDate ? new Date(order.createdAt.toDate()).toLocaleDateString('ar-EG') : 'غير معروف';
 
+                    const characters = order.characters || [{ name: order.charName, image: order.charImage }];
+                    const charTags = characters.map(c => `
+                        <div style="display:inline-flex; align-items:center; gap:5px; background:rgba(255,255,255,0.05); padding:4px 10px; border-radius:12px; font-size:0.85rem;">
+                            ${c.image ? `<img src="${c.image}" style="width:20px; height:20px; border-radius:50%">` : '🗡️'}
+                            <span>${c.name}</span>
+                        </div>
+                    `).join(' ');
+
                     item.innerHTML = `
-                    <div style="display:flex; flex-direction:column; flex:1; gap:8px">
+                    <div style="display:flex; flex-direction:column; flex:1; gap:12px">
                         <div style="display:flex; align-items:center; gap:10px;">
-                            ${order.charImage ? `<img src="${order.charImage}" style="width:40px; height:40px; border-radius:50%; border:2px solid var(--primary)">` : ''}
-                            <div>
-                                <div style="font-weight:700">${order.charName || order.tier}</div>
-                                <div style="font-size:0.8rem; color:var(--text-dim)">${date}</div>
+                            <div style="flex:1">
+                                <div style="font-weight:700; color: var(--primary); margin-bottom:5px;">الفئة: ${order.tier}</div>
+                                <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                                    ${charTags}
+                                </div>
+                                <div style="font-size:0.75rem; color:var(--text-dim); margin-top:8px;">${date}</div>
                             </div>
                         </div>
-                        ${order.workerName ? `<div style="font-size:0.75rem; color:var(--primary)">بواسطة: ${order.workerName}</div>` : ''}
+                        ${order.workerName ? `<div style="font-size:0.75rem; color:var(--primary); font-style:italic;">👤 بواسطة: ${order.workerName}</div>` : ''}
                     </div>
-                    <span class="pos-tag" style="display:flex; flex-direction:column; align-items:flex-end;">
+                    <span class="pos-tag" style="display:flex; flex-direction:column; align-items:flex-end; justify-content:center;">
                         ${statusMap[order.status] || order.status}
                     </span>
                 `;
