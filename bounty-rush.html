@@ -88,8 +88,17 @@
       <div id="charGrid" class="char-grid">
         <!-- Characters will be injected here -->
       </div>
-      <button class="notif-btn" style="background: var(--glass); color: #fff; margin-top: 20px;"
-        onclick="closeCharModal()">إلغاء</button>
+      <div class="modal-footer">
+        <div class="price-display">
+          <div class="price-label">السعر الإجمالي:</div>
+          <div id="totalPrice" class="price-total">0 جنيه</div>
+        </div>
+        <div id="selectionActions" style="display:flex; gap:10px;">
+          <button id="confirmSelection" class="notif-btn" style="width:auto; padding:12px 30px;">تأكيد (0)</button>
+          <button class="notif-btn" style="background: var(--glass); color: #fff; width:auto; padding:12px 20px;"
+            onclick="closeCharModal()">إلغاء</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -123,7 +132,8 @@
     const charModal = document.getElementById('charModal');
 
     let selectedTier = null;
-    let selectedChar = null;
+    let selectedChars = new Set();
+    const TIER_PRICES = { 'Starter': 30, 'Pro': 60, 'Ultimate': 90 };
 
     // Load characters on page load
     loadCharacters().then(() => {
@@ -136,13 +146,14 @@
         return;
       }
       selectedTier = tier;
+      selectedChars.clear();
       openCharModal();
     };
 
     const openCharModal = () => {
       const CHARACTERS = getCharacters();
       charGrid.innerHTML = CHARACTERS.map(char => `
-        <div class="char-item" onclick="selectChar('${char.id}')">
+        <div class="char-item" id="char-${char.id}" onclick="toggleChar('${char.id}')">
           <div style="width:80px; height:80px; border-radius:50%; border:2px solid var(--glass-border); background: linear-gradient(135deg, var(--primary), var(--accent)); display:flex; align-items:center; justify-content:center; margin:0 auto 10px;">
             <span style="font-size:1.5rem;">${char.stars === 5 ? '🌟' : '⭐'.repeat(char.stars)}</span>
           </div>
@@ -152,6 +163,7 @@
           </div>
         </div>
       `).join('');
+      updateSelectionUI();
       charModal.classList.add('visible');
     };
 
@@ -159,13 +171,43 @@
       charModal.classList.remove('visible');
     };
 
-    window.selectChar = (charId) => {
-      const CHARACTERS = getCharacters();
-      selectedChar = CHARACTERS.find(c => c.id === charId);
-      closeCharModal();
+    window.toggleChar = (charId) => {
+      if (selectedChars.has(charId)) {
+        selectedChars.delete(charId);
+        document.getElementById(`char-${charId}`).classList.remove('selected');
+      } else {
+        selectedChars.add(charId);
+        document.getElementById(`char-${charId}`).classList.add('selected');
+      }
+      updateSelectionUI();
+    };
 
-      showConfirm(`هل أنت متأكد من طلب الفئة ${selectedTier} للشخصية ${selectedChar.name}؟`, () => {
-        placeOrder(selectedTier, selectedChar);
+    const updateSelectionUI = () => {
+      const pricePerChar = TIER_PRICES[selectedTier] || 0;
+      const total = pricePerChar * selectedChars.size;
+      document.getElementById('totalPrice').innerText = `${total} جنيه`;
+      document.getElementById('confirmSelection').innerText = `تأكيد (${selectedChars.size})`;
+      document.getElementById('confirmSelection').disabled = selectedChars.size === 0;
+      document.getElementById('confirmSelection').style.opacity = selectedChars.size === 0 ? '0.5' : '1';
+    };
+
+    document.getElementById('confirmSelection').onclick = () => {
+      if (selectedChars.size === 0) {
+        showToast("يرجى اختيار شخصية واحدة على الأقل!", "⚠️");
+        return;
+      }
+
+      const CHARACTERS = getCharacters();
+      const selectedData = Array.from(selectedChars).map(id => CHARACTERS.find(c => c.id === id));
+      const names = selectedData.map(c => c.name).join('، ');
+
+      showConfirm(`هل أنت متأكد من طلب الفئة ${selectedTier} لـ ${selectedChars.size} شخصيات (${names})؟ بقيمة إجمالية ${TIER_PRICES[selectedTier] * selectedChars.size} جنيه؟`, async () => {
+        closeCharModal();
+        showToast("جاري معالجة الطلبات...", "⏳");
+
+        for (const char of selectedData) {
+          await placeOrder(selectedTier, char);
+        }
       });
     };
 
