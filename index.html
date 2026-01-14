@@ -46,19 +46,36 @@
         import { auth, onAuthStateChanged } from './firebase-config.js';
         import { login, logout, isWorker, listenToWorkers } from './app.js';
 
-        const userInfo = document.getElementById('userInfo');
+        const ADMIN_EMAIL = 'abdobwd78@gmail.com';
 
         const refreshUserUI = () => {
             const user = auth.currentUser;
             if (user) {
-                const workerBadge = isWorker(user.email) ? '<span class="worker-badge">Staff 🛡️</span>' : '';
+                const isWorkerUser = isWorker(user.email);
+                const workerBadge = isWorkerUser ? '<span class="worker-badge">Staff 🛡️</span>' : '';
+                const workersLink = (isWorkerUser || user.email === ADMIN_EMAIL)
+                    ? '<a href="bounty-rush.html" class="workers-link">الخدمات 🎮</a>'
+                    : '';
+
+                // لو هو عامل، نخليه يروح صفحة العمال، لو يوزر عادي يروح الخدمات
+                const actionLink = (isWorkerUser || user.email === ADMIN_EMAIL)
+                    ? '<a href="workers.html" class="workers-link">لوحة التحكم ⚙️</a>'
+                    : '';
+
                 userInfo.innerHTML = `
-                <div class="user-profile">
-                    <img src="${user.photoURL}" class="user-avatar">
-                    <span class="user-name">${user.displayName} ${workerBadge}</span>
-                    <button class="auth-btn" onclick="handleLogout()">خروج</button>
-                </div>
-            `;
+                    <div style="display:flex; align-items:center;">
+                        ${actionLink}
+                        <div class="user-dropdown">
+                            <div class="user-profile">
+                                <img src="${user.photoURL}" class="user-avatar">
+                                <span class="user-name">${user.displayName} ${workerBadge}</span>
+                            </div>
+                            <div class="dropdown-menu">
+                                <a href="#" class="dropdown-item" onclick="handleLogout()">🚪 تسجيل الخروج</a>
+                            </div>
+                        </div>
+                    </div>
+                `;
             } else {
                 userInfo.innerHTML = `<button class="auth-btn" id="loginBtn">تسجيل دخول</button>`;
                 const btn = document.getElementById('loginBtn');

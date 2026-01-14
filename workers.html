@@ -88,12 +88,17 @@
             const user = auth.currentUser;
             if (user) {
                 userInfo.innerHTML = `
-                <div class="user-profile">
-                    <img src="${user.photoURL}" class="user-avatar">
-                    <span class="user-name">${user.displayName}</span>
-                    <button class="auth-btn" onclick="handleLogout()">خروج</button>
-                </div>
-            `;
+                    <div class="user-dropdown">
+                        <div class="user-profile">
+                            <img src="${user.photoURL}" class="user-avatar">
+                            <span class="user-name">${user.displayName}</span>
+                        </div>
+                        <div class="dropdown-menu">
+                            <a href="index.html" class="dropdown-item">🏠 العودة للرئيسية</a>
+                            <a href="#" class="dropdown-item" onclick="handleLogout()">🚪 تسجيل الخروج</a>
+                        </div>
+                    </div>
+                `;
 
                 if (isWorker(user.email)) {
                     adminContent.classList.remove('hidden');

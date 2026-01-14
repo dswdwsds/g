@@ -38,7 +38,7 @@
     <div class="tier-card">
       <span class="tier-stars">⭐⭐</span>
       <h3>Starter Tier</h3>
-      <span class="tier-price">30<span class="tier-currency"> SAR</span></span>
+      <span class="tier-price">30<span class="tier-currency"> جنيه مصري</span></span>
       <p>رفع سريع للمستوى الأساسي</p>
       <button class="auth-btn" style="margin-top:20px; width: 100%;" onclick="orderNow('Starter')">طلب هذه
         الفئة</button>
@@ -47,7 +47,7 @@
     <div class="tier-card" style="border-color: var(--primary);">
       <span class="tier-stars">⭐⭐⭐</span>
       <h3>Pro Tier</h3>
-      <span class="tier-price">60<span class="tier-currency"> SAR</span></span>
+      <span class="tier-price">60<span class="tier-currency"> جنيه مصري</span></span>
       <p>تحسين كبير لنقاط الشخصية</p>
       <button class="auth-btn" style="margin-top:20px; width: 100%;" onclick="orderNow('Pro')">طلب هذه الفئة</button>
     </div>
@@ -55,7 +55,7 @@
     <div class="tier-card">
       <span class="tier-stars">⭐⭐⭐⭐</span>
       <h3>Ultimate Tier</h3>
-      <span class="tier-price">90<span class="tier-currency"> SAR</span></span>
+      <span class="tier-price">90<span class="tier-currency"> جنيه مصري</span></span>
       <p>الوصول للحد الأقصى من القوة</p>
       <button class="auth-btn" style="margin-top:20px; width: 100%;" onclick="orderNow('Ultimate')">طلب هذه
         الفئة</button>
@@ -102,12 +102,24 @@
     const refreshUserUI = () => {
       const user = auth.currentUser;
       if (user) {
-        const workerBadge = isWorker(user.email) ? '<span class="worker-badge">Staff 🛡️</span>' : '';
+        const isWorkerUser = isWorker(user.email);
+        const workerBadge = isWorkerUser ? '<span class="worker-badge">Staff 🛡️</span>' : '';
+        const workersLink = (isWorkerUser || user.email === ADMIN_EMAIL)
+          ? '<a href="workers.html" class="workers-link">لوحة التحكم ⚙️</a>'
+          : '';
+
         userInfo.innerHTML = `
-                <div class="user-profile">
-                    <img src="${user.photoURL}" class="user-avatar">
-                    <span class="user-name">${user.displayName} ${workerBadge}</span>
-                    <button class="auth-btn" onclick="handleLogout()">خروج</button>
+                <div style="display:flex; align-items:center;">
+                    ${workersLink}
+                    <div class="user-dropdown">
+                        <div class="user-profile">
+                            <img src="${user.photoURL}" class="user-avatar">
+                            <span class="user-name">${user.displayName} ${workerBadge}</span>
+                        </div>
+                        <div class="dropdown-menu">
+                            <a href="#" class="dropdown-item" onclick="handleLogout()">🚪 تسجيل الخروج</a>
+                        </div>
+                    </div>
                 </div>
             `;
       } else {
@@ -162,18 +174,6 @@
                 `;
         }
 
-        let actionButtons = '';
-        // المدير هو صاحب الإيميل الأساسي أو أي شخص مضاف في الـ staff (كعامل)
-        if (user?.email === ADMIN_EMAIL || isWorker(user?.email)) {
-          actionButtons = `
-                    <div style="display:flex; gap:5px; margin-right:10px;">
-                        ${order.status === 'waiting' ? `<button class="auth-btn" style="padding:4px 8px; font-size:11px; background:#4facfe" onclick="updateStatus('${order.id}', 'working')">بدء</button>` : ''}
-                        ${order.status === 'working' ? `<button class="auth-btn" style="padding:4px 8px; font-size:11px; background:#00f2fe; color:#000" onclick="updateStatus('${order.id}', 'done')">إنهاء</button>` : ''}
-                        <button class="auth-btn" style="padding:4px 8px; font-size:11px; background:#ff00c8" onclick="updateStatus('${order.id}', 'rejected')">رفض</button>
-                    </div>
-                `;
-        }
-
         item.innerHTML = `
                 <div style="display:flex; flex-direction:column; flex:1">
                     <div style="display:flex; align-items:center; gap:10px;">
@@ -182,7 +182,6 @@
                     </div>
                     ${workerInfo}
                 </div>
-                ${actionButtons}
                 <span class="pos-tag" style="display:flex; flex-direction:column; align-items:flex-end;">
                     ${isWorking ? '<span style="font-size:0.8rem">🔥 جارِ العمل</span>' : '#' + (index + 1)}
                 </span>

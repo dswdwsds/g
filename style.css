@@ -319,6 +319,66 @@ body::after {
     transition: 0.3s;
 }
 
+.user-dropdown {
+    position: relative;
+    cursor: pointer;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: var(--glass);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 15px;
+    padding: 10px;
+    min-width: 150px;
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.user-dropdown:hover .dropdown-menu {
+    display: flex;
+}
+
+.dropdown-item {
+    padding: 10px 15px;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 0.85rem;
+    transition: 0.3s;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.dropdown-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--primary);
+}
+
+.workers-link {
+    background: linear-gradient(45deg, #4facfe, #00f2fe);
+    color: #000;
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    font-size: 0.85rem;
+    margin-right: 15px;
+    transition: 0.3s;
+}
+
+.workers-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
+}
+
 .auth-btn:hover {
     background: var(--primary);
     color: #000;
