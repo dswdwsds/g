@@ -105,20 +105,18 @@
         const isWorkerUser = isWorker(user.email);
         const workerBadge = isWorkerUser ? '<span class="worker-badge">Staff 🛡️</span>' : '';
         const workersLink = (isWorkerUser || user.email === ADMIN_EMAIL)
-          ? '<a href="workers.html" class="workers-link">لوحة التحكم ⚙️</a>'
+          ? '<a href="workers.html" class="dropdown-item">⚙️ لوحة التحكم</a>'
           : '';
 
         userInfo.innerHTML = `
-                <div style="display:flex; align-items:center;">
-                    ${workersLink}
-                    <div class="user-dropdown">
-                        <div class="user-profile">
-                            <img src="${user.photoURL}" class="user-avatar">
-                            <span class="user-name">${user.displayName} ${workerBadge}</span>
-                        </div>
-                        <div class="dropdown-menu">
-                            <a href="#" class="dropdown-item" onclick="handleLogout()">🚪 تسجيل الخروج</a>
-                        </div>
+                <div class="user-dropdown">
+                    <div class="user-profile">
+                        <img src="${user.photoURL}" class="user-avatar">
+                        <span class="user-name">${user.displayName} ${workerBadge}</span>
+                    </div>
+                    <div class="dropdown-menu">
+                        ${workersLink}
+                        <a href="#" class="dropdown-item" onclick="handleLogout()">🚪 تسجيل الخروج</a>
                     </div>
                 </div>
             `;

@@ -1,4 +1,4 @@
-import { auth, provider, signInWithPopup, signOut, onAuthStateChanged, db, collection, addDoc, serverTimestamp, query, where, orderBy, onSnapshot, doc, updateDoc } from './firebase-config.js';
+import { auth, provider, signInWithPopup, signOut, onAuthStateChanged, db, collection, addDoc, serverTimestamp, query, where, orderBy, onSnapshot, doc, updateDoc, getDoc } from './firebase-config.js';
 
 const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1395038941110866010/MucgrT_399C44lfUVL79HcqR4cfwNbJlL5iG1qPmxdBF47GGbTbmkokZK6YnslmJ63wL";
 
@@ -98,6 +98,43 @@ export const listenToWorkers = (callback) => {
 
 export const isWorker = (email) => authorizedWorkers.includes(email);
 
+export const sendStatusUpdateToDiscord = async (orderData, newStatus) => {
+    let statusText = "";
+    let color = 0x00f2fe;
+
+    if (newStatus === 'working') {
+        statusText = `✅ **تم قبول الطلب وبدء العمل!**\n👤 المنفذ: ${orderData.workerName}`;
+        color = 0x4facfe;
+    } else if (newStatus === 'done') {
+        statusText = `🎉 **تم الانتهاء من الحساب بنجاح!**`;
+        color = 0x00ff00;
+    } else if (newStatus === 'rejected') {
+        statusText = `❌ **عذراً، تم رفض الطلب.**`;
+        color = 0xff00c8;
+    }
+
+    const payload = {
+        content: `🔄 **تحديث للطلب #${orderData.orderId || orderData.id}**`,
+        embeds: [{
+            title: "تحديث حالة الطلب",
+            description: statusText,
+            color: color,
+            fields: [
+                { name: "👤 العميل", value: orderData.userName, inline: true },
+                { name: "💎 الفئة", value: orderData.tier, inline: true }
+            ],
+            footer: { text: "نظام Professional GS لإدارة الطلبات" },
+            timestamp: new Date().toISOString()
+        }]
+    };
+
+    await fetch(DISCORD_WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+};
+
 export const updateOrderStatus = async (orderId, newStatus) => {
     try {
         const orderRef = doc(db, "orders", orderId);
@@ -111,6 +148,13 @@ export const updateOrderStatus = async (orderId, newStatus) => {
         }
 
         await updateDoc(orderRef, updateData);
+
+        // جلب بيانات الطلب لإرسال التحديث للديسكورد
+        const snapshot = await getDoc(orderRef);
+        if (snapshot.exists()) {
+            const orderData = { id: orderId, ...snapshot.data() };
+            await sendStatusUpdateToDiscord(orderData, newStatus);
+        }
     } catch (error) {
         console.error("Update Error:", error);
         alert("فشل تحديث الحالة.");
