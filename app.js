@@ -168,7 +168,7 @@ export const placeOrder = async (tier, charData) => {
     }
 
     try {
-        const TIER_PRICES = { 'Starter': 30, 'Pro': 60, 'Ultimate': 90 };
+        const TIER_PRICES = { 'Starter': 8, 'Pro': 9, 'Ultimate': 10 };
         const pricePerChar = TIER_PRICES[tier] || 0;
         const characters = Array.isArray(charData) ? charData : [charData];
         const totalPrice = pricePerChar * characters.length;
