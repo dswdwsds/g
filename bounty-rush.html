@@ -76,17 +76,25 @@
 
   <script type="module">
     import { auth, onAuthStateChanged } from './firebase-config.js';
-    import { login, logout, placeOrder, listenToQueue } from './app.js';
+    import { login, logout, placeOrder, listenToQueue, updateOrderStatus } from './app.js';
 
     const userInfo = document.getElementById('userInfo');
     const queueList = document.getElementById('queueList');
     const queueBrief = document.getElementById('queueBrief');
+
+    const ADMIN_EMAIL = 'abdobwd78@gmail.com'; // بريدك الإلكتروني كمدير
 
     window.orderNow = (tier) => {
       if (!auth.currentUser) {
         login();
       } else {
         placeOrder(tier);
+      }
+    };
+
+    window.updateStatus = (id, status) => {
+      if (confirm(`هل أنت متأكد من تغيير حالة الطلب إلى ${status === 'working' ? 'بدء العمل' : status === 'done' ? 'إنهاء' : 'رفض'}؟`)) {
+        updateOrderStatus(id, status);
       }
     };
 
@@ -116,20 +124,36 @@
 
       const myOrderIndex = orders.findIndex(o => o.uid === auth.currentUser?.uid);
       if (myOrderIndex !== -1) {
-        queueBrief.innerText = myOrderIndex === 0 ? "أنت الأن في مرحلة التنفيذ! 🚀" : `أنت في المركز #${myOrderIndex + 1}، يوجد ${myOrderIndex} قبلك.`;
+        queueBrief.innerText = myOrderIndex === 0 && orders[0].status === 'working'
+          ? "أنت الأن في مرحلة التنفيذ! 🚀"
+          : `أنت في المركز #${myOrderIndex + 1}، يوجد ${myOrderIndex} قبلك.`;
       } else {
         queueBrief.innerText = `يوجد حالياً ${orders.length} طلبات في الطابور.`;
       }
 
       orders.forEach((order, index) => {
+        const isWorking = order.status === 'working';
         const item = document.createElement('div');
-        item.className = `queue-item ${index === 0 ? 'active' : ''} ${order.uid === auth.currentUser?.uid ? 'mine' : ''}`;
+        item.className = `queue-item ${isWorking ? 'active' : ''} ${order.uid === auth.currentUser?.uid ? 'mine' : ''}`;
+
+        let actionButtons = '';
+        if (auth.currentUser?.email === ADMIN_EMAIL) {
+          actionButtons = `
+                    <div style="display:flex; gap:5px; margin-right:10px;">
+                        ${order.status === 'waiting' ? `<button class="auth-btn" style="padding:4px 8px; font-size:11px; background:#4facfe" onclick="updateStatus('${order.id}', 'working')">بدء</button>` : ''}
+                        ${order.status === 'working' ? `<button class="auth-btn" style="padding:4px 8px; font-size:11px; background:#00f2fe; color:#000" onclick="updateStatus('${order.id}', 'done')">إنهاء</button>` : ''}
+                        <button class="auth-btn" style="padding:4px 8px; font-size:11px; background:#ff00c8" onclick="updateStatus('${order.id}', 'rejected')">رفض</button>
+                    </div>
+                `;
+        }
+
         item.innerHTML = `
-                <div style="display:flex; align-items:center; gap:10px;">
+                <div style="display:flex; align-items:center; gap:10px; flex:1">
                     <img src="${order.userAvatar}" style="width:30px; height:30px; border-radius:50%">
                     <span>${order.userName.split(' ')[0]} - ${order.tier}</span>
                 </div>
-                <span class="pos-tag">#${index + 1}</span>
+                ${actionButtons}
+                <span class="pos-tag">${isWorking ? '🔥 جارِ العمل' : '#' + (index + 1)}</span>
             `;
         queueList.appendChild(item);
       });
