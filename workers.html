@@ -239,15 +239,21 @@
                         <span style="font-size:0.75rem; background:rgba(255,255,255,0.05); padding:2px 6px; border-radius:5px;">${c.name}</span>
                     `).join(' ');
 
+                    const stars = order.rating ? '⭐'.repeat(order.rating) : '';
+                    const review = order.review ? `<div style="font-size:0.8rem; color:var(--primary); font-style:italic; margin-top:8px; background:rgba(255,255,255,0.05); padding:8px; border-radius:8px;">"${order.review}"</div>` : '';
+
                     item.innerHTML = `
-                        <div>
-                            <div style="font-weight:bold; margin-bottom:5px;">${order.tier}</div>
+                        <div style="flex:1">
+                            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                                <div style="font-weight:bold; margin-bottom:5px;">${order.tier} ${stars}</div>
+                                <div style="color:var(--primary); font-weight:bold; font-size:1.1rem;">${order.totalPrice || 0} ج.م</div>
+                            </div>
                             <div style="display:flex; flex-wrap:wrap; gap:4px;">${charTags}</div>
-                            <div style="font-size:0.75rem; color:var(--text-dim); margin-top:5px;">
-                                ${new Date(order.createdAt?.seconds * 1000).toLocaleDateString('ar-EG')}
+                            ${review}
+                            <div style="font-size:0.75rem; color:var(--text-dim); margin-top:10px;">
+                                👤 لـ: ${order.userName} | 📅 ${new Date(order.createdAt?.seconds * 1000).toLocaleDateString('ar-EG')}
                             </div>
                         </div>
-                        <div style="color:var(--primary); font-weight:bold; font-size:1.1rem;">${order.totalPrice || 0} ج.م</div>
                     `;
                     completedOrdersList.appendChild(item);
                 });

@@ -73,28 +73,48 @@
 
   <!-- Notification Modal -->
   <div id="notificationModal" class="notif-overlay">
-    <div class="notif-card" style="max-width: 500px; width: 95%;">
-      <h3>تم الانتهاء! 🚀</h3>
-      <p id="notifMessage">لقد تم إكمال طلبك بنجاح. شكراً لثقتك بنا!</p>
+    <div class="notif-card"
+      style="max-width: 500px; width: 95%; min-height: 300px; display: flex; flex-direction: column; justify-content: center;">
+      <!-- Step 1: Announcement & Stars -->
+      <div id="ratingStep1" class="rating-step">
+        <h3 id="notifTitle">تم الانتهاء! 🚀</h3>
+        <p id="notifMessage">لقد تم إكمال طلبك بنجاح. شكراً لثقتك بنا!</p>
 
-      <div id="ratingContainer" class="hidden"
-        style="border-top: 1px solid var(--glass-border); margin-top: 20px; padding-top: 20px;">
-        <p style="text-align: center; margin-bottom: 10px;">قيم تجربتك معنا ⭐</p>
-        <div class="rating-stars" id="stars">
-          <span class="star" data-value="1">★</span>
-          <span class="star" data-value="2">★</span>
-          <span class="star" data-value="3">★</span>
-          <span class="star" data-value="4">★</span>
-          <span class="star" data-value="5">★</span>
+        <div id="ratingContainer" class="hidden"
+          style="border-top: 1px solid var(--glass-border); margin-top: 20px; padding-top: 20px;">
+          <p style="text-align: center; margin-bottom: 5px; font-weight: bold; color: var(--primary);">ما رأيك في جودة
+            الخدمة؟ ⭐</p>
+          <div class="rating-stars" id="stars">
+            <span class="star" data-value="1">★</span>
+            <span class="star" data-value="2">★</span>
+            <span class="star" data-value="3">★</span>
+            <span class="star" data-value="4">★</span>
+            <span class="star" data-value="5">★</span>
+          </div>
         </div>
-        <textarea id="reviewText" class="review-input" placeholder="اكتب رأيك هنا (اختياري)..." rows="3"></textarea>
-        <button class="notif-btn" id="submitRatingBtn" style="width: 100%; display: none;">إرسال التقييم</button>
       </div>
 
-      <div style="display:flex; gap:10px; margin-top:20px;">
+      <!-- Step 2: Comment -->
+      <div id="ratingStep2" class="rating-step hidden">
+        <h3 style="color: var(--primary);">يسعدنا سماع رأيك! 💬</h3>
+        <p style="font-size: 0.9rem; color: var(--text-dim); margin-bottom: 15px;">هل لديك أي ملاحظات تود مشاركتها؟</p>
+        <textarea id="reviewText" class="review-input" placeholder="اكتب تقييمك هنا..." rows="3"></textarea>
+        <button class="notif-btn" id="submitRatingBtn"
+          style="width: 100%; height: 50px; font-weight: 800; background: var(--primary); color: #000;">إرسال التقييم
+          النهائي</button>
+      </div>
+
+      <!-- Step 3: Success -->
+      <div id="ratingStep3" class="rating-step hidden" style="text-align: center;">
+        <div class="success-check">✓</div>
+        <h3 style="margin-bottom: 10px;">شكراً لك! ❤️</h3>
+        <p style="color: var(--text-dim);">تقييمك يساعدنا على تقديم خدمة أفضل دائماً.</p>
+      </div>
+
+      <div id="notifActions" style="display:flex; gap:10px; margin-top:20px;">
         <button class="notif-btn" id="viewHistoryBtn" onclick="location.href='history.html'">سجل الطلبات</button>
         <button class="notif-btn" style="background: var(--glass); color: #fff;"
-          onclick="closeNotification()">حسناً</button>
+          onclick="closeNotification()">إغلاق</button>
       </div>
     </div>
   </div>
@@ -345,14 +365,23 @@
     const showNotification = (order) => {
       const modal = document.getElementById('notificationModal');
       const msg = document.getElementById('notifMessage');
+      const title = document.getElementById('notifTitle');
 
       currentOrderIdForRating = order.id;
 
+      // Reset to step 1
+      document.getElementById('ratingStep1').classList.remove('hidden');
+      document.getElementById('ratingStep2').classList.add('hidden');
+      document.getElementById('ratingStep3').classList.add('hidden');
+      document.getElementById('notifActions').style.display = 'flex';
+
       if (order.status === 'done') {
+        title.innerText = 'تم الانتهاء! 🚀';
         msg.innerText = `لقد تم إكمال طلبك (${order.tier}) بنجاح. شكراً لثقتك بنا!`;
         document.getElementById('ratingContainer').classList.remove('hidden');
         setupRating();
       } else {
+        title.innerText = 'تم رفض الطلب';
         msg.innerText = `عذراً، تم رفض طلبك (${order.tier}). يرجى التواصل مع الدعم للمزيد من التفاصيل.`;
         document.getElementById('ratingContainer').classList.add('hidden');
       }
@@ -362,9 +391,13 @@
 
     const setupRating = () => {
       const stars = document.querySelectorAll('.star');
+      const step1 = document.getElementById('ratingStep1');
+      const step2 = document.getElementById('ratingStep2');
+      const step3 = document.getElementById('ratingStep3');
       const submitBtn = document.getElementById('submitRatingBtn');
+      const actions = document.getElementById('notifActions');
+
       selectedRatingValue = 0;
-      submitBtn.style.display = 'none';
       document.getElementById('reviewText').value = '';
 
       stars.forEach(star => {
@@ -375,19 +408,34 @@
             if (i < selectedRatingValue) s.classList.add('active');
             else s.classList.remove('active');
           });
-          submitBtn.style.display = 'block';
+
+          // Auto transition to step 2 after a small delay
+          setTimeout(() => {
+            step1.classList.add('hidden');
+            step2.classList.remove('hidden');
+            actions.style.display = 'none';
+          }, 600);
         };
       });
 
       submitBtn.onclick = async () => {
         if (selectedRatingValue === 0) return;
+        submitBtn.disabled = true;
+        submitBtn.innerText = "جاري الإرسال...";
+
         const review = document.getElementById('reviewText').value;
         const success = await submitRating(currentOrderIdForRating, selectedRatingValue, review);
+
         if (success) {
-          showToast("تم إرسال تقييمك بنجاح! شكراً لك.", "⭐");
-          document.getElementById('ratingContainer').classList.add('hidden');
+          step2.classList.add('hidden');
+          step3.classList.remove('hidden');
+          setTimeout(() => {
+            actions.style.display = 'flex';
+          }, 1000);
         } else {
           showToast("فشل في إرسال التقييم.", "❌");
+          submitBtn.disabled = false;
+          submitBtn.innerText = "إرسال التقييم النهائي";
         }
       };
     };

@@ -36,6 +36,13 @@
                 <span>قريباً جداً</span>
             </a>
         </section>
+
+        <section class="reviews-section">
+            <h2 style="text-align: center; font-size: 2rem; margin-bottom: 30px;">آراء عملائنا الراضين ⭐</h2>
+            <div class="reviews-grid" id="reviewsGrid">
+                <p style="text-align: center; color: var(--text-dim); grid-column: 1/-1;">جاري تحميل التقييمات...</p>
+            </div>
+        </section>
     </main>
 
     <footer>
@@ -44,7 +51,7 @@
 
     <script type="module">
         import { auth, onAuthStateChanged } from './firebase-config.js';
-        import { login, logout, isWorker, listenToWorkers } from './app.js';
+        import { login, logout, isWorker, listenToWorkers, listenToRecentReviews } from './app.js';
 
         const ADMIN_EMAIL = 'abdobwd78@gmail.com';
 
@@ -80,6 +87,36 @@
         onAuthStateChanged(auth, () => refreshUserUI());
 
         window.handleLogout = logout;
+
+        const reviewsGrid = document.getElementById('reviewsGrid');
+        listenToRecentReviews((reviews) => {
+            reviewsGrid.innerHTML = '';
+            if (reviews.length === 0) {
+                reviewsGrid.innerHTML = '<p style="text-align: center; color: var(--text-dim); grid-column: 1/-1;">لا توجد تقييمات بعد. كن أول من يقيمنا!</p>';
+                return;
+            }
+
+            reviews.forEach(review => {
+                const card = document.createElement('div');
+                card.className = 'review-card';
+                const stars = '⭐'.repeat(review.rating);
+
+                card.innerHTML = `
+                    <div class="review-header">
+                        <img src="${review.userAvatar || 'https://via.placeholder.com/40'}" class="review-avatar">
+                        <div>
+                            <div class="review-name">${review.userName.split(' ')[0]}</div>
+                            <div class="review-stars">${stars}</div>
+                        </div>
+                    </div>
+                    <div class="review-text">"${review.review || 'خدمة ممتازة وسريعة جداً، شكراً لكم!'}"</div>
+                    <div style="font-size: 0.7rem; color: var(--text-dim); margin-top:10px; text-align:left;">
+                        ${review.ratedAt ? new Date(review.ratedAt.seconds * 1000).toLocaleDateString('ar-EG') : ''}
+                    </div>
+                `;
+                reviewsGrid.appendChild(card);
+            });
+        });
     </script>
 
 </body>

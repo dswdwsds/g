@@ -1,4 +1,4 @@
-import { auth, provider, signInWithPopup, signOut, onAuthStateChanged, db, collection, addDoc, serverTimestamp, query, where, orderBy, onSnapshot, doc, updateDoc, getDoc } from './firebase-config.js';
+import { auth, provider, signInWithPopup, signOut, onAuthStateChanged, db, collection, addDoc, serverTimestamp, query, where, orderBy, onSnapshot, doc, updateDoc, getDoc, limit } from './firebase-config.js';
 
 const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1395038941110866010/MucgrT_399C44lfUVL79HcqR4cfwNbJlL5iG1qPmxdBF47GGbTbmkokZK6YnslmJ63wL";
 
@@ -326,5 +326,19 @@ export const listenToWorkerCompletedOrders = (workerId, callback) => {
     return onSnapshot(q, (snapshot) => {
         const orders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         callback(orders);
+    });
+};
+
+export const listenToRecentReviews = (callback) => {
+    const q = query(
+        collection(db, "orders"),
+        where("rating", ">", 0),
+        orderBy("rating", "desc"),
+        orderBy("ratedAt", "desc"),
+        limit(10)
+    );
+    return onSnapshot(q, (snapshot) => {
+        const reviews = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        callback(reviews);
     });
 };
