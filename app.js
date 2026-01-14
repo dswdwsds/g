@@ -14,18 +14,39 @@ export const logout = () => signOut(auth);
 
 export const sendToDiscord = async (orderData) => {
     const payload = {
+        content: `📦 **طلب جديد من ${orderData.userName}!**`,
         embeds: [{
-            title: "🚀 New Order Received!",
+            title: "🚀 وصل طلب تلفيل جديد!",
             color: 0x00f2fe,
             fields: [
-                { name: "User", value: orderData.userName, inline: true },
-                { name: "Tier", value: orderData.tier, inline: true },
-                { name: "Order ID", value: orderData.orderId },
-                { name: "Status", value: "Waiting in Queue ⏳" }
+                { name: "👤 اسم العميل", value: orderData.userName, inline: true },
+                { name: "💎 نوع الطلب (الفئة)", value: orderData.tier, inline: true },
+                { name: "🆔 رقم الطلب", value: `\`${orderData.orderId}\`` },
+                { name: "⏳ الحالة الحالية", value: "بانتظار البدء... ⏳" }
             ],
             thumbnail: { url: orderData.userAvatar },
+            footer: { text: "نظام Professional GS لإدارة الطلبات" },
             timestamp: new Date().toISOString()
-        }]
+        }],
+        components: [
+            {
+                type: 1, // Action Row
+                components: [
+                    {
+                        type: 2, // Button
+                        label: "بدء العمل ️🛠️",
+                        style: 1, // Primary (Blue)
+                        custom_id: `start_${orderData.orderId}`
+                    },
+                    {
+                        type: 2,
+                        label: "رفض الطلب ❌",
+                        style: 4, // Danger (Red)
+                        custom_id: `reject_${orderData.orderId}`
+                    }
+                ]
+            }
+        ]
     };
 
     await fetch(DISCORD_WEBHOOK, {
@@ -66,10 +87,28 @@ export const placeOrder = async (tier) => {
     }
 };
 
+export const updateOrderStatus = async (orderId, newStatus) => {
+    try {
+        const orderRef = doc(db, "orders", orderId);
+        await updateDoc(orderRef, { status: newStatus });
+    } catch (error) {
+        console.error("Update Error:", error);
+        alert("فشل تحديث الحالة.");
+    }
+};
+
 export const listenToQueue = (callback) => {
     const q = query(collection(db, "orders"), where("status", "in", ["waiting", "working"]), orderBy("createdAt", "asc"));
-    return onSnapshot(q, (snapshot) => {
-        const orders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        callback(orders);
-    });
+    return onSnapshot(q,
+        (snapshot) => {
+            const orders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            callback(orders);
+        },
+        (error) => {
+            console.error("Firestore Error:", error);
+            if (error.code === 'not-found') {
+                console.warn("Please ensure Firestore is enabled in your Firebase Console.");
+            }
+        }
+    );
 };
