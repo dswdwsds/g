@@ -261,7 +261,8 @@
 
     <div id="toastContainer" class="toast-container"></div>
     <!-- Floating Support Button -->
-    <a href="https://discord.com/channels/1284591581717987422/1284591582187622539" target="_blank" class="floating-support-btn">
+    <a href="https://discord.com/channels/1284591581717987422/1284591582187622539" target="_blank"
+        class="floating-support-btn">
         <span>🎧</span>
         <span>تحدث مع الدعم</span>
     </a>
@@ -552,7 +553,7 @@
 
                     const characters = order.characters || [{ name: order.charName, image: order.charImage }];
                     const charTags = characters.map(c => `
-                        <div style="display:inline-flex; align-items:center; gap:5px; background:rgba(255,255,255,0.05); padding:3px 10px; border-radius:12px; font-size:0.85rem; border:1px solid var(--glass-border);">
+                        <div class="char-tag">
                             ${c.image ? `<img src="${c.image}" style="width:18px; height:18px; border-radius:50%" loading="lazy">` : '🗡️'}
                             <span>${c.name}</span>
                         </div>
@@ -572,7 +573,7 @@
                                 الفئة: ${order.tier} | 
                                 <span style="color:#00f2fe; font-weight:bold;">${order.totalPrice || 0} جنيه</span>
                             </div>
-                            <div style="display:flex; flex-wrap:wrap; gap:6px;">
+                            <div class="char-list-container">
                                 ${charTags}
                             </div>
                         </div>
@@ -586,7 +587,7 @@
                             </div>
                         ` : ''}
                     </div>
-                    <div class="action-group" id="action-group-${order.id}" style="flex-shrink:0; display:flex; flex-direction:column; gap:8px;">
+                    <div class="action-group" id="action-group-${order.id}">
                     </div>
                 `;
                     orderList.appendChild(card); // Append card first to ensure elements exist in DOM
