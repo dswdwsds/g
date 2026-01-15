@@ -21,7 +21,10 @@
 
 body {
     font-family: var(--font-ar);
-    background-color: var(--bg-dark);
+    background: linear-gradient(rgba(6, 11, 19, 0.85), rgba(6, 11, 19, 0.85)), url('GIF/luffy.gif');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
     color: var(--text-main);
     direction: rtl;
     overflow-x: hidden;
@@ -107,9 +110,11 @@ body::after {
 }
 
 .service-card {
-    background: var(--glass);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
+    background: linear-gradient(rgba(6, 11, 19, 0.8), rgba(6, 11, 19, 0.8)), url('GIF/One_Piece_Zoro_Vs_King_GIF_-_One_piece_Zoro_vs_king_King_of_hell_-_Discover__Share_GIFs.gif');
+    background-size: cover;
+    background-position: center;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
     border: 1px solid var(--glass-border);
     border-radius: 24px;
     padding: 40px;
@@ -138,7 +143,10 @@ body::after {
 .service-card:hover {
     transform: translateY(-10px);
     border-color: var(--primary);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 242, 254, 0.1);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 242, 254, 0.2);
+    background: linear-gradient(rgba(6, 11, 19, 0.7), rgba(6, 11, 19, 0.7)), url('GIF/One_Piece_Zoro_Vs_King_GIF_-_One_piece_Zoro_vs_king_King_of_hell_-_Discover__Share_GIFs.gif');
+    background-size: cover;
+    background-position: center;
 }
 
 .service-card:hover::before {
@@ -157,26 +165,16 @@ body::after {
 
 .service-card span {
     margin-top: auto;
-    font-weight: 700;
-    color: #fff;
+    font-weight: 600;
+    color: var(--primary);
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 10px;
-    padding: 12px 25px;
-    border-radius: 12px;
-    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('GIF/One_Piece_Zoro_Vs_King_GIF_-_One_piece_Zoro_vs_king_King_of_hell_-_Discover__Share_GIFs.gif');
-    background-size: cover;
-    background-position: center;
-    border: 1px solid var(--primary);
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    gap: 8px;
+    transition: all 0.3s;
 }
 
 .service-card:hover span {
     gap: 15px;
-    transform: scale(1.05);
-    box-shadow: 0 0 20px rgba(0, 242, 254, 0.3);
 }
 
 /* Bounty Rush Specifics */
