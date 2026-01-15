@@ -50,6 +50,42 @@
             display: flex;
             gap: 10px;
         }
+
+        /* Dashboard Stats Definitions */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            padding: 25px;
+            border-radius: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-dim);
+        }
     </style>
 </head>
 
@@ -79,25 +115,35 @@
         </div>
 
         <!-- لوحة تحكم المالك (Owner) -->
-        <div id="ownerPanel" class="hidden"
-            style="margin-top: 30px; background: var(--glass); border: 1px solid var(--primary); padding: 25px; border-radius: 20px;">
-            <h3 style="color: var(--primary); margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
-                👑 لوحة تحكم المالك (Owner)
-            </h3>
-            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                <input type="email" id="newStaffEmail" placeholder="إيميل الموظف الجديد..."
-                    style="flex: 1; height: 50px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 12px; color: white; padding: 0 15px;">
-                <select id="newStaffRole"
-                    style="height: 50px; background: var(--glass); border: 1px solid var(--glass-border); border-radius: 12px; color: white; padding: 0 10px;">
-                    <option value="staff">Staff 🛡️</option>
-                    <option value="admin">Admin 👑</option>
-                    <option value="owner">Owner 💎</option>
-                </select>
-                <button class="auth-btn" onclick="handleAddStaff(event)">إضافة/تحديث</button>
-            </div>
+        <div id="ownerModal" class="notif-overlay">
+            <div class="notif-card" style="max-width: 600px; width: 95%; max-height: 80vh; overflow-y: auto;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+                    <h3 style="color: var(--primary); margin: 0; display: flex; align-items: center; gap: 10px;">
+                        👑 إدارة طاقم العمل
+                    </h3>
+                    <button class="auth-btn" style="background:none; border:none; padding:5px; min-width:auto;"
+                        onclick="toggleOwnerPanel()">✖</button>
+                </div>
 
-            <div id="staffList" style="display: grid; gap: 10px;">
-                <!-- ستظهر قائمة الموظفين هنا -->
+                <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-direction: column;">
+                    <div style="display:flex; gap:10px;">
+                        <input type="email" id="newStaffEmail" placeholder="إيميل الموظف الجديد..."
+                            style="flex: 1; height: 50px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 12px; color: white; padding: 0 15px;">
+                        <select id="newStaffRole"
+                            style="height: 50px; background: var(--glass); border: 1px solid var(--glass-border); border-radius: 12px; color: white; padding: 0 10px;">
+                            <option value="staff">Staff 🛡️</option>
+                            <option value="admin">Admin 👑</option>
+                            <option value="owner">Owner 💎</option>
+                        </select>
+                    </div>
+                    <button class="auth-btn"
+                        style="width:100%; padding:15px; background: var(--primary); color:#000; font-weight:800;"
+                        onclick="handleAddStaff(event)">حفظ بيانات الموظف</button>
+                </div>
+
+                <div id="staffList" style="display: grid; gap: 10px; text-align: left;">
+                    <!-- ستظهر قائمة الموظفين هنا -->
+                </div>
             </div>
         </div>
 
@@ -140,7 +186,7 @@
         const orderCount = document.getElementById('orderCount');
         const completedOrdersList = document.getElementById('completedOrdersList');
         const earningsModal = document.getElementById('earningsModal');
-        const ownerPanel = document.getElementById('ownerPanel');
+        const ownerModal = document.getElementById('ownerModal');
         const newStaffEmail = document.getElementById('newStaffEmail');
         const newStaffRole = document.getElementById('newStaffRole');
         const staffList = document.getElementById('staffList');
@@ -170,7 +216,7 @@
                     renderStaffList();
                 } else {
                     document.getElementById('toggleOwnerBtn').classList.add('hidden');
-                    ownerPanel.classList.add('hidden');
+                    ownerModal.classList.remove('visible');
                 }
 
                 if (isWorker(user.email)) {
@@ -243,7 +289,7 @@
         };
 
         window.toggleOwnerPanel = () => {
-            ownerPanel.classList.toggle('hidden');
+            ownerModal.classList.toggle('visible');
         };
 
         window.openCompletedOrdersModal = () => {
