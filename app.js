@@ -392,8 +392,6 @@ export const sendPaymentProofToDiscord = async (orderId, file, orderData) => {
                 : `📷 الدخول عبر QR (تواصل مع العميل)`
         ) : 'غير محدد';
 
-        const walletInfo = orderData.senderWallet ? `\n📱 محفظة المحول: \`${orderData.senderWallet}\`` : '';
-
         const payload = {
             content: `📢 **وصل طلب جديد مع إيصال الدفع!**`,
             embeds: [{
@@ -405,7 +403,6 @@ export const sendPaymentProofToDiscord = async (orderId, file, orderData) => {
                     { name: "💵 السعر", value: `${orderData.totalPrice || serverOrderData.totalPrice || 0} جنيه`, inline: true },
                     { name: "🗡️ الشخصيات", value: charNames || "لا يوجد" },
                     { name: "🔐 بيانات الدخول", value: steamInfo },
-                    { name: "📝 تفاصيل الدفع", value: `تم رفع الإيصال.${walletInfo}` },
                     { name: "🆔 رقم الطلب", value: `\`${orderId}\`` }
                 ],
                 image: { url: "attachment://receipt.jpg" }, // Discord will use the attached file

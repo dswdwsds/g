@@ -250,31 +250,6 @@
         </div>
       </div>
 
-      <!-- Login Section -->
-      <div
-        style="background: rgba(0, 242, 254, 0.05); border: 1px solid var(--glass-border); border-radius: 12px; padding: 15px; margin-bottom: 20px; text-align: right;">
-        <p style="margin: 0 0 12px 0; font-weight: bold; color: var(--primary); font-size: 0.95rem;">🔐 طريقة الدخول
-          للحساب:</p>
-
-        <div style="display: flex; gap: 15px; margin-bottom: 12px; flex-wrap: wrap;">
-          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.9rem;">
-            <input type="radio" name="loginMethod" value="credentials" checked onchange="toggleLoginInputs()">
-            <span>حساب Steam (اسم + باسورد)</span>
-          </label>
-          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.9rem;">
-            <input type="radio" name="loginMethod" value="qr" onchange="toggleLoginInputs()">
-            <span>QR Code (تواصل دعم)</span>
-          </label>
-        </div>
-
-        <div id="steamInputs" style="display: block;">
-          <input type="text" id="steamUsername" placeholder="اسم المستخدم (Steam Username)" class="review-input"
-            style="margin-bottom: 8px; width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border);">
-          <input type="password" id="steamPassword" placeholder="كلمة المرور (Password)" class="review-input"
-            style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border);">
-        </div>
-      </div>
-
       <!-- Footer -->
       <div class="modal-footer" style="border-top: 2px solid var(--glass-border); padding-top: 15px;">
         <div class="price-display" style="margin-bottom: 15px;">
@@ -289,6 +264,46 @@
             style="flex: 1; max-width: 150px; background: var(--glass); color: #fff; padding: 14px 20px;"
             onclick="closeCharModal()">إلغاء</button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Steam Login Modal -->
+  <div id="steamModal" class="notif-overlay">
+    <div class="notif-card" style="max-width: 500px; width: 95%;">
+      <h3 style="margin-bottom: 20px;">🔐 بيانات حساب Steam</h3>
+
+      <div
+        style="background: rgba(255, 235, 59, 0.08); border: 1px solid rgba(255, 235, 59, 0.3); border-radius: 12px; padding: 12px; margin-bottom: 20px; text-align: right; font-size: 0.85rem;">
+        ⚠️ نحتاج للدخول إلى حسابك لإتمام التلفيل. بياناتك محمية بالكامل ولن تُستخدم لأي غرض آخر.
+      </div>
+
+      <div style="text-align: right; margin-bottom: 20px;">
+        <p style="margin-bottom: 12px; font-weight: bold; color: var(--primary);">اختر طريقة الدخول:</p>
+
+        <div style="display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap;">
+          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+            <input type="radio" name="loginMethod" value="credentials" checked onchange="toggleLoginInputs()">
+            <span>حساب Steam (اسم + باسورد)</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+            <input type="radio" name="loginMethod" value="qr" onchange="toggleLoginInputs()">
+            <span>QR Code (تواصل دعم)</span>
+          </label>
+        </div>
+
+        <div id="steamInputs" style="display: block;">
+          <input type="text" id="steamUsername" placeholder="اسم المستخدم (Steam Username)" class="review-input"
+            style="margin-bottom: 10px; width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); padding: 12px; border-radius: 8px;">
+          <input type="password" id="steamPassword" placeholder="كلمة المرور (Password)" class="review-input"
+            style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); padding: 12px; border-radius: 8px;">
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 10px;">
+        <button id="confirmSteamLogin" class="notif-btn" style="flex: 1; padding: 14px;">متابعة للدفع</button>
+        <button class="notif-btn" style="flex: 1; background: var(--glass); color: #fff; padding: 14px;"
+          onclick="closeSteamModal()">إلغاء</button>
       </div>
     </div>
   </div>
@@ -311,13 +326,6 @@
             <strong id="payWallet">01015831676</strong>
             <span style="font-size: 0.8rem; opacity: 0.7;">📋 نسخ</span>
           </div>
-        </div>
-
-        <!-- Sender Wallet Number -->
-        <div style="margin-top: 15px; border-top: 1px dashed var(--glass-border); padding-top: 10px;">
-          <p style="font-size: 0.9rem; margin-bottom: 5px;">رقم المحفظة المحول منها (اختياري):</p>
-          <input type="tel" id="senderWalletInput" placeholder="010xxxxxxx" class="review-input"
-            style="width: 100%; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.2);">
         </div>
       </div>
 
@@ -586,13 +594,46 @@
       btn.style.opacity = !isValid ? '0.5' : '1';
     };
 
+    // Store order info temporarily
+    let pendingOrderData = null;
+
     document.getElementById('confirmSelection').onclick = () => {
       if (selectedChars.size === 0) {
         showToast("يرجى اختيار شخصية واحدة على الأقل!", "⚠️");
         return;
       }
 
-      // Capture Login Data
+      const CHARACTERS = getCharacters();
+      const selectedData = Array.from(selectedChars).map(id => CHARACTERS.find(c => c.id === id));
+      const totalText = document.getElementById('totalPrice').innerText;
+      const finalPrice = parseFloat(totalText);
+
+      // Store data for next step
+      pendingOrderData = {
+        tier: selectedTier,
+        characters: selectedData,
+        totalPrice: finalPrice
+      };
+
+      // Close character modal and open Steam modal
+      closeCharModal();
+      openSteamModal();
+    };
+
+    // Steam Modal Functions
+    window.openSteamModal = () => {
+      document.getElementById('steamModal').classList.add('visible');
+    };
+
+    window.closeSteamModal = () => {
+      document.getElementById('steamModal').classList.remove('visible');
+      pendingOrderData = null; // Clear pending data
+    };
+
+    // Confirm Steam Login
+    document.getElementById('confirmSteamLogin').onclick = async () => {
+      if (!pendingOrderData) return;
+
       const loginMethod = document.querySelector('input[name="loginMethod"]:checked').value;
       let steamData = {};
 
@@ -608,18 +649,15 @@
         steamData = { method: 'qr' };
       }
 
-      const CHARACTERS = getCharacters();
-      const selectedData = Array.from(selectedChars).map(id => CHARACTERS.find(c => c.id === id));
-      const names = selectedData.map(c => c.name).join('، ');
-      const totalText = document.getElementById('totalPrice').innerText;
-      const finalPrice = parseFloat(totalText); // Extract number from text "100 جنيه..."
+      closeSteamModal();
+      showToast("جاري معالجة الطلب...", "⏳");
 
-      showConfirm(`هل أنت متأكد من طلب الفئة ${selectedTier} لـ ${selectedChars.size} شخصيات (${names})؟ بقيمة إجمالية ${finalPrice} جنيه؟`, async () => {
-        closeCharModal();
-        showToast("جاري معالجة الطلب...", "⏳");
+      await placeOrder(pendingOrderData.tier, pendingOrderData.characters, pendingOrderData.totalPrice, steamData);
 
-        await placeOrder(selectedTier, selectedData, finalPrice, steamData);
-      });
+      // Clear inputs
+      document.getElementById('steamUsername').value = '';
+      document.getElementById('steamPassword').value = '';
+      pendingOrderData = null;
     };
 
     // --- Manual Payment Logic ---
@@ -794,7 +832,6 @@
       try {
         const orderId = currentOrderForPayment.orderId;
         const characters = currentOrderForPayment.characters || Array.from(selectedChars).map(id => getCharacters().find(c => c.id === id));
-        const senderWallet = document.getElementById('senderWalletInput').value.trim();
 
         const success = await sendPaymentProofToDiscord(
           orderId,
@@ -803,8 +840,7 @@
             userName: auth.currentUser.displayName,
             tier: currentOrderForPayment.tier,
             totalPrice: currentOrderForPayment.totalPrice,
-            characters: characters,
-            senderWallet: senderWallet // Pass captured wallet info
+            characters: characters
           }
         );
 
