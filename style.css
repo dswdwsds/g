@@ -188,7 +188,7 @@ body::after {
 }
 
 .tier-card {
-    background: linear-gradient(rgba(6, 11, 19, 0.85), rgba(6, 11, 19, 0.85)), url('IMAGE/FsMfvk8WcAEbc_0.jpg');
+    background: linear-gradient(rgba(6, 11, 19, 0.85), rgba(6, 11, 19, 0.85)), url('IMAGE/FsMfvk8WcAEbc_0.WebP');
     background-size: cover;
     background-position: center;
     border: 1px solid var(--glass-border);
