@@ -328,7 +328,6 @@ export const sendPaymentProofToDiscord = async (orderId, file, orderData) => {
 
         if (response.ok) {
             const result = await response.json();
-            console.log("Discord Full Response Object:", JSON.stringify(result, null, 2));
 
             let receiptUrl = null;
 
@@ -346,7 +345,6 @@ export const sendPaymentProofToDiscord = async (orderId, file, orderData) => {
                 receiptUrl = result.embeds[0].image.url || result.embeds[0].image.proxy_url;
             }
 
-            console.log("Final Receipt URL being saved:", receiptUrl);
 
             const orderRef = doc(db, "orders", orderId);
             await updateDoc(orderRef, {
