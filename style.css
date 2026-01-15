@@ -9,8 +9,8 @@
     --glass-border: rgba(255, 255, 255, 0.1);
     --text-main: #ffffff;
     --text-dim: #a0aec0;
-    --font-ar: 'Cairo', sans-serif;
-    --font-en: 'Outfit', sans-serif;
+    --font-ar: 'Cairo', system-ui, -apple-system, sans-serif;
+    --font-en: 'Outfit', system-ui, sans-serif;
 }
 
 * {
@@ -29,6 +29,7 @@ body {
     direction: rtl;
     overflow-x: hidden;
     line-height: 1.6;
+    text-rendering: optimizeSpeed;
 }
 
 /* Background Decoration */
