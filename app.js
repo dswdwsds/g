@@ -1,4 +1,4 @@
-import { auth, provider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, db, collection, addDoc, serverTimestamp, query, where, orderBy, onSnapshot, doc, updateDoc, getDoc, limit, increment, setDoc, deleteDoc } from './firebase-config.js';
+import { auth, provider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, db, collection, addDoc, serverTimestamp, query, where, orderBy, onSnapshot, doc, updateDoc, getDoc, limit, increment, setDoc, deleteDoc, getDocs, writeBatch } from './firebase-config.js';
 
 const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1395038941110866010/MucgrT_399C44lfUVL79HcqR4cfwNbJlL5iG1qPmxdBF47GGbTbmkokZK6YnslmJ63wL";
 
@@ -94,6 +94,7 @@ export const sendMessage = async (orderId, message) => {
             senderAvatar: user.photoURL,
             text: message,
             image: null,
+            read: false,
             timestamp: serverTimestamp()
         });
         return true;
@@ -140,6 +141,7 @@ export const sendImageMessage = async (orderId, file) => {
             senderAvatar: user.photoURL,
             text: null,
             image: imageUrl,
+            read: false,
             timestamp: serverTimestamp()
         });
         return true;
@@ -159,6 +161,42 @@ export const listenToMessages = (orderId, callback) => {
     return onSnapshot(q, (snapshot) => {
         const messages = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         callback(messages);
+    });
+};
+
+export const markMessagesAsRead = async (orderId, userId) => {
+    try {
+        const q = query(
+            collection(db, "messages"),
+            where("orderId", "==", orderId),
+            where("read", "==", false)
+        );
+        const snapshot = await getDocs(q);
+        const batch = writeBatch(db);
+
+        let hasUpdates = false;
+        snapshot.docs.forEach(doc => {
+            if (doc.data().senderId !== userId) {
+                batch.update(doc.ref, { read: true });
+                hasUpdates = true;
+            }
+        });
+
+        if (hasUpdates) await batch.commit();
+    } catch (error) {
+        console.error("Error marking read:", error);
+    }
+};
+
+export const listenToUnreadCount = (orderId, userId, callback) => {
+    const q = query(
+        collection(db, "messages"),
+        where("orderId", "==", orderId),
+        where("read", "==", false)
+    );
+    return onSnapshot(q, (snapshot) => {
+        const count = snapshot.docs.filter(doc => doc.data().senderId !== userId).length;
+        callback(count);
     });
 };
 
