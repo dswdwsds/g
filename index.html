@@ -51,7 +51,7 @@
 
     <script type="module">
         import { auth, onAuthStateChanged } from './firebase-config.js';
-        import { login, logout, isWorker, listenToWorkers, listenToRecentReviews, getUserRole } from './app.js';
+        import { login, logout, isWorker, listenToWorkers, listenToRecentReviews, getUserRole, deleteReview } from './app.js';
 
 
         const refreshUserUI = () => {
@@ -87,6 +87,12 @@
         onAuthStateChanged(auth, () => refreshUserUI());
 
         window.handleLogout = logout;
+        window.handleDeleteReview = async (id) => {
+            if (confirm("هل أنت متأكد من حذف هذا التعليق؟")) {
+                const success = await deleteReview(id);
+                if (!success) alert("فشل في حذف التعليق.");
+            }
+        };
 
         const reviewsGrid = document.getElementById('reviewsGrid');
         listenToRecentReviews((reviews) => {
@@ -101,13 +107,20 @@
                 card.className = 'review-card';
                 const stars = '⭐'.repeat(review.rating);
 
+                const userRole = getUserRole(auth.currentUser?.email);
+                const canDelete = userRole === 'owner' || userRole === 'admin';
+                const deleteBtn = canDelete ? `<button onclick="handleDeleteReview('${review.id}')" style="background:none; border:none; color:#ff4d4d; font-size:0.7rem; cursor:pointer; margin-top:5px;">حذف 🗑️</button>` : '';
+
                 card.innerHTML = `
                     <div class="review-header">
-                        <img src="${review.userAvatar || 'https://via.placeholder.com/40'}" class="review-avatar">
-                        <div>
-                            <div class="review-name">${review.userName.split(' ')[0]}</div>
-                            <div class="review-stars">${stars}</div>
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <img src="${review.userAvatar || 'https://via.placeholder.com/40'}" class="review-avatar">
+                            <div>
+                                <div class="review-name">${review.userName.split(' ')[0]}</div>
+                                <div class="review-stars">${stars}</div>
+                            </div>
                         </div>
+                        ${deleteBtn}
                     </div>
                     <div class="review-text">"${review.review || 'خدمة ممتازة وسريعة جداً، شكراً لكم!'}"</div>
                     <div style="font-size: 0.7rem; color: var(--text-dim); margin-top:10px; text-align:left;">

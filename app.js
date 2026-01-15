@@ -259,6 +259,17 @@ export const deleteStaff = async (docId) => {
     }
 };
 
+// وظيفة لحذف تعليق (للمالك والأدمن فقط)
+export const deleteReview = async (commentId) => {
+    try {
+        await deleteDoc(doc(db, "comments", commentId));
+        return true;
+    } catch (error) {
+        console.error("Delete Review Error:", error);
+        return false;
+    }
+};
+
 export const listenToStaffStats = (email, uid, callback) => {
     // نحدد الـ ID الصحيح للوثيقة (سواء كان إيميلاً أو UID)
     const staff = authorizedStaff.find(s => s.email === email || s.id === email);
