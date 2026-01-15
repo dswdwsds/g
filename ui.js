@@ -10,7 +10,7 @@ export const injectNavbar = () => {
     header.className = 'nav-bar';
     header.innerHTML = `
         <div class="user-info" id="userInfo"></div>
-        <a href="index.html" class="logo" style="text-decoration: none; font-family: var(--font-en); font-weight: 800; color: var(--primary);">PRO GS</a>
+        <a href="index.html" class="logo" style="text-decoration: none; font-family: var(--font-en); font-weight: 800; color: var(--primary);">TEAM GS</a>
     `;
 };
 

@@ -199,6 +199,9 @@ export const listenToMessages = (orderId, callback) => {
         } else {
             callback([]);
         }
+    }, (error) => {
+        console.error("Chat Listener Error:", error);
+        callback([]);
     });
 };
 
@@ -227,5 +230,8 @@ export const listenToUnreadCount = (orderId, userId, callback) => {
 
         const count = messages.filter(msg => msg.senderId !== userId && msg.timestamp > lastRead).length;
         callback(count);
+    }, (error) => {
+        console.error("Unread Count Listener Error:", error);
+        callback(0);
     });
 };

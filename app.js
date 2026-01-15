@@ -34,4 +34,4 @@ window.showConfirm = showConfirm;
 window.hasUserPurchasedOffer = (uid, tier) => import('./order_service.js').then(m => m.hasUserPurchasedOffer(uid, tier));
 window.listenToUnreadCount = (orderId, userId, callback) => import('./chat_service.js').then(m => m.listenToUnreadCount(orderId, userId, callback));
 
-console.log("PRO GS - Modular App Initialized 🚀");
+console.log("TEAM GS - Modular App Initialized 🚀");

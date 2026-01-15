@@ -22,6 +22,9 @@ export const listenToWorkers = (callback) => {
     return onSnapshot(collection(db, "staff"), (snapshot) => {
         authorizedStaff = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         if (callback) callback(authorizedStaff);
+    }, (error) => {
+        console.warn("Staff Listener Error (Likely Unauthenticated):", error);
+        if (callback) callback([]);
     });
 };
 

@@ -20,7 +20,7 @@ export const sendToDiscord = async (orderData) => {
                 { name: "⏳ الحالة الحالية", value: "بانتظار الدفع أو البدء... ⏳" }
             ],
             thumbnail: { url: orderData.characters?.[0]?.image || orderData.charImage || orderData.userAvatar },
-            footer: { text: "نظام Professional GS لإدارة الطلبات" },
+            footer: { text: "نظام TEAM GS لإدارة الطلبات" },
             timestamp: new Date().toISOString()
         }],
         components: [
@@ -98,7 +98,7 @@ export const updateDiscordMessage = async (orderData, newStatus) => {
             ],
             thumbnail: { url: orderData.characters?.[0]?.image || orderData.userAvatar },
             image: orderData.receiptUrl ? { url: orderData.receiptUrl } : null,
-            footer: { text: "Professional GS - نظام التلفيل الآلي" },
+            footer: { text: "TEAM GS - نظام التلفيل الآلي" },
             timestamp: new Date().toISOString()
         }]
     };
@@ -147,7 +147,7 @@ export const sendPaymentProofToDiscord = async (orderId, file, orderData, sender
                     { name: "🆔 رقم الطلب", value: `\`${orderId}\`` }
                 ],
                 image: { url: "attachment://receipt.jpg" },
-                footer: { text: "Professional GS - نظام إدارة المدفوعات المستقل" },
+                footer: { text: "TEAM GS - نظام إدارة المدفوعات المستقل" },
                 timestamp: new Date().toISOString()
             }],
             components: [
