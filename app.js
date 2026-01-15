@@ -691,3 +691,19 @@ export const listenToRecentReviews = (callback) => {
         callback(reviews);
     });
 };
+
+export const hasUserPurchasedOffer = async (uid, tierName) => {
+    try {
+        const q = query(
+            collection(db, "orders"),
+            where("uid", "==", uid),
+            where("tier", "==", tierName)
+        );
+        const snapshot = await getDocs(q);
+        const hasActiveOrder = snapshot.docs.some(doc => doc.data().status !== 'rejected');
+        return hasActiveOrder;
+    } catch (error) {
+        console.error("Check Offer Error:", error);
+        return false;
+    }
+};
