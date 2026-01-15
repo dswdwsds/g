@@ -4,7 +4,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Services | خدمات الألعاب الاحترافية</title>
+    <meta name="description"
+        content="Professional Game Services (PRO GS) - أفضل خدمات تطوير شخصيات Bounty Rush وشحن الألعاب بأمان وسرعة.">
+    <meta property="og:title" content="Professional Game Services | PRO GS">
+    <meta property="og:description" content="ارتقِ بمستواك في الألعاب مع خدماتنا الاحترافية والموثوقة.">
+
+    <title>Professional Game Services | PRO GS - الرئيسية</title>
+
+    <!-- Optimized Font Loading -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&family=Noto+Sans+Arabic:wght@400;700;800&display=swap"
+        rel="stylesheet">
+
     <link rel="stylesheet" href="style.css">
     <style>
         .reviews-section {
@@ -93,7 +106,9 @@
         <div class="user-info" id="userInfo">
             <!-- Auth Content -->
         </div>
-        <div class="logo" style="font-family: var(--font-en); font-weight: 800; color: var(--primary);">PRO GS</div>
+        <a href="index.html" class="logo"
+            style="text-decoration: none; font-family: var(--font-en); font-weight: 800; color: var(--primary);">PRO
+            GS</a>
     </nav>
 
     <main class="container" style="padding-top: 80px;">
@@ -146,7 +161,7 @@
                 userInfo.innerHTML = `
                     <div class="user-dropdown">
                         <div class="user-profile">
-                            <img src="${user.photoURL}" class="user-avatar">
+                            <img src="${user.photoURL}" class="user-avatar" loading="lazy">
                             <span class="user-name">${user.displayName} ${workerBadge}</span>
                         </div>
                         <div class="dropdown-menu">
@@ -193,7 +208,7 @@
                 card.innerHTML = `
                     <div class="review-header">
                         <div style="display:flex; align-items:center; gap:12px;">
-                            <img src="${review.userAvatar || 'https://via.placeholder.com/40'}" class="review-avatar">
+                            <img src="${review.userAvatar || 'https://via.placeholder.com/40'}" class="review-avatar" loading="lazy">
                             <div>
                                 <div class="review-name">${review.userName.split(' ')[0]}</div>
                                 <div class="review-stars">${stars}</div>

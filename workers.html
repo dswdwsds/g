@@ -4,7 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
     <title>Worker Dashboard | Professional GS</title>
+
+    <!-- Optimized Font Loading -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&family=Noto+Sans+Arabic:wght@400;700;800&display=swap"
+        rel="stylesheet">
+
     <link rel="stylesheet" href="style.css">
     <style>
         .admin-container {
@@ -93,7 +102,7 @@
 
     <nav class="nav-bar">
         <div class="user-info" id="userInfo"></div>
-        <div class="logo">WORKER PANEL</div>
+        <a href="index.html" class="logo" style="text-decoration: none; color: inherit;">WORKER PANEL</a>
     </nav>
 
     <main class="admin-container">
@@ -198,11 +207,10 @@
                 userInfo.innerHTML = `
                     <div class="user-dropdown">
                         <div class="user-profile">
-                            <img src="${user.photoURL}" class="user-avatar">
+                            <img src="${user.photoURL}" class="user-avatar" loading="lazy">
                             <span class="user-name">${user.displayName}</span>
                         </div>
                         <div class="dropdown-menu">
-                            <a href="index.html" class="dropdown-item">🏠 العودة للرئيسية</a>
                             <a href="#" class="dropdown-item" onclick="handleLogout()">🚪 تسجيل الخروج</a>
                         </div>
                     </div>
@@ -316,7 +324,7 @@
                     const characters = order.characters || [{ name: order.charName, image: order.charImage }];
                     const charTags = characters.map(c => `
                         <div style="display:inline-flex; align-items:center; gap:5px; background:rgba(255,255,255,0.05); padding:3px 10px; border-radius:12px; font-size:0.85rem; border:1px solid var(--glass-border);">
-                            ${c.image ? `<img src="${c.image}" style="width:18px; height:18px; border-radius:50%">` : '🗡️'}
+                            ${c.image ? `<img src="${c.image}" style="width:18px; height:18px; border-radius:50%" loading="lazy">` : '🗡️'}
                             <span>${c.name}</span>
                         </div>
                     `).join(' ');
@@ -324,7 +332,7 @@
                     card.innerHTML = `
                     <div style="flex:1">
                         <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
-                            <img src="${order.userAvatar}" style="width:35px; height:35px; border-radius:50%; border:2px solid var(--primary)">
+                            <img src="${order.userAvatar}" style="width:35px; height:35px; border-radius:50%; border:2px solid var(--primary)" loading="lazy">
                             <div>
                                 <strong>${order.userName}</strong>
                                 <span class="badge ${order.status}" style="margin-right:10px;">${order.status === 'waiting' ? 'بانتظار العمل' : 'قيد التنفيذ'}</span>

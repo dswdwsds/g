@@ -4,7 +4,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="سجل طلباتك في Professional GS - تابع حالة طلبات تطوير الشخصيات والخدمات الخاصة بك.">
     <title>سجل طلباتي | Professional GS</title>
+
+    <!-- Optimized Font Loading -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&family=Noto+Sans+Arabic:wght@400;700;800&display=swap"
+        rel="stylesheet">
+
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -14,7 +24,9 @@
         <div class="user-info" id="userInfo">
             <!-- Auth Content -->
         </div>
-        <div class="logo" style="font-family: var(--font-en); font-weight: 800; color: var(--primary);">PRO GS</div>
+        <a href="index.html" class="logo"
+            style="text-decoration: none; font-family: var(--font-en); font-weight: 800; color: var(--primary);">PRO
+            GS</a>
     </nav>
 
     <header class="hero" style="padding-top: 120px;">
@@ -56,7 +68,7 @@
                 userInfo.innerHTML = `
                 <div class="user-dropdown">
                     <div class="user-profile">
-                        <img src="${user.photoURL}" class="user-avatar">
+                        <img src="${user.photoURL}" class="user-avatar" loading="lazy">
                         <span class="user-name">${user.displayName} ${workerBadge}</span>
                     </div>
                     <div class="dropdown-menu">
@@ -115,7 +127,7 @@
                     const characters = order.characters || [{ name: order.charName, image: order.charImage }];
                     const charTags = characters.map(c => `
                         <div style="display:inline-flex; align-items:center; gap:5px; background:rgba(255,255,255,0.05); padding:4px 10px; border-radius:12px; font-size:0.85rem;">
-                            ${c.image ? `<img src="${c.image}" style="width:20px; height:20px; border-radius:50%">` : '🗡️'}
+                            ${c.image ? `<img src="${c.image}" style="width:20px; height:20px; border-radius:50%" loading="lazy">` : '🗡️'}
                             <span>${c.name}</span>
                         </div>
                     `).join(' ');

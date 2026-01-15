@@ -4,7 +4,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>One Piece Bounty Rush | Professional GS</title>
+  <meta name="description"
+    content="خدمة تطوير شخصيات لعبة Bounty Rush - اختر الفئة المناسبة وطور شخصياتك المفضلة بسرعة وأمان مع PRO GS.">
+  <meta property="og:title" content="تطوير شخصيات Bounty Rush | PRO GS">
+  <meta property="og:description" content="أسرع خدمة لتطوير شخصيات باونتي راش بأسعار تنافسية.">
+
+  <title>تطوير شخصيات Bounty Rush | Professional GS</title>
+
+  <!-- Optimized Font Loading -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&family=Noto+Sans+Arabic:wght@400;700;800&display=swap"
+    rel="stylesheet">
+
   <link rel="stylesheet" href="style.css">
   <link rel="icon" href="data:;base64,iVBORw0KGgo=">
   <style>
@@ -69,7 +82,8 @@
     <div class="user-info" id="userInfo">
       <!-- Auth Content -->
     </div>
-    <div class="logo" style="font-family: var(--font-en); font-weight: 800; color: var(--primary);">PRO GS</div>
+    <a href="index.html" class="logo"
+      style="text-decoration: none; font-family: var(--font-en); font-weight: 800; color: var(--primary);">PRO GS</a>
   </nav>
 
   <header class="hero" style="padding-top: 120px;">
@@ -210,7 +224,7 @@
   <div id="toastContainer" class="toast-container"></div>
 
   <footer>
-    <p><a href="index.html" style="color: var(--primary); text-decoration: none;">← العودة للرئيسية</a></p>
+    <p>© 2026 Professional Game Services. All rights reserved.</p>
   </footer>
 
   <script type="module">
@@ -366,7 +380,7 @@
         userInfo.innerHTML = `
                 <div class="user-dropdown">
                     <div class="user-profile">
-                        <img src="${user.photoURL}" class="user-avatar">
+                        <img src="${user.photoURL}" class="user-avatar" loading="lazy">
                         <span class="user-name">${user.displayName} ${workerBadge}</span>
                     </div>
                     <div class="dropdown-menu">
@@ -530,7 +544,7 @@
           workerInfo = `
                     <div style="display:flex; align-items:center; gap:5px; font-size:0.75rem; color:var(--primary);">
                          <span>بواسطة:</span>
-                         <img src="${order.workerAvatar}" style="width:20px; height:20px; border-radius:50%; border:1px solid var(--primary)">
+                         <img src="${order.workerAvatar}" style="width:20px; height:20px; border-radius:50%; border:1px solid var(--primary)" loading="lazy">
                          <span>${order.workerName.split(' ')[0]}</span>
                     </div>
                 `;
@@ -539,7 +553,7 @@
         const characters = order.characters || [{ name: order.charName, image: order.charImage }];
         const charTags = characters.map(c => `
           <div style="display:inline-flex; align-items:center; gap:5px; background:rgba(255,255,255,0.05); padding:2px 8px; border-radius:10px; font-size:0.8rem;">
-            ${c.image ? `<img src="${c.image}" style="width:16px; height:16px; border-radius:50%">` : '🗡️'}
+            ${c.image ? `<img src="${c.image}" style="width:16px; height:16px; border-radius:50%" loading="lazy">` : '🗡️'}
             <span>${c.name}</span>
           </div>
         `).join(' ');
@@ -547,7 +561,7 @@
         item.innerHTML = `
                 <div style="display:flex; flex-direction:column; flex:1">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-                        <img src="${order.userAvatar}" style="width:30px; height:30px; border-radius:50%">
+                        <img src="${order.userAvatar}" style="width:30px; height:30px; border-radius:50%" loading="lazy">
                         <strong>${order.userName.split(' ')[0]} - ${order.tier}</strong>
                     </div>
                     <div style="display:flex; flex-wrap:wrap; gap:5px; margin-right:40px;">
