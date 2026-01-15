@@ -418,6 +418,13 @@
       showPaymentModal(details);
     };
 
+    window.cancelOrder = (orderId) => {
+      showConfirm("هل أنت متأكد من رغبتك في إلغاء هذا الطلب؟ لا يمكن التراجع عن هذه الخطوة.", () => {
+        updateOrderStatus(orderId, 'rejected');
+        showToast("تم إلغاء الطلب بنجاح.", "🗑️");
+      });
+    };
+
     submitPayment.onclick = async () => {
       if (receiptInput.files.length === 0) {
         showToast("يرجى رفع صورة الإيصال أولاً!", "⚠️");
@@ -705,9 +712,14 @@
                         ${statusBadge}
                     </span>
                     ${(isAwaiting && order.uid === user?.uid) ? `
-                      <button onclick="resumePayment('${order.id}')" class="auth-btn" style="padding: 4px 10px; font-size: 0.7rem; border-radius: 8px; margin-top: 5px; background: var(--primary); color: #000; border: none;">
-                        استكمال الدفع 💳
-                      </button>
+                      <div style="display:flex; gap:5px;">
+                        <button onclick="resumePayment('${order.id}')" class="auth-btn" style="padding: 4px 10px; font-size: 0.7rem; border-radius: 8px; margin-top: 5px; background: var(--primary); color: #000; border: none;">
+                          استكمال الدفع 💳
+                        </button>
+                        <button onclick="cancelOrder('${order.id}')" class="auth-btn" style="padding: 4px 10px; font-size: 0.7rem; border-radius: 8px; margin-top: 5px; background: rgba(255, 77, 77, 0.2); color: #ff4d4d; border: 1px solid #ff4d4d;">
+                          إلغاء 🗑️
+                        </button>
+                      </div>
                     ` : ''}
                 </div>
             `;
