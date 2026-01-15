@@ -1198,10 +1198,6 @@ footer {
 }
 
 /* Operations Modal Specifics */
-.ops-modal {
-    max-width: 600px !important;
-}
-
 .search-container {
     margin-bottom: 20px;
     display: flex;

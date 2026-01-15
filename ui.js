@@ -38,11 +38,11 @@ export const injectSharedModals = () => {
         </div>
 
         <!-- Operations Modal -->
-        <div id="operationsModal" class="ops-modal">
-            <div class="ops-card">
-                <div class="ops-header">
-                    <h3>سجل العمليات 📂</h3>
-                    <button class="ops-close" onclick="closeOperationsModal()">✖</button>
+        <div id="operationsModal" class="notif-overlay">
+            <div class="notif-card" style="max-width: 600px; width: 95%;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3 style="margin: 0;">سجل العمليات 📂</h3>
+                    <button class="auth-btn" style="background:none; border:none; font-size:1.2rem; padding:0;" onclick="closeOperationsModal()">✖</button>
                 </div>
                 <div class="search-container">
                     <input type="text" id="opsSearchInput" placeholder="بحث برقم الطلب (Order ID)..." class="search-input">
