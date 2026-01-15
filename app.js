@@ -93,11 +93,58 @@ export const sendMessage = async (orderId, message) => {
             senderName: user.displayName,
             senderAvatar: user.photoURL,
             text: message,
+            image: null,
             timestamp: serverTimestamp()
         });
         return true;
     } catch (error) {
         console.error("Chat Error:", error);
+        return false;
+    }
+};
+
+const IMGBB_API_KEY = "22d2abeb6052c5dbee3c353e6aa617c0";
+
+const uploadToImgBB = async (file) => {
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+        const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+            method: "POST",
+            body: formData
+        });
+
+        if (!response.ok) throw new Error("ImgBB Upload Failed");
+
+        const data = await response.json();
+        return data.data.url;
+    } catch (error) {
+        console.error("ImgBB Upload Error:", error);
+        return null;
+    }
+};
+
+export const sendImageMessage = async (orderId, file) => {
+    try {
+        const user = auth.currentUser;
+        if (!user) return false;
+
+        const imageUrl = await uploadToImgBB(file);
+        if (!imageUrl) return false;
+
+        await addDoc(collection(db, "messages"), {
+            orderId: orderId,
+            senderId: user.uid,
+            senderName: user.displayName,
+            senderAvatar: user.photoURL,
+            text: null,
+            image: imageUrl,
+            timestamp: serverTimestamp()
+        });
+        return true;
+    } catch (error) {
+        console.error("Image Send Error:", error);
         return false;
     }
 };
