@@ -2,6 +2,7 @@
 // هذا الملف الآن يعمل كمنسق بين جميع الخدمات الفرعية لتقليل حجم الكود وتحسين التنظيم.
 
 import { auth } from './firebase-config.js';
+export { auth };
 
 // 1. استيراد كافة الخدمات
 export * from './auth_service.js';
@@ -24,8 +25,8 @@ export const sendPaymentProofToDiscord = async (orderId, file, orderData, sender
 };
 
 // 3. التعرض العالمي (للحفاظ على عمل الـ onclick في الـ HTML)
-import { 
-    openOperationsModal, closeOperationsModal, handleOpsSearch, closeOpsDetailsModal 
+import {
+    openOperationsModal, closeOperationsModal, handleOpsSearch, closeOpsDetailsModal
 } from './operations_service.js';
 import { openChat, closeChat, handleSendMessage, handleSendImage } from './chat_service.js';
 import { showToast, showConfirm } from './ui_utils.js';
