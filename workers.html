@@ -135,10 +135,23 @@
     </nav>
 
     <main class="admin-container">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+        <div
+            style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px; gap: 15px; flex-wrap: wrap;">
             <h1 style="margin: 0;">إدارة الطلبات المباشرة 💼</h1>
-            <button id="toggleOwnerBtn" class="auth-btn hidden" style="background: var(--accent); white-space: nowrap;"
-                onclick="toggleOwnerPanel()">⚙️ إدارة الطاقم</button>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <!-- Search by Order ID -->
+                <div style="position: relative;">
+                    <input type="text" id="orderSearchInput" placeholder="🔍 ابحث برقم الطلب..."
+                        style="padding: 10px 15px; border-radius: 12px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.3); color: white; font-size: 0.9rem; width: 250px;"
+                        onkeypress="if(event.key === 'Enter') searchOrderById()">
+                    <button onclick="searchOrderById()" class="auth-btn" style="padding: 10px 18px; margin-left: 5px;">
+                        بحث
+                    </button>
+                </div>
+                <button id="toggleOwnerBtn" class="auth-btn hidden"
+                    style="background: var(--accent); white-space: nowrap;" onclick="toggleOwnerPanel()">⚙️ إدارة
+                    الطاقم</button>
+            </div>
         </div>
 
         <div id="statsContainer" class="stats-grid hidden" style="margin-top: 20px;">
@@ -267,6 +280,18 @@
         <span>تحدث مع الدعم</span>
     </a>
 
+    <!-- Order Search Result Modal -->
+    <div id="orderDetailsModal" class="notif-overlay">
+        <div class="notif-card" style="max-width: 600px; width: 95%;">
+            <h3 style="margin-bottom: 20px;">تفاصيل الطلب 📋</h3>
+            <div id="orderDetailsContent" style="text-align: right; line-height: 1.8;">
+                <!-- Order details will be injected here -->
+            </div>
+            <button class="notif-btn" style="margin-top: 20px; width: 100%;"
+                onclick="closeOrderDetailsModal()">إغلاق</button>
+        </div>
+    </div>
+
     <script type="module">
         import { auth, onAuthStateChanged } from './firebase-config.js';
         import { login, logout, listenToAllOrders, updateOrderStatus, isWorker, listenToWorkers, listenToWorkerCompletedOrders, listenToStaffStats, getUserRole, setStaffRole, deleteStaff, sendMessage, listenToMessages, sendImageMessage, listenToUnreadCount, markMessagesAsRead, leaveOrder } from './app.js?v=2';
@@ -286,6 +311,98 @@
         const staffList = document.getElementById('staffList');
         const receiptImg = document.getElementById('receiptImg');
         const receiptDownload = document.getElementById('receiptDownload');
+
+        // Search Order by ID
+        window.searchOrderById = async () => {
+            const orderId = document.getElementById('orderSearchInput').value.trim();
+            if (!orderId) {
+                showToast("يرجى إدخال رقم الطلب!", "⚠️");
+                return;
+            }
+
+            try {
+                const { doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js');
+                const { db } = await import('./firebase-config.js');
+
+                const orderRef = doc(db, "orders", orderId);
+                const orderSnap = await getDoc(orderRef);
+
+                if (!orderSnap.exists()) {
+                    showToast("الطلب غير موجود!", "❌");
+                    return;
+                }
+
+                const order = { id: orderSnap.id, ...orderSnap.data() };
+                displayOrderDetails(order);
+            } catch (error) {
+                console.error("Error searching order:", error);
+                showToast("حدث خطأ أثناء البحث!", "❌");
+            }
+        };
+
+        window.displayOrderDetails = (order) => {
+            const statusMap = {
+                'awaiting_payment': '💸 بانتظار الدفع',
+                'pending_verification': '⏳ مراجعة الإيصال',
+                'waiting': '⏰ بانتظار البدء',
+                'working': '🔥 جارِ العمل',
+                'done': '✅ مكتمل',
+                'rejected': '❌ مرفوض'
+            };
+
+            const date = order.createdAt?.toDate ? new Date(order.createdAt.toDate()).toLocaleString('ar-EG') : 'غير معروف';
+            const characters = order.characters || [];
+            const charList = characters.map(c => `<li>${c.name} (${c.stars || '?'}★)</li>`).join('');
+
+            const steamInfo = order.steamData
+                ? (order.steamData.method === 'credentials'
+                    ? `<div style="background: rgba(0,242,254,0.1); padding: 10px; border-radius: 8px; margin: 10px 0;">
+                        <strong>🔐 بيانات Steam:</strong><br>
+                        اسم المستخدم: <code>${order.steamData.username}</code><br>
+                        كلمة المرور: <code>${order.steamData.password}</code>
+                       </div>`
+                    : '<div style="color: var(--primary);">📱 الدخول عبر QR Code</div>')
+                : '<div style="color: var(--text-dim);">غير محدد</div>';
+
+            const content = `
+                <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; margin-bottom: 15px;">
+                    <div style="font-size: 0.9rem; color: var(--text-dim); margin-bottom: 8px;">🆔 رقم الطلب</div>
+                    <div style="font-family: monospace; color: var(--primary); font-size: 1.1rem; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">${order.id}</div>
+                </div>
+
+                <div style="display: grid; gap: 12px;">
+                    <div><strong>👤 العميل:</strong> ${order.userName || 'غير معروف'}</div>
+                    <div><strong>💎 الفئة:</strong> ${order.tier}</div>
+                    <div><strong>💵 السعر:</strong> ${order.totalPrice} جنيه</div>
+                    <div><strong>📊 الحالة:</strong> ${statusMap[order.status] || order.status}</div>
+                    <div><strong>📅 التاريخ:</strong> ${date}</div>
+                    ${order.workerName ? `<div><strong>⚙️ الموظف:</strong> ${order.workerName}</div>` : ''}
+                    
+                    <div style="margin-top: 10px;">
+                        <strong>🗡️ الشخصيات (${characters.length}):</strong>
+                        <ul style="margin: 8px 0; padding-right: 20px; max-height: 200px; overflow-y: auto;">
+                            ${charList}
+                        </ul>
+                    </div>
+
+                    ${steamInfo}
+
+                    ${order.receiptUrl ? `
+                        <div style="margin-top: 10px;">
+                            <strong>📸 الإيصال:</strong><br>
+                            <img src="${order.receiptUrl}" style="max-width: 100%; border-radius: 8px; margin-top: 8px; border: 1px solid var(--glass-border);">
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+
+            document.getElementById('orderDetailsContent').innerHTML = content;
+            document.getElementById('orderDetailsModal').classList.add('visible');
+        };
+
+        window.closeOrderDetailsModal = () => {
+            document.getElementById('orderDetailsModal').classList.remove('visible');
+        };
 
         // UI Helper Functions
         window.showToast = (message, icon = 'ℹ️') => {

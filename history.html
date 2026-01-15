@@ -224,6 +224,9 @@
                                 <div style="font-size:0.75rem; color:var(--text-dim); margin-top:8px;">${date}</div>
                             </div>
                         </div>
+                        <div style="font-size:0.7rem; color:var(--text-dim); background: rgba(255,255,255,0.03); padding: 4px 8px; border-radius: 6px; display: inline-block; margin-bottom: 8px;">
+                            🆔 رقم الطلب: <span style="color: var(--primary); font-family: monospace;">${order.id}</span>
+                        </div>
                         ${order.workerName ? `<div style="font-size:0.75rem; color:var(--primary); font-style:italic;">👤 بواسطة: ${order.workerName}</div>` : ''}
                         ${actionsHtml}
                     </div>
