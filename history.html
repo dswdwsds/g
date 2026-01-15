@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.firebaseapp.com https://*.googleapis.com https://apis.google.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.gstatic.com; img-src 'self' data: https://*.discordapp.com https://*.discordapp.net https://*.googleusercontent.com https://lh3.googleusercontent.com https://via.placeholder.com https://ui-avatars.com https://*.ibb.co; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://*.firebaseio.com https://*.googleapis.com https://discord.com https://*.discordapp.com https://www.gstatic.com https://api.imgbb.com; frame-src 'self' https://*.firebaseapp.com https://*.googleapis.com https://apis.google.com;">
+    <meta charset="UTF-8">
+    <link rel="icon" href="https://ui-avatars.com/api/?name=BR&background=00f2fe&color=000">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="سجل طلباتك في Professional GS - تابع حالة طلبات تطوير الشخصيات والخدمات الخاصة بك.">
+    <title>سجل طلباتي | Professional GS</title>
+
+    <!-- Optimized Font Loading -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&family=Noto+Sans+Arabic:wght@400;700;800&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div id="navbar-placeholder"></div>
+
+    <header class="hero" style="padding-top: 120px;">
+        <h1 style="font-family: var(--font-ar);">سجل طلباتي 📋</h1>
+        <p>هنا يمكنك متابعة جميع طلباتك السابقة والحالية</p>
+    </header>
+
+    <section class="queue-container" style="max-width: 1000px;">
+        <div class="queue-card">
+            <h2 style="margin-bottom: 20px;">طلباتي</h2>
+            <div id="historyList" class="queue-list">
+                <!-- Orders will appear here -->
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p><a href="bounty-rush.html" style="color: var(--primary); text-decoration: none;">← العودة للطلبات</a></p>
+    </footer>
+
+    <div id="shared-modals-placeholder"></div>
+
+    <!-- Floating Support Button -->
+    <a href="https://discord.com/channels/1284591581717987422/1284591582187622539" target="_blank"
+        class="floating-support-btn">
+        <span>🎧</span>
+        <span>تحدث مع الدعم</span>
+    </a>
+
+    <script type="module">
+        import { auth, onAuthStateChanged } from './firebase-config.js';
+        import {
+            login, logout, listenToUserOrders, submitRating,
+            getUserRole, listenToWorkers, openChat, showToast, showConfirm
+        } from './app.js';
+        import { initSharedUI } from './ui.js';
+
+        // Initialize Centralized UI Components
+        initSharedUI();
+
+        const historyList = document.getElementById('historyList');
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                loadHistory(user.uid);
+            } else {
+                window.location.href = 'bounty-rush.html';
+            }
+        });
+
+        window.handleLogin = login;
+        window.handleLogout = logout;
+
+        const loadHistory = (uid) => {
+            listenToUserOrders(uid, (orders) => {
+                historyList.innerHTML = '';
+                if (orders.length === 0) {
+                    historyList.innerHTML = '<p style="text-align:center; color: var(--text-dim);">لا توجد طلبات بعد</p>';
+                    return;
+                }
+
+                orders.sort((a, b) => {
+                    const aTime = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
+                    const bTime = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
+                    return bTime - aTime;
+                });
+
+                orders.forEach(order => {
+                    const item = document.createElement('div');
+                    item.className = `queue-item ${order.status === 'working' ? 'active' : ''} ${order.status === 'done' ? 'done' : ''}`;
+
+                    const statusMap = {
+                        'waiting': '⏳ بانتظار البدء',
+                        'working': '🔥 جارِ العمل',
+                        'done': '✅ مكتمل',
+                        'rejected': '❌ مرفوض'
+                    };
+
+                    const date = order.createdAt?.toDate ? new Date(order.createdAt.toDate()).toLocaleDateString('ar-EG') : 'غير معروف';
+
+                    const characters = order.characters || [{ name: order.charName, image: order.charImage }];
+
+                    // Show More Logic
+                    const limit = 6;
+                    const visibleChars = characters.slice(0, limit);
+                    const hiddenChars = characters.slice(limit);
+
+                    const generateCharTag = (c, hidden = false) => `
+                            <div class="${hidden ? `hidden-char-${order.id}` : ''}" style="${hidden ? 'display:none;' : 'display:inline-flex;'} align-items:center; gap:5px; background:rgba(255,255,255,0.05); padding:4px 10px; border-radius:12px; font-size:0.85rem;">
+                                ${c.image ? `<img src="${c.image}" style="width:20px; height:20px; border-radius:50%" loading="lazy">` : '🗡️'}
+                                <span>${c.name}</span>
+                            </div>
+                        `;
+
+                    const visibleTags = visibleChars.map(c => generateCharTag(c)).join(' ');
+                    const hiddenTags = hiddenChars.map(c => generateCharTag(c, true)).join(' ');
+
+                    let moreBtn = '';
+                    if (hiddenChars.length > 0) {
+                        moreBtn = `
+                                <button onclick="document.querySelectorAll('.hidden-char-${order.id}').forEach(el => el.style.display='inline-flex'); this.style.display='none';" 
+                                    style="background:rgba(0, 242, 254, 0.1); border:1px solid var(--primary); color:white; border-radius:12px; padding:4px 10px; font-size:0.75rem; cursor:pointer;">
+                                    عرض المزيد (+${hiddenChars.length})
+                                </button>
+                            `;
+                    }
+
+                    // Actions for working orders
+                    let actionsHtml = '';
+                    if (order.status === 'working' && order.uid === auth.currentUser?.uid) {
+                        actionsHtml = `
+                                <button onclick="openChat('${order.id}')" class="auth-btn" style="padding: 6px 12px; font-size: 0.8rem; border-radius: 8px; margin-top: 8px; background: #4facfe; color: #fff; border: none;">
+                                    تواصل مع الموظف 💬
+                                </button>
+                            `;
+                    }
+
+                    item.innerHTML = `
+                    <div style="display:flex; flex-direction:column; flex:1; gap:12px">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <div style="flex:1">
+                                <div style="font-weight:700; color: var(--primary); margin-bottom:5px;">الفئة: ${order.tier}</div>
+                                <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                                    ${visibleTags}
+                                    ${hiddenTags}
+                                    ${moreBtn}
+                                </div>
+                                <div style="font-size:0.75rem; color:var(--text-dim); margin-top:8px;">${date}</div>
+                            </div>
+                        </div>
+                        <div style="font-size:0.7rem; color:var(--text-dim); background: rgba(255,255,255,0.03); padding: 4px 8px; border-radius: 6px; display: inline-block; margin-bottom: 8px;">
+                            🆔 رقم الطلب: <span style="color: var(--primary); font-family: monospace;">${order.id}</span>
+                        </div>
+                        ${order.workerName ? `<div style="font-size:0.75rem; color:var(--primary); font-style:italic;">👤 بواسطة: ${order.workerName}</div>` : ''}
+                        ${actionsHtml}
+                    </div>
+                    <span class="pos-tag" style="display:flex; flex-direction:column; align-items:flex-end; justify-content:center;">
+                        ${statusMap[order.status] || order.status}
+                    </span>
+                `;
+                    historyList.appendChild(item);
+                });
+            });
+        };
+
+    </script>
+</body>
+
+</html>
