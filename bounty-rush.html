@@ -298,6 +298,22 @@
           <input type="password" id="steamPassword" placeholder="كلمة المرور (Password)" class="review-input"
             style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); padding: 12px; border-radius: 8px;">
         </div>
+
+        <!-- QR Code Info -->
+        <div id="qrInfo"
+          style="display: none; background: rgba(0, 242, 254, 0.08); border: 1px solid var(--primary); border-radius: 12px; padding: 15px; text-align: right; line-height: 1.8;">
+          <p style="margin: 0 0 10px 0; font-weight: bold; color: var(--primary);">📱 طريقة QR Code:</p>
+          <p style="margin: 0 0 8px 0; font-size: 0.9rem;">
+            ✅ بعد قبول طلبك ووصول دورك، أحد أعضاء الدعم سيتواصل معك عبر Discord لإرسال QR Code.
+          </p>
+          <p style="margin: 0 0 12px 0; font-size: 0.85rem; color: #ffeb3b;">
+            ⚡ <strong>للأسرع:</strong> إذا أدخلت اسم المستخدم وكلمة المرور، سنبدأ العمل على طلبك فوراً بدون انتظار!
+          </p>
+          <a href="https://discord.com/channels/1284591581717987422/1284591582187622539" target="_blank"
+            style="display: inline-flex; align-items: center; gap: 6px; background: #5865F2; color: white; padding: 10px 16px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 0.9rem;">
+            <span>Discord</span> 💬
+          </a>
+        </div>
       </div>
 
       <div style="display: flex; gap: 10px;">
@@ -440,6 +456,21 @@
     loadCharacters().then(() => {
       console.log('Characters loaded:', getCharacters().length);
     });
+
+    // Toggle Login Inputs (Steam vs QR)
+    window.toggleLoginInputs = () => {
+      const method = document.querySelector('input[name="loginMethod"]:checked').value;
+      const steamInputs = document.getElementById('steamInputs');
+      const qrInfo = document.getElementById('qrInfo');
+
+      if (method === 'credentials') {
+        steamInputs.style.display = 'block';
+        qrInfo.style.display = 'none';
+      } else {
+        steamInputs.style.display = 'none';
+        qrInfo.style.display = 'block';
+      }
+    };
 
     window.orderNow = async (tier, event) => {
       if (!auth.currentUser) {

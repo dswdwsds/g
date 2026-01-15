@@ -201,6 +201,16 @@
                             `;
                         }
 
+                        // Actions for working orders
+                        let actionsHtml = '';
+                        if (order.status === 'working' && order.uid === user?.uid) {
+                            actionsHtml = `
+                                <button onclick="openChat('${order.id}')" class="auth-btn" style="padding: 6px 12px; font-size: 0.8rem; border-radius: 8px; margin-top: 8px; background: #4facfe; color: #fff; border: none;">
+                                    تواصل مع الموظف 💬
+                                </button>
+                            `;
+                        }
+
                         item.innerHTML = `
                     <div style="display:flex; flex-direction:column; flex:1; gap:12px">
                         <div style="display:flex; align-items:center; gap:10px;">
