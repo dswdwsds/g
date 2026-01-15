@@ -143,7 +143,6 @@ export const refreshUserUI = async () => {
                     <button onclick="handleLogout()" class="dropdown-btn logout-btn">تسجيل الخروج 🚪</button>
                 </div>
             </div>
-            ${isStaff ? `<button onclick="openOperationsModal()" class="auth-btn ops-nav-btn" style="margin-right:10px;">العمليات 📂</button>` : ''}
         `;
     } else {
         userInfo.innerHTML = `
