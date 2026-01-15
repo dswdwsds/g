@@ -328,16 +328,20 @@ export const sendPaymentProofToDiscord = async (orderId, file, orderData) => {
 
         if (response.ok) {
             const result = await response.json();
+            console.log("Discord Full Response Object:", JSON.stringify(result, null, 2));
 
-            // محاولة جلب الرابط بأكثر من طريقة لضمان الدقة
             let receiptUrl = null;
             if (result.attachments && result.attachments.length > 0) {
-                // نفضل الرابط الذي ينتهي بـ jpg أو الرابط الأول المتاح
-                const bestAttachment = result.attachments.find(a => a.filename?.toLowerCase().includes('receipt')) || result.attachments[0];
+                // نأخذ المرفق، ونبحث أولاً عن أي واحد فيه كلمة 'receipt' أو 'jpg' أو 'png'
+                const bestAttachment = result.attachments.find(a =>
+                    a.filename?.toLowerCase().includes('receipt') ||
+                    a.content_type?.includes('image')
+                ) || result.attachments[0];
+
                 receiptUrl = bestAttachment.url || bestAttachment.proxy_url;
             }
 
-            console.log("Order Verified on Discord. Receipt URL:", receiptUrl);
+            console.log("Final Receipt URL being saved:", receiptUrl);
 
             const orderRef = doc(db, "orders", orderId);
             await updateDoc(orderRef, {

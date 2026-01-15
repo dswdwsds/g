@@ -73,24 +73,6 @@
             object-fit: contain;
         }
 
-        .badge.pending_verification {
-            background: #00f2fe;
-            color: #000;
-        }
-
-        .badge.awaiting_payment {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-dim);
-        }
-
-        .receipt-preview {
-            max-width: 100%;
-            max-height: 70vh;
-            border-radius: 12px;
-            border: 1px solid var(--glass-border);
-            object-fit: contain;
-        }
-
         .receipt-preview {
             max-width: 100%;
             max-height: 70vh;
@@ -433,7 +415,7 @@
                         ` : ''}
                     </div>
                     <div class="action-group" style="flex-shrink:0; display:flex; flex-direction:column; gap:8px;">
-                        ${order.receiptUrl ? `<button class="auth-btn" style="background:rgba(255,255,255,0.1); border: 1px solid var(--primary); font-size: 0.8rem; padding: 5px;" onclick="viewReceipt('${order.receiptUrl}')">👁️ عرض الإيصال</button>` : (order.status === 'pending_verification' ? '<span style="font-size:0.7rem; color:#ff4d4d; text-align:center;">⚠️ الرابط مفقود</span>' : '')}
+                        ${order.receiptUrl ? `<button class="auth-btn" style="background:rgba(255,255,255,0.1); border: 1px solid var(--primary); font-size: 0.8rem; padding: 5px;" onclick="viewReceipt('${order.receiptUrl}')">👁️ عرض الإيصال</button>` : (order.status === 'pending_verification' ? `<span style="font-size:0.7rem; color:#ff4d4d; text-align:center;">⚠️ الرابط مفقود<br><small>(${order.id})</small></span>` : '')}
                         ${order.status === 'pending_verification' ? `<button class="auth-btn" style="background:#4facfe" onclick="manageOrder('${order.id}', 'waiting')">تأكيد الدفع ✅</button>` : ''}
                         ${order.status === 'waiting' ? `<button class="auth-btn" style="background:#4facfe" onclick="manageOrder('${order.id}', 'working')">قبول الطلب</button>` : ''}
                         ${(order.status === 'working' && isOwner) ? `<button class="auth-btn" style="background:#00f2fe; color:#000" onclick="manageOrder('${order.id}', 'done')">إنهاء العمل</button>` : ''}
