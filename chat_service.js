@@ -1,4 +1,4 @@
-import { auth, db, collection, addDoc, serverTimestamp, query, where, orderBy, onSnapshot, getDocs, writeBatch } from './firebase-config.js';
+import { auth, db, doc, setDoc, updateDoc, getDoc, onSnapshot, serverTimestamp, arrayUnion } from './firebase-config.js';
 import { showToast } from './ui_utils.js';
 
 const IMGBB_API_KEY = "22d2abeb6052c5dbee3c353e6aa617c0";
@@ -65,7 +65,7 @@ export const openChat = async (orderId) => {
 
         if (!chatMessages) return;
         chatMessages.innerHTML = '';
-        if (messages.length === 0) {
+        if (!messages || messages.length === 0) {
             chatMessages.innerHTML = '<div class="chat-empty">لا توجد رسائل بعد. ابدأ المحادثة الآن! 👋</div>';
         } else {
             messages.forEach(msg => {
@@ -73,7 +73,7 @@ export const openChat = async (orderId) => {
                 const bubble = document.createElement('div');
                 bubble.className = `message-bubble ${isMe ? 'sent' : 'received'}`;
 
-                const time = msg.timestamp ? new Date(msg.timestamp.seconds * 1000).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }) : '...';
+                const time = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }) : '...';
 
                 bubble.innerHTML = `
                   <div class="message-info">
@@ -108,16 +108,23 @@ export const sendMessage = async (orderId, message) => {
         const user = auth.currentUser;
         if (!user) return false;
 
-        await addDoc(collection(db, "messages"), {
-            orderId: orderId,
+        const chatRef = doc(db, "chats", orderId);
+        const msg = {
             senderId: user.uid,
             senderName: user.displayName,
             senderAvatar: user.photoURL,
             text: message,
             image: null,
-            read: false,
-            timestamp: serverTimestamp()
-        });
+            timestamp: Date.now(), // Fixed timestamp for serializability in array
+            readStatus: {} // New system: track read status per user
+        };
+
+        await setDoc(chatRef, {
+            orderId: orderId,
+            messages: arrayUnion(msg),
+            lastUpdated: serverTimestamp()
+        }, { merge: true });
+
         return true;
     } catch (error) {
         console.error("Chat Error:", error);
@@ -146,16 +153,23 @@ export const sendImageMessage = async (orderId, file) => {
         const imageUrl = await uploadToImgBB(file);
         if (!imageUrl) return false;
 
-        await addDoc(collection(db, "messages"), {
-            orderId: orderId,
+        const chatRef = doc(db, "chats", orderId);
+        const msg = {
             senderId: user.uid,
             senderName: user.displayName,
             senderAvatar: user.photoURL,
             text: null,
             image: imageUrl,
-            read: false,
-            timestamp: serverTimestamp()
-        });
+            timestamp: Date.now(),
+            readStatus: {}
+        };
+
+        await setDoc(chatRef, {
+            orderId: orderId,
+            messages: arrayUnion(msg),
+            lastUpdated: serverTimestamp()
+        }, { merge: true });
+
         return true;
     } catch (error) {
         console.error("Image Send Error:", error);
@@ -177,49 +191,41 @@ export const handleSendImage = async (file) => {
 };
 
 export const listenToMessages = (orderId, callback) => {
-    const q = query(
-        collection(db, "messages"),
-        where("orderId", "==", orderId),
-        orderBy("timestamp", "asc")
-    );
-    return onSnapshot(q, (snapshot) => {
-        const messages = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        callback(messages);
+    const chatRef = doc(db, "chats", orderId);
+    return onSnapshot(chatRef, (snapshot) => {
+        if (snapshot.exists()) {
+            const data = snapshot.data();
+            callback(data.messages || []);
+        } else {
+            callback([]);
+        }
     });
 };
 
 export const markMessagesAsRead = async (orderId, userId) => {
     try {
-        const q = query(
-            collection(db, "messages"),
-            where("orderId", "==", orderId),
-            where("read", "==", false)
-        );
-        const snapshot = await getDocs(q);
-        const batch = writeBatch(db);
-
-        let hasUpdates = false;
-        snapshot.docs.forEach(doc => {
-            if (doc.data().senderId !== userId) {
-                batch.update(doc.ref, { read: true });
-                hasUpdates = true;
-            }
-        });
-
-        if (hasUpdates) await batch.commit();
+        const chatRef = doc(db, "chats", orderId);
+        // Simple approach: Store lastRead timestamp for the user
+        await setDoc(chatRef, {
+            [`lastRead_${userId}`]: Date.now()
+        }, { merge: true });
     } catch (error) {
         console.error("Error marking read:", error);
     }
 };
 
 export const listenToUnreadCount = (orderId, userId, callback) => {
-    const q = query(
-        collection(db, "messages"),
-        where("orderId", "==", orderId),
-        where("read", "==", false)
-    );
-    return onSnapshot(q, (snapshot) => {
-        const count = snapshot.docs.filter(doc => doc.data().senderId !== userId).length;
+    const chatRef = doc(db, "chats", orderId);
+    return onSnapshot(chatRef, (snapshot) => {
+        if (!snapshot.exists()) {
+            callback(0);
+            return;
+        }
+        const data = snapshot.data();
+        const messages = data.messages || [];
+        const lastRead = data[`lastRead_${userId}`] || 0;
+
+        const count = messages.filter(msg => msg.senderId !== userId && msg.timestamp > lastRead).length;
         callback(count);
     });
 };
