@@ -404,6 +404,20 @@
       }
     };
 
+    window.resumePayment = (orderId) => {
+      const order = lastOrders.find(o => o.id === orderId);
+      if (!order) return;
+
+      const details = {
+        orderId: order.id,
+        totalPrice: order.totalPrice,
+        walletNumber: '01015831676',
+        tier: order.tier,
+        characters: order.characters
+      };
+      showPaymentModal(details);
+    };
+
     submitPayment.onclick = async () => {
       if (receiptInput.files.length === 0) {
         showToast("يرجى رفع صورة الإيصال أولاً!", "⚠️");
@@ -414,14 +428,17 @@
       submitPayment.innerText = "جاري الإرسال...";
 
       try {
+        const orderId = currentOrderForPayment.orderId;
+        const characters = currentOrderForPayment.characters || Array.from(selectedChars).map(id => getCharacters().find(c => c.id === id));
+
         const success = await sendPaymentProofToDiscord(
-          currentOrderForPayment.orderId,
+          orderId,
           receiptInput.files[0],
           {
             userName: auth.currentUser.displayName,
             tier: currentOrderForPayment.tier,
             totalPrice: currentOrderForPayment.totalPrice,
-            characters: Array.from(selectedChars).map(id => getCharacters().find(c => c.id === id))
+            characters: characters
           }
         );
 
@@ -683,9 +700,16 @@
                     </div>
                     ${workerInfo}
                 </div>
-                <span class="pos-tag" style="display:flex; flex-direction:column; align-items:flex-end;">
-                    ${statusBadge}
-                </span>
+                <div style="display:flex; flex-direction:column; align-items:flex-end; gap:5px;">
+                    <span class="pos-tag" style="display:flex; flex-direction:column; align-items:flex-end;">
+                        ${statusBadge}
+                    </span>
+                    ${(isAwaiting && order.uid === user?.uid) ? `
+                      <button onclick="resumePayment('${order.id}')" class="auth-btn" style="padding: 4px 10px; font-size: 0.7rem; border-radius: 8px; margin-top: 5px; background: var(--primary); color: #000; border: none;">
+                        استكمال الدفع 💳
+                      </button>
+                    ` : ''}
+                </div>
             `;
         queueList.appendChild(item);
       });
