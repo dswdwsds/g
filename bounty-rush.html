@@ -7,6 +7,60 @@
   <title>One Piece Bounty Rush | Professional GS</title>
   <link rel="stylesheet" href="style.css">
   <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+  <style>
+    .rating-stars {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      font-size: 2.8rem;
+      margin: 15px 0;
+      direction: ltr;
+      /* Ensure star hover works left-to-right logic */
+      user-select: none;
+    }
+
+    .star {
+      cursor: pointer;
+      color: rgba(255, 255, 255, 0.1);
+      transition: all 0.2s ease;
+      display: inline-block;
+    }
+
+    /* Hover effect: make all previous stars yellow */
+    .star:hover,
+    .star:hover~.star {
+      color: #ffd700 !important;
+      transform: scale(1.2);
+    }
+
+    /* Fixed rating effect */
+    .star.active {
+      color: #ffd700 !important;
+      text-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+    }
+
+    /* Make sure stars don't flicker on hover */
+    .rating-stars:hover .star {
+      color: rgba(255, 255, 255, 0.1);
+    }
+
+    .rating-stars:hover .star:hover,
+    .rating-stars:hover .star:hover~.star {
+      color: #ffd700 !important;
+    }
+
+    .review-input {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--glass-border);
+      border-radius: 15px;
+      color: white;
+      padding: 15px;
+      margin-bottom: 20px;
+      font-family: var(--font-ar);
+      resize: none;
+    }
+  </style>
 </head>
 
 <body>
@@ -84,12 +138,12 @@
           style="border-top: 1px solid var(--glass-border); margin-top: 20px; padding-top: 20px;">
           <p style="text-align: center; margin-bottom: 5px; font-weight: bold; color: var(--primary);">ما رأيك في جودة
             الخدمة؟ ⭐</p>
-          <div class="rating-stars" id="stars">
-            <span class="star" data-value="1">★</span>
-            <span class="star" data-value="2">★</span>
-            <span class="star" data-value="3">★</span>
-            <span class="star" data-value="4">★</span>
+          <div class="rating-stars" id="stars" style="flex-direction: row-reverse;">
             <span class="star" data-value="5">★</span>
+            <span class="star" data-value="4">★</span>
+            <span class="star" data-value="3">★</span>
+            <span class="star" data-value="2">★</span>
+            <span class="star" data-value="1">★</span>
           </div>
         </div>
       </div>
@@ -403,8 +457,8 @@
         star.classList.remove('active');
         star.onclick = () => {
           selectedRatingValue = parseInt(star.dataset.value);
-          stars.forEach((s, i) => {
-            if (i < selectedRatingValue) s.classList.add('active');
+          stars.forEach((s) => {
+            if (parseInt(s.dataset.value) <= selectedRatingValue) s.classList.add('active');
             else s.classList.remove('active');
           });
 

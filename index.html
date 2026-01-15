@@ -6,6 +6,85 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Game Services | خدمات الألعاب الاحترافية</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        .reviews-section {
+            padding: 80px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .reviews-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+        }
+
+        .review-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            animation: fadeIn 0.6s ease-out both;
+        }
+
+        .review-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .review-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 2px solid var(--primary);
+            object-fit: cover;
+        }
+
+        .review-name {
+            font-weight: 800;
+            color: #fff;
+            font-size: 1rem;
+        }
+
+        .review-stars {
+            color: #ffd700;
+            font-size: 0.9rem;
+            margin-top: 2px;
+        }
+
+        .review-text {
+            color: var(--text-dim);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            font-style: italic;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
 </head>
 
 <body>
