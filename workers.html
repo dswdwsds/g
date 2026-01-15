@@ -63,6 +63,8 @@
     <main class="admin-container">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
             <h1 style="margin: 0;">إدارة الطلبات المباشرة 💼</h1>
+            <button id="toggleOwnerBtn" class="auth-btn hidden" style="background: var(--accent); white-space: nowrap;"
+                onclick="toggleOwnerPanel()">⚙️ إدارة الطاقم</button>
         </div>
 
         <div id="statsContainer" class="stats-grid hidden" style="margin-top: 20px;">
@@ -89,6 +91,7 @@
                     style="height: 50px; background: var(--glass); border: 1px solid var(--glass-border); border-radius: 12px; color: white; padding: 0 10px;">
                     <option value="staff">Staff 🛡️</option>
                     <option value="admin">Admin 👑</option>
+                    <option value="owner">Owner 💎</option>
                 </select>
                 <button class="auth-btn" onclick="handleAddStaff(event)">إضافة/تحديث</button>
             </div>
@@ -160,10 +163,13 @@
                 `;
 
                 const userRole = getUserRole(user.email);
-                if (userRole === 'owner' || user.email === 'abdobwd78@gmail.com') {
-                    ownerPanel.classList.remove('hidden');
+                const isOwnerOrAdmin = userRole === 'owner' || userRole === 'admin';
+
+                if (isOwnerOrAdmin) {
+                    document.getElementById('toggleOwnerBtn').classList.remove('hidden');
                     renderStaffList();
                 } else {
+                    document.getElementById('toggleOwnerBtn').classList.add('hidden');
                     ownerPanel.classList.add('hidden');
                 }
 
@@ -222,7 +228,7 @@
                     <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
                         <div>
                             <div style="font-weight: bold;">${s.email}</div>
-                            <div style="font-size: 0.8rem; color: var(--primary);">${s.role === 'admin' ? 'Admin 👑' : 'Staff 🛡️'}</div>
+                            <div style="font-size: 0.8rem; color: var(--primary);">${s.role === 'admin' ? 'Admin 👑' : (s.role === 'owner' ? 'Owner 💎' : 'Staff 🛡️')}</div>
                         </div>
                         <button onclick="handleDeleteStaff('${s.id}')" style="background: #ff4d4d22; color: #ff4d4d; border: 1px solid #ff4d4d; padding: 5px 12px; border-radius: 8px; font-size: 0.8rem; cursor: pointer;">حذف 🗑️</button>
                     </div>
@@ -234,6 +240,10 @@
 
         window.toggleEarningsModal = () => {
             earningsModal.classList.toggle('visible');
+        };
+
+        window.toggleOwnerPanel = () => {
+            ownerPanel.classList.toggle('hidden');
         };
 
         window.openCompletedOrdersModal = () => {

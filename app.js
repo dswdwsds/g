@@ -220,17 +220,15 @@ export const listenToWorkers = (callback) => {
     });
 };
 
-const PRIMARY_OWNER = 'abdobwd78@gmail.com'; // إيميل المالك الأساسي كاحتياط
-
 export const isWorker = (email) => {
-    return authorizedStaff.some(s => s.email === email || s.id === email) || email === PRIMARY_OWNER;
+    const staff = authorizedStaff.find(s => s.email === email || s.id === email);
+    // يعتبر موظفاً إذا كان له دور (staff, admin, owner)
+    return !!staff && !!staff.role;
 };
 
 export const getUserRole = (email) => {
     const staff = authorizedStaff.find(s => s.email === email || s.id === email);
-    if (staff) return staff.role;
-    if (email === PRIMARY_OWNER) return 'owner';
-    return null;
+    return staff ? staff.role : null;
 };
 
 // وظيفة لإضافة أو تحديث دور موظف (للمالك فقط)
