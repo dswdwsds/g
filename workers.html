@@ -129,10 +129,7 @@
 
 <body>
 
-    <nav class="nav-bar">
-        <div class="user-info" id="userInfo"></div>
-        <a href="index.html" class="logo" style="text-decoration: none; color: inherit;">WORKER PANEL</a>
-    </nav>
+    <div id="navbar-placeholder"></div>
 
     <main class="admin-container">
         <div
@@ -240,39 +237,7 @@
         </div>
     </main>
 
-    <!-- Chat Modal -->
-    <div id="chatModal" class="chat-modal">
-        <div class="chat-container">
-            <div class="chat-header">
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <div style="position:relative;">
-                        <img id="chatTargetAvatar" src=""
-                            style="width:35px; height:35px; border-radius:50%; border:1px solid var(--primary)">
-                    </div>
-                    <div>
-                        <div id="chatTargetName" style="font-weight:bold; font-size:0.9rem;">اسم العميل</div>
-                    </div>
-                </div>
-                <button class="auth-btn" style="background:none; border:none; font-size:1.2rem; padding:0;"
-                    onclick="closeChat()">✖</button>
-            </div>
-            <div id="chatMessages" class="chat-messages">
-                <div class="chat-empty">جاري تحميل الرسائل...</div>
-            </div>
-            <div class="chat-input-area" style="position:relative;">
-                <div id="uploadProgress" class="upload-progress-container">
-                    <div class="upload-progress-bar"></div>
-                </div>
-                <input type="file" id="chatImageInput" accept="image/*" hidden>
-                <button onclick="document.getElementById('chatImageInput').click()" class="chat-send-btn"
-                    style="background:rgba(255,255,255,0.1); font-size:1.1rem;">📸</button>
-                <input type="text" id="chatInput" placeholder="اكتب رسالتك هنا..." autocomplete="off">
-                <button id="sendMessageBtn" class="chat-send-btn">🕊️</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="toastContainer" class="toast-container"></div>
+    <div id="shared-modals-placeholder"></div>
     <!-- Floating Support Button -->
     <a href="https://discord.com/channels/1284591581717987422/1284591582187622539" target="_blank"
         class="floating-support-btn">
@@ -294,7 +259,16 @@
 
     <script type="module">
         import { auth, onAuthStateChanged } from './firebase-config.js';
-        import { login, logout, listenToAllOrders, updateOrderStatus, isWorker, listenToWorkers, listenToWorkerCompletedOrders, listenToStaffStats, getUserRole, setStaffRole, deleteStaff, sendMessage, listenToMessages, sendImageMessage, listenToUnreadCount, markMessagesAsRead, leaveOrder } from './app.js?v=2';
+        import {
+            login, logout, listenToAllOrders, updateOrderStatus, isWorker,
+            listenToWorkers, listenToWorkerCompletedOrders, listenToStaffStats,
+            getUserRole, setStaffRole, deleteStaff, listenToUnreadCount,
+            markMessagesAsRead, leaveOrder, openChat, showToast, showConfirm
+        } from './app.js';
+        import { initSharedUI } from './ui.js';
+
+        // Initialize Shared UI
+        initSharedUI();
 
         const userInfo = document.getElementById('userInfo');
         const adminContent = document.getElementById('adminContent');
@@ -405,22 +379,6 @@
         };
 
         // UI Helper Functions
-        window.showToast = (message, icon = 'ℹ️') => {
-            const container = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.innerHTML = `<span class="toast-icon">${icon}</span><span>${message}</span>`;
-            container.appendChild(toast);
-            setTimeout(() => {
-                toast.classList.add('removing');
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
-        };
-
-        window.showConfirm = (message, onConfirm) => {
-            const result = confirm(message);
-            if (result) onConfirm();
-        };
 
         let currentOrders = [];
 
@@ -428,18 +386,6 @@
         const checkAccess = () => {
             const user = auth.currentUser;
             if (user) {
-                userInfo.innerHTML = `
-                    <div class="user-dropdown">
-                        <div class="user-profile">
-                            <img src="${user.photoURL}" class="user-avatar" loading="lazy">
-                            <span class="user-name">${user.displayName}</span>
-                        </div>
-                        <div class="dropdown-menu">
-                            <a href="#" class="dropdown-item" onclick="handleLogout()">🚪 تسجيل الخروج</a>
-                        </div>
-                    </div>
-                `;
-
                 const userRole = getUserRole(user.email);
                 const isOwnerOrAdmin = userRole === 'owner' || userRole === 'admin';
 
@@ -463,7 +409,6 @@
                     statsContainer.classList.add('hidden');
                 }
             } else {
-                userInfo.innerHTML = `<button class="auth-btn" onclick="handleLogin()">تسجيل دخول</button>`;
                 adminContent.classList.add('hidden');
                 accessDenied.classList.remove('hidden');
                 statsContainer.classList.add('hidden');
@@ -552,112 +497,6 @@
             }
         };
 
-        let chatUnsubscribe = null;
-        let activeChatOrderId = null;
-
-        window.openChat = (orderId) => {
-            const order = currentOrders.find(o => o.id === orderId);
-            if (!order) return;
-
-            activeChatOrderId = orderId;
-            document.getElementById('chatTargetName').innerText = order.userName || "العميل";
-            document.getElementById('chatTargetAvatar').src = order.userAvatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(order.userName || 'U')}&background=ff00c8&color=fff`;
-
-            const modal = document.getElementById('chatModal');
-            modal.classList.add('visible');
-
-            const chatMessages = document.getElementById('chatMessages');
-            chatMessages.innerHTML = '<div class="chat-empty">جاري تحميل الرسائل...</div>';
-
-            if (chatUnsubscribe) chatUnsubscribe();
-
-            chatUnsubscribe = listenToMessages(orderId, (messages) => {
-                // Mark as read when messages load and chat is open
-                markMessagesAsRead(orderId, auth.currentUser.uid);
-
-                chatMessages.innerHTML = '';
-                if (messages.length === 0) {
-                    chatMessages.innerHTML = '<div class="chat-empty">لا توجد رسائل بعد. ابدأ المحادثة الآن! 👋</div>';
-                } else {
-                    messages.forEach(msg => {
-                        const isMe = msg.senderId === auth.currentUser?.uid;
-                        const bubble = document.createElement('div');
-                        bubble.className = `message-bubble ${isMe ? 'sent' : 'received'}`;
-
-                        const time = msg.timestamp ? new Date(msg.timestamp.seconds * 1000).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }) : '...';
-
-                        bubble.innerHTML = `
-                            <div class="message-info">
-                                ${!isMe ? `<img src="${msg.senderAvatar}" style="width:15px; height:15px; border-radius:50%">` : ''}
-                                <span>${isMe ? 'أنا' : msg.senderName} • ${time}</span>
-                            </div>
-                            <div class="message-text">
-                                ${msg.text ? `<div>${msg.text}</div>` : ''}
-                                ${msg.image ? `
-                                    <a href="${msg.image}" target="_blank">
-                                        <img src="${msg.image}" style="max-width:100%; border-radius:10px; margin-top:5px; border:1px solid var(--glass-border); cursor:pointer;">
-                                    </a>
-                                ` : ''}
-                            </div>
-                        `;
-                        chatMessages.appendChild(bubble);
-                    });
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
-                }
-            });
-        };
-
-        window.closeChat = () => {
-            document.getElementById('chatModal').classList.remove('visible');
-            if (chatUnsubscribe) chatUnsubscribe();
-            chatUnsubscribe = null;
-            activeChatOrderId = null;
-        };
-
-        document.getElementById('sendMessageBtn').onclick = async () => {
-            const input = document.getElementById('chatInput');
-            const text = input.value.trim();
-            if (!text || !activeChatOrderId) return;
-
-            input.value = '';
-            const success = await sendMessage(activeChatOrderId, text);
-            if (!success) {
-                showToast("فشل إرسال الرسالة!", "❌");
-                input.value = text;
-            }
-        };
-
-        document.getElementById('chatInput').onkeypress = (e) => {
-            if (e.key === 'Enter') document.getElementById('sendMessageBtn').click();
-        };
-
-        document.getElementById('chatImageInput').onchange = async (e) => {
-            const file = e.target.files[0];
-            if (!file || !activeChatOrderId) return;
-
-            if (file.size > 32 * 1024 * 1024) {
-                showToast("حجم الصورة كبير جداً! (الأقصى 32 ميجا)", "⚠️");
-                return;
-            }
-
-            // Show progress bar
-            const progressBar = document.getElementById('uploadProgress');
-            progressBar.style.display = 'block';
-
-            // showToast("جاري رفع الصورة...", "⏳"); // Replace with bar
-
-            const success = await sendImageMessage(activeChatOrderId, file);
-
-            // Hide progress bar
-            progressBar.style.display = 'none';
-
-            if (success) {
-                // showToast("تم إرسال الصورة!", "✅");
-            } else {
-                showToast("فشل رفع الصورة!", "❌");
-            }
-            e.target.value = '';
-        };
 
         function loadOrders() {
             listenToAllOrders((orders) => {

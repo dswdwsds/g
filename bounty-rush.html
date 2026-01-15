@@ -81,13 +81,7 @@
 
 <body>
 
-  <nav class="nav-bar">
-    <div class="user-info" id="userInfo">
-      <!-- Auth Content -->
-    </div>
-    <a href="index.html" class="logo"
-      style="text-decoration: none; font-family: var(--font-en); font-weight: 800; color: var(--primary);">PRO GS</a>
-  </nav>
+  <div id="navbar-placeholder"></div>
 
   <header class="hero" style="padding-top: 120px;">
     <h1>One Piece Bounty Rush</h1>
@@ -374,92 +368,7 @@
     </div>
   </div>
 
-  <!-- Custom Confirm Modal -->
-  <div id="confirmModal" class="confirm-overlay">
-    <div class="confirm-card">
-      <div id="confirmTitle" class="confirm-title">تأكيد الطلب</div>
-      <p id="confirmMsg" class="confirm-msg"></p>
-      <div class="confirm-actions">
-        <button id="confirmYes" class="confirm-btn yes">نعم، متأكد</button>
-        <button id="confirmNo" class="confirm-btn no">إلغاء</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Toast Container -->
-  <div id="toastContainer" class="toast-container"></div>
-
-  <!-- Chat Modal -->
-  <div id="chatModal" class="chat-modal">
-    <div class="chat-container">
-      <div class="chat-header">
-        <div style="display:flex; align-items:center; gap:10px;">
-          <div style="position:relative;">
-            <img id="chatTargetAvatar" src=""
-              style="width:35px; height:35px; border-radius:50%; border:1px solid var(--primary)">
-            <div
-              style="position:absolute; bottom:0; right:0; width:10px; height:10px; background:#00ff00; border-radius:50%; border:2px solid #000;">
-            </div>
-          </div>
-          <div>
-            <div id="chatTargetName" style="font-weight:bold; font-size:0.9rem;">اسم الموظف</div>
-            <div style="font-size:0.7rem; color:var(--text-dim);">متصل الآن</div>
-          </div>
-        </div>
-        <button class="auth-btn" style="background:none; border:none; font-size:1.2rem; padding:0;"
-          onclick="closeChat()">✖</button>
-      </div>
-      <div id="chatMessages" class="chat-messages">
-        <div class="chat-empty">جاري تحميل الرسائل...</div>
-      </div>
-      <div id="uploadProgress"
-        style="display:none; padding:10px; background:rgba(0,242,254,0.1); font-size:0.8rem; text-align:center; color:var(--primary);">
-        ⏳ جاري رفع الملف...
-      </div>
-      <div class="chat-input-area">
-        <input type="file" id="chatImageInput" accept="image/*" hidden>
-        <button onclick="document.getElementById('chatImageInput').click()" class="chat-send-btn"
-          style="background:rgba(255,255,255,0.1); font-size:1.1rem;">📸</button>
-        <input type="text" id="chatInput" placeholder="اكتب رسالتك هنا..." autocomplete="off">
-        <button id="sendMessageBtn" class="chat-send-btn">🕊️</button>
-      </div>
-    </div>
-  </div>
-
-  <footer>
-    <p>© 2026 Professional Game Services. All rights reserved.</p>
-  </footer>
-
-  <!-- Operations History Modal -->
-  <div id="operationsModal" class="notif-overlay">
-    <div class="notif-card ops-modal">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
-        <h3 style="margin: 0;">سجل العمليات 📂</h3>
-        <button class="auth-btn" style="background:none; border:none; padding:5px; min-width:auto; font-size: 1.2rem;"
-          onclick="closeOperationsModal()">✖</button>
-      </div>
-
-      <div class="search-container">
-        <input type="text" id="opsSearchInput" class="search-input" placeholder="🔍 ابحث برقم الطلب (Order ID)..."
-          onkeypress="if(event.key === 'Enter') handleOpsSearch()">
-        <button onclick="handleOpsSearch()" class="auth-btn" style="padding: 10px 18px; margin-right: 5px;">بحث</button>
-      </div>
-
-      <div id="opsList" class="ops-list">
-        <!-- Operations will load here -->
-        <div class="ops-empty">جاري تحميل أحدث العمليات...</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Order Details Modal -->
-  <div id="opsDetailsModal" class="notif-overlay">
-    <div class="notif-card" style="max-width: 500px; width: 95%;">
-      <h3 style="margin-bottom: 20px;">تفاصيل العملية 📋</h3>
-      <div id="opsDetailsContent" style="text-align: right; line-height: 1.6; font-size: 0.9rem;"></div>
-      <button class="notif-btn" style="margin-top: 20px;" onclick="closeOpsDetailsModal()">إغلاق</button>
-    </div>
-  </div>
+  <div id="shared-modals-placeholder"></div>
 
   <!-- Floating Support Button -->
   <a href="https://discord.com/channels/1284591581717987422/1284591582187622539" target="_blank"
@@ -469,8 +378,17 @@
   </a>
 
   <script type="module">
-    import { auth, onAuthStateChanged } from './firebase-config.js';
-    import { login, logout, placeOrder, sendPaymentProofToDiscord, updateOrderStatus, listenToQueue, listenToUserOrders, listenToWorkers, getUserRole, submitRating, loadCharacters, getCharacters, sendMessage, listenToMessages, sendImageMessage, listenToUnreadCount, markMessagesAsRead, hasUserPurchasedOffer, listenToAllOrdersExtended, getOrderById } from './app.js?v=2';
+    import { auth, onAuthStateChanged, db, doc, getDoc } from './firebase-config.js';
+    import {
+      login, logout, placeOrder, sendPaymentProofToDiscord, updateOrderStatus,
+      listenToQueue, listenToUserOrders, listenToWorkers, getUserRole,
+      submitRating, loadCharacters, getCharacters,
+      showToast, showConfirm, openChat
+    } from './app.js';
+    import { initSharedUI } from './ui.js';
+
+    // Initialize Shared UI Components (Navbar, Modals, Auth)
+    initSharedUI();
 
     const userInfo = document.getElementById('userInfo');
     const queueList = document.getElementById('queueList');
@@ -785,113 +703,6 @@
       });
     };
 
-    let chatUnsubscribe = null;
-    let activeChatOrderId = null;
-
-    window.openChat = (orderId) => {
-      const order = lastOrders.find(o => o.id === orderId);
-      if (!order) return;
-
-      activeChatOrderId = orderId;
-      document.getElementById('chatTargetName').innerText = order.workerName || "الموظف";
-      // We don't have worker avatar easily accessible here without a separate fetch, using a default or order user dummy for now
-      document.getElementById('chatTargetAvatar').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(order.workerName || 'W')}&background=00f2fe&color=000`;
-
-      const modal = document.getElementById('chatModal');
-      modal.classList.add('visible');
-
-      const chatMessages = document.getElementById('chatMessages');
-      chatMessages.innerHTML = '<div class="chat-empty">جاري تحميل الرسائل...</div>';
-
-      if (chatUnsubscribe) chatUnsubscribe();
-
-      chatUnsubscribe = listenToMessages(orderId, (messages) => {
-        // Mark as read when messages load and chat is open
-        markMessagesAsRead(orderId, auth.currentUser.uid);
-
-        chatMessages.innerHTML = '';
-        if (messages.length === 0) {
-          chatMessages.innerHTML = '<div class="chat-empty">لا توجد رسائل بعد. ابدأ المحادثة الآن! 👋</div>';
-        } else {
-          messages.forEach(msg => {
-            const isMe = msg.senderId === auth.currentUser?.uid;
-            const bubble = document.createElement('div');
-            bubble.className = `message-bubble ${isMe ? 'sent' : 'received'}`;
-
-            const time = msg.timestamp ? new Date(msg.timestamp.seconds * 1000).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }) : '...';
-
-            bubble.innerHTML = `
-              <div class="message-info">
-                ${!isMe ? `<img src="${msg.senderAvatar}" style="width:15px; height:15px; border-radius:50%">` : ''}
-                <span>${isMe ? 'أنا' : msg.senderName} • ${time}</span>
-              </div>
-              <div class="message-text">
-                ${msg.text ? `<div>${msg.text}</div>` : ''}
-                ${msg.image ? `
-                  <a href="${msg.image}" target="_blank">
-                    <img src="${msg.image}" style="max-width:100%; border-radius:10px; margin-top:5px; border:1px solid var(--glass-border); cursor:pointer;">
-                  </a>
-                ` : ''}
-              </div>
-            `;
-            chatMessages.appendChild(bubble);
-          });
-          chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-      });
-    };
-
-    window.closeChat = () => {
-      document.getElementById('chatModal').classList.remove('visible');
-      if (chatUnsubscribe) chatUnsubscribe();
-      chatUnsubscribe = null;
-      activeChatOrderId = null;
-    };
-
-    document.getElementById('sendMessageBtn').onclick = async () => {
-      const input = document.getElementById('chatInput');
-      const text = input.value.trim();
-      if (!text || !activeChatOrderId) return;
-
-      input.value = '';
-      const success = await sendMessage(activeChatOrderId, text);
-      if (!success) {
-        showToast("فشل إرسال الرسالة!", "❌");
-        input.value = text;
-      }
-    };
-
-    document.getElementById('chatInput').onkeypress = (e) => {
-      if (e.key === 'Enter') document.getElementById('sendMessageBtn').click();
-    };
-
-    document.getElementById('chatImageInput').onchange = async (e) => {
-      const file = e.target.files[0];
-      if (!file || !activeChatOrderId) return;
-
-      if (file.size > 32 * 1024 * 1024) {
-        showToast("حجم الصورة كبير جداً! (الأقصى 32 ميجا)", "⚠️");
-        return;
-      }
-
-      // Show progress bar
-      const progressBar = document.getElementById('uploadProgress');
-      progressBar.style.display = 'block';
-
-      // showToast("جاري رفع الصورة...", "⏳"); // Replace with bar
-
-      const success = await sendImageMessage(activeChatOrderId, file);
-
-      // Hide progress bar
-      progressBar.style.display = 'none';
-
-      if (success) {
-        // showToast("تم إرسال الصورة!", "✅");
-      } else {
-        showToast("فشل رفع الصورة!", "❌");
-      }
-      e.target.value = '';
-    };
 
     submitPayment.onclick = async () => {
       const wallet = document.getElementById('senderWalletInput').value.trim();
@@ -937,33 +748,6 @@
     };
 
 
-    // UI Helper Functions
-    window.showToast = (message, icon = 'ℹ️') => {
-      const container = document.getElementById('toastContainer');
-      const toast = document.createElement('div');
-      toast.className = 'toast';
-      toast.innerHTML = `<span class="toast-icon">${icon}</span><span>${message}</span>`;
-      container.appendChild(toast);
-      setTimeout(() => {
-        toast.classList.add('removing');
-        setTimeout(() => toast.remove(), 300);
-      }, 3000);
-    };
-
-    window.showConfirm = (message, onConfirm) => {
-      const modal = document.getElementById('confirmModal');
-      const msg = document.getElementById('confirmMsg');
-      const yesBtn = document.getElementById('confirmYes');
-      const noBtn = document.getElementById('confirmNo');
-
-      msg.innerText = message;
-      modal.classList.add('visible');
-
-      const close = () => modal.classList.remove('visible');
-
-      yesBtn.onclick = () => { onConfirm(); close(); };
-      noBtn.onclick = close;
-    };
 
     window.updateStatus = (id, status) => {
       showConfirm(`هل أنت متأكد من تغيير حالة الطلب إلى ${status === 'working' ? 'بدء العمل' : status === 'done' ? 'إنهاء' : 'رفض'}؟`, () => {
@@ -971,55 +755,6 @@
       });
     };
 
-    // نحدث اليوزر في كل مرة تتغير فيها قائمة العمال أو حالة الدخول
-    const refreshUserUI = () => {
-      const user = auth.currentUser;
-      if (user) {
-        const userRole = getUserRole(user.email);
-        const isStaff = !!userRole;
-        const workerBadge = isStaff ? `<span class="worker-badge">${userRole === 'admin' ? 'Admin 👑' : 'Staff 🛡️'}</span>` : '';
-        const workersLink = isStaff
-          ? '<a href="workers.html" class="dropdown-item">⚙️ لوحة التحكم</a>'
-          : '';
-
-        const opsButton = isStaff
-          ? '<button class="auth-btn" style="padding: 8px 15px; margin-left: 10px; font-size: 0.85rem;" onclick="openOperationsModal()">📂 العمليات</button>'
-          : '';
-
-        userInfo.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    ${opsButton}
-                    <div class="user-dropdown">
-                        <div class="user-profile">
-                            <img src="${user.photoURL}" class="user-avatar" loading="lazy">
-                            <span class="user-name">${user.displayName} ${workerBadge}</span>
-                        </div>
-                        <div class="dropdown-menu">
-                            <a href="history.html" class="dropdown-item">📋 طلباتي</a>
-                            ${workersLink}
-                            <a href="#" class="dropdown-item" onclick="handleLogout()">🚪 تسجيل الخروج</a>
-                        </div>
-                    </div>
-                </div>
-            `;
-      } else {
-        userInfo.innerHTML = `<button class="auth-btn" onclick="handleLogin()">تسجيل دخول بجوجل</button>`;
-      }
-    };
-
-    // البدء بمزامنة العمال
-    listenToWorkers(() => {
-      refreshUserUI();
-      // إذا كان هناك قائمة انتظار مفتوحة، نعيد عرضها لتظهر أزرار الإدارة إذا كان أدمن
-      if (lastOrders) renderQueue(lastOrders);
-    });
-
-    onAuthStateChanged(auth, (user) => {
-      refreshUserUI();
-      if (user) {
-        startOrderListener(user.uid);
-      }
-    });
 
     // تحميل الطلبات التي تم عرض إشعارات لها من localStorage
     const savedNotifs = localStorage.getItem('notifiedOrders');
@@ -1252,93 +987,7 @@
       });
     }
 
-    // --- Operations Modal Logic ---
-    let opsUnsubscribe = null;
-    const statusMap = {
-      'awaiting_payment': '💸 بانتظار الدفع',
-      'pending_verification': '⏳ مراجعة الإيصال',
-      'waiting': '⏰ بانتظار البدء',
-      'working': '🔥 جارِ العمل',
-      'done': '✅ مكتمل',
-      'rejected': '❌ مرفوض'
-    };
-
-    window.openOperationsModal = () => {
-      document.getElementById('operationsModal').classList.add('visible');
-      loadRecentOperations();
-    };
-
-    window.closeOperationsModal = () => {
-      document.getElementById('operationsModal').classList.remove('visible');
-      if (opsUnsubscribe) opsUnsubscribe();
-    };
-
-    function loadRecentOperations() {
-      const opsList = document.getElementById('opsList');
-      if (opsUnsubscribe) opsUnsubscribe();
-      opsUnsubscribe = listenToAllOrdersExtended((orders) => {
-        opsList.innerHTML = '';
-        if (orders.length === 0) {
-          opsList.innerHTML = '<div class="ops-empty">لا توجد عمليات مؤخراً.</div>';
-          return;
-        }
-        orders.forEach(order => {
-          const item = document.createElement('div');
-          item.className = 'ops-item';
-          item.onclick = () => viewOpDetails(order);
-          item.innerHTML = `
-                    <div class="ops-info">
-                        <div class="ops-main">
-                            <img src="${order.userAvatar || 'https://ui-avatars.com/api/?name=U'}" class="ops-avatar">
-                            <span style="font-weight:bold;">${order.userName || 'مجهول'}</span>
-                        </div>
-                        <div class="ops-id">${order.id}</div>
-                        <div style="font-size:0.8rem; color:var(--primary);">${order.tier} - ${order.totalPrice} جنيه</div>
-                    </div>
-                    <div class="ops-badge ${order.status}">${statusMap[order.status] || order.status}</div>
-                `;
-          opsList.appendChild(item);
-        });
-      });
-    }
-
-    window.handleOpsSearch = async () => {
-      const input = document.getElementById('opsSearchInput');
-      const orderId = input.value.trim();
-      if (!orderId) return;
-      const order = await getOrderById(orderId);
-      if (order) viewOpDetails(order);
-      else alert("الطلب غير موجود! تأكد من الرقم التعريفي صحيح.");
-    };
-
-    window.viewOpDetails = (order) => {
-      const date = order.createdAt?.seconds ? new Date(order.createdAt.seconds * 1000).toLocaleString('ar-EG') : 'غير معروف';
-      const chars = order.characters || [];
-      const charNames = chars.map(c => `<li>${c.name} (${c.stars || '?'}★)</li>`).join('');
-      const content = `
-            <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin-bottom: 15px; font-family: monospace; font-size: 0.8rem; color: var(--primary); text-align: center;">
-                ${order.id}
-            </div>
-            <div style="display: grid; gap: 8px;">
-                <div><strong>👤 العميل:</strong> ${order.userName}</div>
-                <div><strong>💎 الفئة:</strong> ${order.tier}</div>
-                <div><strong>💰 السعر:</strong> ${order.totalPrice} جنيه</div>
-                <div><strong>📊 الحالة:</strong> ${statusMap[order.status] || order.status}</div>
-                <div><strong>📅 التاريخ:</strong> ${date}</div>
-                ${order.workerName ? `<div><strong>⚙️ المنفذ:</strong> ${order.workerName}</div>` : ''}
-                <div style="margin-top: 10px;">
-                    <strong>⚔️ الشخصيات:</strong>
-                    <ul style="margin: 5px 0; padding-right: 20px;">${charNames}</ul>
-                </div>
-            </div>
-        `;
-      document.getElementById('opsDetailsContent').innerHTML = content;
-      document.getElementById('opsDetailsModal').classList.add('visible');
-    };
-
-    window.closeOpsDetailsModal = () => {
-      document.getElementById('opsDetailsModal').classList.remove('visible');
-    };
+    // --- Operations Modal Logic Removed (Now in app.js/ui.js) ---
 
     listenToQueue(renderQueue);
   </script>

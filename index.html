@@ -105,14 +105,7 @@
 
 <body>
 
-    <nav class="nav-bar">
-        <div class="user-info" id="userInfo">
-            <!-- Auth Content -->
-        </div>
-        <a href="index.html" class="logo"
-            style="text-decoration: none; font-family: var(--font-en); font-weight: 800; color: var(--primary);">PRO
-            GS</a>
-    </nav>
+    <div id="navbar-placeholder"></div>
 
     <main class="container" style="padding-top: 80px;">
         <header class="hero">
@@ -146,179 +139,20 @@
         <p>© 2026 Professional Game Services. All rights reserved.</p>
     </footer>
 
-    <!-- Operations History Modal -->
-    <div id="operationsModal" class="notif-overlay">
-        <div class="notif-card ops-modal">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
-                <h3 style="margin: 0;">سجل العمليات 📂</h3>
-                <button class="auth-btn"
-                    style="background:none; border:none; padding:5px; min-width:auto; font-size: 1.2rem;"
-                    onclick="closeOperationsModal()">✖</button>
-            </div>
-
-            <div class="search-container">
-                <input type="text" id="opsSearchInput" class="search-input"
-                    placeholder="🔍 ابحث برقم الطلب (Order ID)..."
-                    onkeypress="if(event.key === 'Enter') handleOpsSearch()">
-                <button onclick="handleOpsSearch()" class="auth-btn"
-                    style="padding: 10px 18px; margin-right: 5px;">بحث</button>
-            </div>
-
-            <div id="opsList" class="ops-list">
-                <!-- Operations will load here -->
-                <div class="ops-empty">جاري تحميل أحدث العمليات...</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Order Details Modal -->
-    <div id="opsDetailsModal" class="notif-overlay">
-        <div class="notif-card" style="max-width: 500px; width: 95%;">
-            <h3 style="margin-bottom: 20px;">تفاصيل العملية 📋</h3>
-            <div id="opsDetailsContent" style="text-align: right; line-height: 1.6; font-size: 0.9rem;"></div>
-            <button class="notif-btn" style="margin-top: 20px;" onclick="closeOpsDetailsModal()">إغلاق</button>
-        </div>
-    </div>
-
     <script type="module">
-        import { auth, onAuthStateChanged } from './firebase-config.js';
-        import { login, logout, isWorker, listenToWorkers, listenToRecentReviews, getUserRole, deleteReview, listenToAllOrdersExtended, getOrderById } from './app.js';
+        import { auth } from './firebase-config.js';
+        import { listenToRecentReviews, getUserRole, deleteReview, showToast, showConfirm } from './app.js';
+        import { initSharedUI } from './ui.js';
 
-
-        const refreshUserUI = () => {
-            const user = auth.currentUser;
-            if (user) {
-                const userRole = getUserRole(user.email);
-                const isStaff = !!userRole;
-                const workerBadge = isStaff ? `<span class="worker-badge">${userRole === 'admin' ? 'Admin 👑' : 'Staff 🛡️'}</span>` : '';
-                const workersLink = isStaff
-                    ? '<a href="workers.html" class="dropdown-item">⚙️ لوحة التحكم</a>'
-                    : '';
-
-                const opsButton = isStaff
-                    ? '<button class="auth-btn" style="padding: 8px 15px; margin-left: 10px; font-size: 0.85rem;" onclick="openOperationsModal()">📂 العمليات</button>'
-                    : '';
-
-                userInfo.innerHTML = `
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        ${opsButton}
-                        <div class="user-dropdown">
-                            <div class="user-profile">
-                                <img src="${user.photoURL}" class="user-avatar" loading="lazy">
-                                <span class="user-name">${user.displayName} ${workerBadge}</span>
-                            </div>
-                            <div class="dropdown-menu">
-                                ${workersLink}
-                                <a href="#" class="dropdown-item" onclick="handleLogout()">🚪 تسجيل الخروج</a>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            } else {
-                userInfo.innerHTML = `<button class="auth-btn" id="loginBtn">تسجيل دخول</button>`;
-                const btn = document.getElementById('loginBtn');
-                if (btn) btn.onclick = login;
-            }
-        };
-
-        listenToWorkers(() => refreshUserUI());
-        onAuthStateChanged(auth, () => refreshUserUI());
-
-        window.handleLogout = logout;
-
-        // --- Operations Modal Logic ---
-        let opsUnsubscribe = null;
-        const statusMap = {
-            'awaiting_payment': '💸 بانتظار الدفع',
-            'pending_verification': '⏳ مراجعة الإيصال',
-            'waiting': '⏰ بانتظار البدء',
-            'working': '🔥 جارِ العمل',
-            'done': '✅ مكتمل',
-            'rejected': '❌ مرفوض'
-        };
-
-        window.openOperationsModal = () => {
-            document.getElementById('operationsModal').classList.add('visible');
-            loadRecentOperations();
-        };
-
-        window.closeOperationsModal = () => {
-            document.getElementById('operationsModal').classList.remove('visible');
-            if (opsUnsubscribe) opsUnsubscribe();
-        };
-
-        function loadRecentOperations() {
-            const opsList = document.getElementById('opsList');
-            if (opsUnsubscribe) opsUnsubscribe();
-            opsUnsubscribe = listenToAllOrdersExtended((orders) => {
-                opsList.innerHTML = '';
-                if (orders.length === 0) {
-                    opsList.innerHTML = '<div class="ops-empty">لا توجد عمليات مؤخراً.</div>';
-                    return;
-                }
-                orders.forEach(order => {
-                    const item = document.createElement('div');
-                    item.className = 'ops-item';
-                    item.onclick = () => viewOpDetails(order);
-                    item.innerHTML = `
-                        <div class="ops-info">
-                            <div class="ops-main">
-                                <img src="${order.userAvatar || 'https://ui-avatars.com/api/?name=U'}" class="ops-avatar">
-                                <span style="font-weight:bold;">${order.userName || 'مجهول'}</span>
-                            </div>
-                            <div class="ops-id">${order.id}</div>
-                            <div style="font-size:0.8rem; color:var(--primary);">${order.tier} - ${order.totalPrice} جنيه</div>
-                        </div>
-                        <div class="ops-badge ${order.status}">${statusMap[order.status] || order.status}</div>
-                    `;
-                    opsList.appendChild(item);
-                });
-            });
-        }
-
-        window.handleOpsSearch = async () => {
-            const input = document.getElementById('opsSearchInput');
-            const orderId = input.value.trim();
-            if (!orderId) return;
-            const order = await getOrderById(orderId);
-            if (order) viewOpDetails(order);
-            else alert("الطلب غير موجود! تأكد من الرقم التعريفي صحيح.");
-        };
-
-        window.viewOpDetails = (order) => {
-            const date = order.createdAt?.seconds ? new Date(order.createdAt.seconds * 1000).toLocaleString('ar-EG') : 'غير معروف';
-            const chars = order.characters || [];
-            const charNames = chars.map(c => `<li>${c.name} (${c.stars || '?'}★)</li>`).join('');
-            const content = `
-                <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin-bottom: 15px; font-family: monospace; font-size: 0.8rem; color: var(--primary); text-align: center;">
-                    ${order.id}
-                </div>
-                <div style="display: grid; gap: 8px;">
-                    <div><strong>👤 العميل:</strong> ${order.userName}</div>
-                    <div><strong>💎 الفئة:</strong> ${order.tier}</div>
-                    <div><strong>💰 السعر:</strong> ${order.totalPrice} جنيه</div>
-                    <div><strong>📊 الحالة:</strong> ${statusMap[order.status] || order.status}</div>
-                    <div><strong>📅 التاريخ:</strong> ${date}</div>
-                    ${order.workerName ? `<div><strong>⚙️ المنفذ:</strong> ${order.workerName}</div>` : ''}
-                    <div style="margin-top: 10px;">
-                        <strong>⚔️ الشخصيات:</strong>
-                        <ul style="margin: 5px 0; padding-right: 20px;">${charNames}</ul>
-                    </div>
-                </div>
-            `;
-            document.getElementById('opsDetailsContent').innerHTML = content;
-            document.getElementById('opsDetailsModal').classList.add('visible');
-        };
-
-        window.closeOpsDetailsModal = () => {
-            document.getElementById('opsDetailsModal').classList.remove('visible');
-        };
+        // Initialize Centralized UI (Navbar, Modals, Auth State)
+        initSharedUI();
 
         window.handleDeleteReview = async (id) => {
-            if (confirm("هل أنت متأكد من حذف هذا التعليق؟")) {
+            showConfirm("هل أنت متأكد من حذف هذا التعليق؟", async () => {
                 const success = await deleteReview(id);
-                if (!success) alert("فشل في حذف التعليق.");
-            }
+                if (!success) showToast("فشل في حذف التعليق.", "❌");
+                else showToast("تم حذف التعليق بنجاح.", "✅");
+            });
         };
 
         const reviewsGrid = document.getElementById('reviewsGrid');

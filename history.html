@@ -23,14 +23,7 @@
 
 <body>
 
-    <nav class="nav-bar">
-        <div class="user-info" id="userInfo">
-            <!-- Auth Content -->
-        </div>
-        <a href="index.html" class="logo"
-            style="text-decoration: none; font-family: var(--font-en); font-weight: 800; color: var(--primary);">PRO
-            GS</a>
-    </nav>
+    <div id="navbar-placeholder"></div>
 
     <header class="hero" style="padding-top: 120px;">
         <h1 style="font-family: var(--font-ar);">سجل طلباتي 📋</h1>
@@ -50,168 +43,104 @@
         <p><a href="bounty-rush.html" style="color: var(--primary); text-decoration: none;">← العودة للطلبات</a></p>
     </footer>
 
-    <!-- Toast Container -->
-    <div id="toastContainer" class="toast-container"></div>
+    <div id="shared-modals-placeholder"></div>
 
-    <!-- Chat Modal -->
-    <div id="chatModal" class="chat-modal">
-        <div class="chat-container">
-            <div class="chat-header">
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <div style="position:relative;">
-                        <img id="chatTargetAvatar" src=""
-                            style="width:35px; height:35px; border-radius:50%; border:1px solid var(--primary)">
-                        <div
-                            style="position:absolute; bottom:0; right:0; width:10px; height:10px; background:#00ff00; border-radius:50%; border:2px solid #000;">
-                        </div>
-                    </div>
-                    <div>
-                        <div id="chatTargetName" style="font-weight:bold; font-size:0.9rem;">الموظف</div>
-                        <div style="font-size:0.7rem; color:var(--text-dim);">متصل الآن</div>
-                    </div>
-                </div>
-                <button class="auth-btn" style="background:none; border:none; font-size:1.2rem; padding:0;"
-                    onclick="closeChat()">✖</button>
-            </div>
-            <div id="chatMessages" class="chat-messages">
-                <div class="chat-empty">جاري تحميل الرسائل...</div>
-            </div>
-            <div class="chat-input-area">
-                <div class="chat-input-area" style="position:relative;">
-                    <div id="uploadProgress" class="upload-progress-container">
-                        <div class="upload-progress-bar"></div>
-                    </div>
-                    <input type="file" id="chatImageInput" accept="image/*" hidden>
-                    <button onclick="document.getElementById('chatImageInput').click()" class="chat-send-btn"
-                        style="background:rgba(255,255,255,0.1); font-size:1.1rem;">📸</button>
-                    <input type="text" id="chatInput" placeholder="اكتب رسالتك هنا..." autocomplete="off">
-                    <button id="sendMessageBtn" class="chat-send-btn">🕊️</button>
-                </div>
-            </div>
-        </div>
+    <!-- Floating Support Button -->
+    <a href="https://discord.com/channels/1284591581717987422/1284591582187622539" target="_blank"
+        class="floating-support-btn">
+        <span>🎧</span>
+        <span>تحدث مع الدعم</span>
+    </a>
 
-        <!-- Floating Support Button -->
-        <a href="https://discord.com/channels/1284591581717987422/1284591582187622539" target="_blank"
-            class="floating-support-btn">
-            <span>🎧</span>
-            <span>تحدث مع الدعم</span>
-        </a>
+    <script type="module">
+        import { auth, onAuthStateChanged } from './firebase-config.js';
+        import {
+            login, logout, listenToUserOrders, submitRating,
+            getUserRole, listenToWorkers, openChat, showToast, showConfirm
+        } from './app.js';
+        import { initSharedUI } from './ui.js';
 
-        <script type="module">
-            import { auth, onAuthStateChanged } from './firebase-config.js';
-            import { login, logout, listenToUserOrders, submitRating, sendMessage, listenToMessages, sendImageMessage, listenToUnreadCount, markMessagesAsRead, getUserRole, listenToWorkers } from './app.js?v=2';
+        // Initialize Centralized UI Components
+        initSharedUI();
 
-            const userInfo = document.getElementById('userInfo');
-            const historyList = document.getElementById('historyList');
+        const historyList = document.getElementById('historyList');
 
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                loadHistory(user.uid);
+            } else {
+                window.location.href = 'bounty-rush.html';
+            }
+        });
 
-            const refreshUserUI = () => {
-                const user = auth.currentUser;
-                if (user) {
-                    const userRole = getUserRole(user.email);
-                    const isStaff = !!userRole;
-                    const workerBadge = isStaff ? `<span class="worker-badge">${userRole === 'admin' ? 'Admin 👑' : 'Staff 🛡️'}</span>` : '';
-                    const workersLink = isStaff
-                        ? '<a href="workers.html" class="dropdown-item">⚙️ لوحة التحكم</a>'
-                        : '';
+        window.handleLogin = login;
+        window.handleLogout = logout;
 
-                    userInfo.innerHTML = `
-                <div class="user-dropdown">
-                    <div class="user-profile">
-                        <img src="${user.photoURL}" class="user-avatar" loading="lazy">
-                        <span class="user-name">${user.displayName} ${workerBadge}</span>
-                    </div>
-                    <div class="dropdown-menu">
-                        <a href="history.html" class="dropdown-item">📋 طلباتي</a>
-                        ${workersLink}
-                        <a href="#" class="dropdown-item" onclick="handleLogout()">🚪 تسجيل الخروج</a>
-                    </div>
-                </div>
-            `;
-                } else {
-                    userInfo.innerHTML = `<button class="auth-btn" onclick="handleLogin()">تسجيل دخول بجوجل</button>`;
+        const loadHistory = (uid) => {
+            listenToUserOrders(uid, (orders) => {
+                historyList.innerHTML = '';
+                if (orders.length === 0) {
+                    historyList.innerHTML = '<p style="text-align:center; color: var(--text-dim);">لا توجد طلبات بعد</p>';
+                    return;
                 }
-            };
 
-            listenToWorkers(() => refreshUserUI());
+                orders.sort((a, b) => {
+                    const aTime = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
+                    const bTime = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
+                    return bTime - aTime;
+                });
 
-            onAuthStateChanged(auth, (user) => {
-                refreshUserUI();
-                if (user) {
-                    loadHistory(user.uid);
-                } else {
-                    window.location.href = 'bounty-rush.html';
-                }
-            });
+                orders.forEach(order => {
+                    const item = document.createElement('div');
+                    item.className = `queue-item ${order.status === 'working' ? 'active' : ''} ${order.status === 'done' ? 'done' : ''}`;
 
-            window.handleLogin = login;
-            window.handleLogout = logout;
+                    const statusMap = {
+                        'waiting': '⏳ بانتظار البدء',
+                        'working': '🔥 جارِ العمل',
+                        'done': '✅ مكتمل',
+                        'rejected': '❌ مرفوض'
+                    };
 
-            const loadHistory = (uid) => {
-                listenToUserOrders(uid, (orders) => {
-                    historyList.innerHTML = '';
-                    if (orders.length === 0) {
-                        historyList.innerHTML = '<p style="text-align:center; color: var(--text-dim);">لا توجد طلبات بعد</p>';
-                        return;
-                    }
+                    const date = order.createdAt?.toDate ? new Date(order.createdAt.toDate()).toLocaleDateString('ar-EG') : 'غير معروف';
 
-                    orders.sort((a, b) => {
-                        const aTime = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
-                        const bTime = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
-                        return bTime - aTime;
-                    });
+                    const characters = order.characters || [{ name: order.charName, image: order.charImage }];
 
-                    orders.forEach(order => {
-                        const item = document.createElement('div');
-                        item.className = `queue-item ${order.status === 'working' ? 'active' : ''} ${order.status === 'done' ? 'done' : ''}`;
+                    // Show More Logic
+                    const limit = 6;
+                    const visibleChars = characters.slice(0, limit);
+                    const hiddenChars = characters.slice(limit);
 
-                        const statusMap = {
-                            'waiting': '⏳ بانتظار البدء',
-                            'working': '🔥 جارِ العمل',
-                            'done': '✅ مكتمل',
-                            'rejected': '❌ مرفوض'
-                        };
-
-                        const date = order.createdAt?.toDate ? new Date(order.createdAt.toDate()).toLocaleDateString('ar-EG') : 'غير معروف';
-
-                        const characters = order.characters || [{ name: order.charName, image: order.charImage }];
-
-                        // Show More Logic
-                        const limit = 6;
-                        const visibleChars = characters.slice(0, limit);
-                        const hiddenChars = characters.slice(limit);
-
-                        const generateCharTag = (c, hidden = false) => `
+                    const generateCharTag = (c, hidden = false) => `
                             <div class="${hidden ? `hidden-char-${order.id}` : ''}" style="${hidden ? 'display:none;' : 'display:inline-flex;'} align-items:center; gap:5px; background:rgba(255,255,255,0.05); padding:4px 10px; border-radius:12px; font-size:0.85rem;">
                                 ${c.image ? `<img src="${c.image}" style="width:20px; height:20px; border-radius:50%" loading="lazy">` : '🗡️'}
                                 <span>${c.name}</span>
                             </div>
                         `;
 
-                        const visibleTags = visibleChars.map(c => generateCharTag(c)).join(' ');
-                        const hiddenTags = hiddenChars.map(c => generateCharTag(c, true)).join(' ');
+                    const visibleTags = visibleChars.map(c => generateCharTag(c)).join(' ');
+                    const hiddenTags = hiddenChars.map(c => generateCharTag(c, true)).join(' ');
 
-                        let moreBtn = '';
-                        if (hiddenChars.length > 0) {
-                            moreBtn = `
+                    let moreBtn = '';
+                    if (hiddenChars.length > 0) {
+                        moreBtn = `
                                 <button onclick="document.querySelectorAll('.hidden-char-${order.id}').forEach(el => el.style.display='inline-flex'); this.style.display='none';" 
                                     style="background:rgba(0, 242, 254, 0.1); border:1px solid var(--primary); color:white; border-radius:12px; padding:4px 10px; font-size:0.75rem; cursor:pointer;">
                                     عرض المزيد (+${hiddenChars.length})
                                 </button>
                             `;
-                        }
+                    }
 
-                        // Actions for working orders
-                        let actionsHtml = '';
-                        if (order.status === 'working' && order.uid === auth.currentUser?.uid) {
-                            actionsHtml = `
+                    // Actions for working orders
+                    let actionsHtml = '';
+                    if (order.status === 'working' && order.uid === auth.currentUser?.uid) {
+                        actionsHtml = `
                                 <button onclick="openChat('${order.id}')" class="auth-btn" style="padding: 6px 12px; font-size: 0.8rem; border-radius: 8px; margin-top: 8px; background: #4facfe; color: #fff; border: none;">
                                     تواصل مع الموظف 💬
                                 </button>
                             `;
-                        }
+                    }
 
-                        item.innerHTML = `
+                    item.innerHTML = `
                     <div style="display:flex; flex-direction:column; flex:1; gap:12px">
                         <div style="display:flex; align-items:center; gap:10px;">
                             <div style="flex:1">
@@ -234,137 +163,12 @@
                         ${statusMap[order.status] || order.status}
                     </span>
                 `;
-                        historyList.appendChild(item);
-                    });
+                    historyList.appendChild(item);
                 });
-            };
+            });
+        };
 
-            let chatUnsubscribe = null;
-            let activeChatOrderId = null;
-            let lastOrdersList = []; // To store orders for chat details lookup if needed
-
-            window.openChat = (orderId) => {
-                // In history we might not have the full order object handy easily without fetching or storing, 
-                // but we passed ID. For simple UI we can just show "الموظف".
-                // Ideally we find the order in the 'orders' list from the closure, 
-                // but since that's inside loadHistory, we might need a global or fetch.
-                // For now, let's keep it simple or user dummy avatar.
-
-                activeChatOrderId = orderId;
-                document.getElementById('chatTargetName').innerText = "الموظف المسؤول";
-                document.getElementById('chatTargetAvatar').src = `https://ui-avatars.com/api/?name=W&background=00f2fe&color=000`;
-
-                const modal = document.getElementById('chatModal');
-                modal.classList.add('visible');
-
-                const chatMessages = document.getElementById('chatMessages');
-                chatMessages.innerHTML = '<div class="chat-empty">جاري تحميل الرسائل...</div>';
-
-                if (chatUnsubscribe) chatUnsubscribe();
-
-                chatUnsubscribe = listenToMessages(orderId, (messages) => {
-                    // Mark as read
-                    markMessagesAsRead(orderId, auth.currentUser.uid);
-
-                    chatMessages.innerHTML = '';
-                    if (messages.length === 0) {
-                        chatMessages.innerHTML = '<div class="chat-empty">لا توجد رسائل بعد. ابدأ المحادثة الآن! 👋</div>';
-                    } else {
-                        messages.forEach(msg => {
-                            const isMe = msg.senderId === auth.currentUser?.uid;
-                            const bubble = document.createElement('div');
-                            bubble.className = `message-bubble ${isMe ? 'sent' : 'received'}`;
-
-                            const time = msg.timestamp ? new Date(msg.timestamp.seconds * 1000).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }) : '...';
-
-                            bubble.innerHTML = `
-                           <div class="message-info">
-                             ${!isMe ? `<img src="${msg.senderAvatar}" style="width:15px; height:15px; border-radius:50%">` : ''}
-                             <span>${isMe ? 'أنا' : msg.senderName} • ${time}</span>
-                           </div>
-                           <div class="message-text">
-                             ${msg.text ? `<div>${msg.text}</div>` : ''}
-                             ${msg.image ? `
-                               <a href="${msg.image}" target="_blank">
-                                 <img src="${msg.image}" style="max-width:100%; border-radius:10px; margin-top:5px; border:1px solid var(--glass-border); cursor:pointer;">
-                               </a>
-                             ` : ''}
-                           </div>
-                         `;
-                            chatMessages.appendChild(bubble);
-                        });
-                        chatMessages.scrollTop = chatMessages.scrollHeight;
-                    }
-                });
-            };
-
-            window.closeChat = () => {
-                document.getElementById('chatModal').classList.remove('visible');
-                if (chatUnsubscribe) chatUnsubscribe();
-                chatUnsubscribe = null;
-                activeChatOrderId = null;
-            };
-
-            document.getElementById('sendMessageBtn').onclick = async () => {
-                const input = document.getElementById('chatInput');
-                const text = input.value.trim();
-                if (!text || !activeChatOrderId) return;
-
-                input.value = '';
-                const success = await sendMessage(activeChatOrderId, text);
-                if (!success) {
-                    // We need showToast here, let's look if we have it or use alert
-                    // alert("فشل إرسال الرسالة!");
-                    showToast("فشل إرسال الرسالة!", "❌");
-                    input.value = text;
-                }
-            };
-
-            document.getElementById('chatInput').onkeypress = (e) => {
-                if (e.key === 'Enter') document.getElementById('sendMessageBtn').click();
-            };
-
-            document.getElementById('chatImageInput').onchange = async (e) => {
-                const file = e.target.files[0];
-                if (!file || !activeChatOrderId) return;
-
-                if (file.size > 32 * 1024 * 1024) {
-                    showToast("حجم الصورة كبير جداً! (الأقصى 32 ميجا)", "⚠️");
-                    return;
-                }
-
-                // Show progress bar
-                const progressBar = document.getElementById('uploadProgress');
-                progressBar.style.display = 'block';
-
-                // showToast("جاري رفع الصورة...", "⏳"); // Replace with bar
-
-                const success = await sendImageMessage(activeChatOrderId, file);
-
-                // Hide progress bar
-                progressBar.style.display = 'none';
-
-                if (success) {
-                    // showToast("تم إرسال الصورة!", "✅");
-                } else {
-                    showToast("فشل رفع الصورة!", "❌");
-                }
-                e.target.value = '';
-            };
-
-            // UI Helper
-            window.showToast = (message, icon = 'ℹ️') => {
-                const container = document.getElementById('toastContainer');
-                const toast = document.createElement('div');
-                toast.className = 'toast';
-                toast.innerHTML = `<span class="toast-icon">${icon}</span><span>${message}</span>`;
-                container.appendChild(toast);
-                setTimeout(() => {
-                    toast.classList.add('removing');
-                    setTimeout(() => toast.remove(), 300);
-                }, 3000);
-            };
-        </script>
+    </script>
 </body>
 
 </html>
