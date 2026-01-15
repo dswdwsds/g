@@ -2,6 +2,21 @@ import { auth, provider, signInWithPopup, signOut, onAuthStateChanged, db, colle
 
 const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1395038941110866010/MucgrT_399C44lfUVL79HcqR4cfwNbJlL5iG1qPmxdBF47GGbTbmkokZK6YnslmJ63wL";
 
+// Kashier.io Configuration
+const KASHIER_CONFIG = {
+    merchantId: "31511019-29d3-4bbd-be57-8bb2a8f96cbc",
+    apiKey: "31511019-29d3-4bbd-be57-8bb2a8f96cbc", // Often same as MID in simple integrations
+    secretKey: "1adca016e63f09ee221302e51bd27539$d6104854451381712d0cc986f214c6c1fdfe72d7b4bc5fe61e3aaa8346288fa21b8959881f6b2352ef1598cb0999f059",
+    mode: "test" // Change to "live" when ready
+};
+
+// Generate Kashier Hash
+const generateKashierHash = (orderId, amount) => {
+    const path = `/?payment=${KASHIER_CONFIG.merchantId}&amount=${amount}&currency=EGP&orderId=${orderId}&sdk=js`;
+    return CryptoJS.HmacSHA256(path, KASHIER_CONFIG.secretKey).toString();
+};
+
+
 export const login = async () => {
     try {
         await signInWithPopup(auth, provider);
@@ -200,8 +215,38 @@ export const placeOrder = async (tier, charData) => {
             await updateDoc(orderRef, { discordMessageId: discordRes.id });
         }
 
-        if (window.showToast) window.showToast("تم ارسال الطلب بنجاح! تابع الحالة في سجل الطلبات.", "✅");
-        else alert("تم ارسال الطلب بنجاح! انتقل لسجل الطلبات لمتابعة الحالة.");
+        // --- Start Kashier Payment Flow ---
+        const hash = generateKashierHash(orderRef.id, totalPrice);
+
+        if (window.Kashier) {
+            Kashier.init({
+                "merchantId": KASHIER_CONFIG.merchantId,
+                "apiKey": KASHIER_CONFIG.apiKey,
+                "orderId": orderRef.id,
+                "amount": totalPrice,
+                "currency": "EGP",
+                "hash": hash,
+                "mode": KASHIER_CONFIG.mode,
+                "metaData": { "userName": user.displayName, "tier": tier },
+                "customerName": user.displayName,
+                "customerEmail": user.email,
+                "serverType": KASHIER_CONFIG.mode,
+                "display": "ar",
+                "onCompleted": function (result) {
+                    console.log("Payment Completed", result);
+                    if (window.showToast) window.showToast("تم الدفع بنجاح! شكراً لك.", "✅");
+                    // Here we could update Firestore status to 'paid' if needed
+                },
+                "onFailure": function (error) {
+                    console.error("Payment Failed", error);
+                    if (window.showToast) window.showToast("فشلت عملية الدفع. يرجى المحاولة مرة أخرى.", "❌");
+                }
+            });
+
+            Kashier.showCheckout();
+        }
+
+        if (window.showToast) window.showToast("تم إنشاء الطلب! يرجى إتمام عملية الدفع...", "💳");
         return orderRef.id;
     } catch (error) {
         console.error("Order Error:", error);
