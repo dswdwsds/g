@@ -21,7 +21,7 @@
 
 body {
     font-family: var(--font-ar);
-    background: linear-gradient(rgba(6, 11, 19, 0.85), rgba(6, 11, 19, 0.85)), url('GIF/luffy.gif');
+    background: linear-gradient(rgba(6, 11, 19, 0.85), rgba(6, 11, 19, 0.85)), url('GIF/luffy.WebP');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
@@ -111,7 +111,7 @@ body::after {
 }
 
 .service-card {
-    background: linear-gradient(rgba(6, 11, 19, 0.8), rgba(6, 11, 19, 0.8)), url('GIF/One_Piece_Zoro_Vs_King_GIF_-_One_piece_Zoro_vs_king_King_of_hell_-_Discover__Share_GIFs.gif');
+    background: linear-gradient(rgba(6, 11, 19, 0.8), rgba(6, 11, 19, 0.8)), url('GIF/Zoro.WebP');
     background-size: cover;
     background-position: center;
     backdrop-filter: blur(5px);
@@ -145,7 +145,7 @@ body::after {
     transform: translateY(-10px);
     border-color: var(--primary);
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 242, 254, 0.2);
-    background: linear-gradient(rgba(6, 11, 19, 0.7), rgba(6, 11, 19, 0.7)), url('GIF/One_Piece_Zoro_Vs_King_GIF_-_One_piece_Zoro_vs_king_King_of_hell_-_Discover__Share_GIFs.gif');
+    background: linear-gradient(rgba(6, 11, 19, 0.7), rgba(6, 11, 19, 0.7)), url('GIF/Zoro.WebP');
     background-size: cover;
     background-position: center;
 }
