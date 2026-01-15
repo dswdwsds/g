@@ -146,7 +146,7 @@
       <p>20 شخصية (ميكس نجمتين وثلاث)</p>
       <p style="font-size:0.8rem; color:#ff4d4d; margin-top:5px;">*مرة واحدة لكل حساب</p>
       <button class="auth-btn" style="margin-top:20px; width: 100%; background: #00f2fe; color:#000;"
-        onclick="orderNow('BulkMix')">طلب الباقة</button>
+        onclick="orderNow('BulkMix', event)">طلب الباقة</button>
       <div class="offer-ribbon new">عرض خاص</div>
     </div>
 
@@ -157,7 +157,7 @@
       <p>20 شخصية (أربع نجوم)</p>
       <p style="font-size:0.8rem; color:#ff4d4d; margin-top:5px;">*مرة واحدة لكل حساب</p>
       <button class="auth-btn" style="margin-top:20px; width: 100%; background: #ff00c8;"
-        onclick="orderNow('BulkUltimate')">طلب الباقة</button>
+        onclick="orderNow('BulkUltimate', event)">طلب الباقة</button>
       <div class="offer-ribbon new">عرض خاص</div>
     </div>
   </section>
@@ -261,6 +261,13 @@
             <strong id="payWallet">01015831676</strong>
             <span style="font-size: 0.8rem; opacity: 0.7;">📋 نسخ</span>
           </div>
+        </div>
+
+        <!-- Sender Wallet Number -->
+        <div style="margin-top: 15px; border-top: 1px dashed var(--glass-border); padding-top: 10px;">
+          <p style="font-size: 0.9rem; margin-bottom: 5px;">رقم المحفظة المحول منها (اختياري):</p>
+          <input type="tel" id="senderWalletInput" placeholder="010xxxxxxx" class="review-input"
+            style="width: 100%; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.2);">
         </div>
       </div>
 
@@ -535,15 +542,33 @@
         return;
       }
 
+      // Capture Login Data
+      const loginMethod = document.querySelector('input[name="loginMethod"]:checked').value;
+      let steamData = {};
+
+      if (loginMethod === 'credentials') {
+        const user = document.getElementById('steamUsername').value.trim();
+        const pass = document.getElementById('steamPassword').value.trim();
+        if (!user || !pass) {
+          alert("يرجى كتابة اسم المستخدم وكلمة المرور، أو اختيار طريقة QR.");
+          return;
+        }
+        steamData = { method: 'credentials', username: user, password: pass };
+      } else {
+        steamData = { method: 'qr' };
+      }
+
       const CHARACTERS = getCharacters();
       const selectedData = Array.from(selectedChars).map(id => CHARACTERS.find(c => c.id === id));
       const names = selectedData.map(c => c.name).join('، ');
+      const totalText = document.getElementById('totalPrice').innerText;
+      const finalPrice = parseFloat(totalText); // Extract number from text "100 جنيه..."
 
-      showConfirm(`هل أنت متأكد من طلب الفئة ${selectedTier} لـ ${selectedChars.size} شخصيات (${names})؟ بقيمة إجمالية ${TIER_PRICES[selectedTier] * selectedChars.size} جنيه؟`, async () => {
+      showConfirm(`هل أنت متأكد من طلب الفئة ${selectedTier} لـ ${selectedChars.size} شخصيات (${names})؟ بقيمة إجمالية ${finalPrice} جنيه؟`, async () => {
         closeCharModal();
         showToast("جاري معالجة الطلب...", "⏳");
 
-        await placeOrder(selectedTier, selectedData);
+        await placeOrder(selectedTier, selectedData, finalPrice, steamData);
       });
     };
 
@@ -719,6 +744,7 @@
       try {
         const orderId = currentOrderForPayment.orderId;
         const characters = currentOrderForPayment.characters || Array.from(selectedChars).map(id => getCharacters().find(c => c.id === id));
+        const senderWallet = document.getElementById('senderWalletInput').value.trim();
 
         const success = await sendPaymentProofToDiscord(
           orderId,
@@ -727,7 +753,8 @@
             userName: auth.currentUser.displayName,
             tier: currentOrderForPayment.tier,
             totalPrice: currentOrderForPayment.totalPrice,
-            characters: characters
+            characters: characters,
+            senderWallet: senderWallet // Pass captured wallet info
           }
         );
 
@@ -1009,6 +1036,7 @@
                         ${moreBtn}
                     </div>
                     ${workerInfo}
+                </div>
                 </div>
                 <div style="display:flex; flex-direction:column; align-items:flex-end; gap:5px;">
                     <span class="pos-tag" style="display:flex; flex-direction:column; align-items:flex-end;">

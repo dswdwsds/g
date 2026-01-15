@@ -254,7 +254,7 @@ export const sendToDiscord = async (orderData) => {
 
 
 
-export const placeOrder = async (tier, charData) => {
+export const placeOrder = async (tier, charData, finalPrice, steamData) => {
     const user = auth.currentUser;
     if (!user) {
         if (window.showToast) window.showToast("Please login first!", "🔑");
@@ -269,12 +269,12 @@ export const placeOrder = async (tier, charData) => {
     }
 
     try {
-        const TIER_PRICES = { 'Starter': 8, 'Pro': 9, 'Ultimate': 10 };
-        const pricePerChar = TIER_PRICES[tier] || 0;
         const characters = Array.isArray(charData) ? charData : [charData];
-        const totalPrice = pricePerChar * characters.length;
+        // Use passed finalPrice to support offers/bulk prices logic calculated in frontend
+        const totalPrice = finalPrice || 0;
 
-        const orderRef = await addDoc(collection(db, "orders"), {
+        // Prepare order document
+        const orderDoc = {
             uid: user.uid,
             userName: user.displayName,
             userAvatar: user.photoURL,
@@ -286,8 +286,11 @@ export const placeOrder = async (tier, charData) => {
                 image: c.image || ""
             })),
             status: "awaiting_payment",
+            steamData: steamData || null, // Store login info (encrypted ideally, but plain for now as per request)
             createdAt: serverTimestamp()
-        });
+        };
+
+        const orderRef = await addDoc(collection(db, "orders"), orderDoc);
 
         if (window.showPaymentModal) {
             window.showPaymentModal({
@@ -366,24 +369,43 @@ export const deleteReview = async (commentId) => {
     }
 };
 
+// function definition update (we need to change signature or rely on orderData override)
+// Best: update signature to: export const sendPaymentProofToDiscord = async (orderId, file, extraData) => { ... }
+// extraData contains: { userName, tier, totalPrice, characters, senderWallet }
+
 export const sendPaymentProofToDiscord = async (orderId, file, orderData) => {
     try {
         const formData = new FormData();
 
-        const charNames = (Array.isArray(orderData.characters) && orderData.characters.length > 0)
+        // Fetch full order data to get Steam Data which is already saved
+        const orderRef = doc(db, "orders", orderId);
+        const snapshot = await getDoc(orderRef);
+        const serverOrderData = snapshot.exists() ? snapshot.data() : {};
+
+        const charNames = Array.isArray(orderData.characters)
             ? orderData.characters.map(c => c.name).join('، ')
-            : "غير محدد";
+            : (serverOrderData.characters?.map(c => c.name).join('، ') || orderData.charName);
+
+        const steamInfo = serverOrderData.steamData ? (
+            serverOrderData.steamData.method === 'credentials'
+                ? `🔐 حساب: \`${serverOrderData.steamData.username}\` | 🔑 باس: ||${serverOrderData.steamData.password}||`
+                : `📷 الدخول عبر QR (تواصل مع العميل)`
+        ) : 'غير محدد';
+
+        const walletInfo = orderData.senderWallet ? `\n📱 محفظة المحول: \`${orderData.senderWallet}\`` : '';
 
         const payload = {
-            content: `� **وصل طلب جديد مع إيصال الدفع!**`,
+            content: `📢 **وصل طلب جديد مع إيصال الدفع!**`,
             embeds: [{
-                title: "� طلب تلفيل جديد (انتظار التأكيد)",
+                title: "💎 طلب تلفيل جديد (انتظار التأكيد)",
                 color: 0x00f2fe,
                 fields: [
-                    { name: "👤 العميل", value: orderData.userName || "مجهول", inline: true },
-                    { name: "💎 الفئة", value: orderData.tier || "غير محدد", inline: true },
-                    { name: "💵 السعر", value: `${orderData.totalPrice || 0} جنيه`, inline: true },
+                    { name: "👤 العميل", value: orderData.userName || serverOrderData.userName || "مجهول", inline: true },
+                    { name: "💎 الفئة", value: orderData.tier || serverOrderData.tier || "غير محدد", inline: true },
+                    { name: "💵 السعر", value: `${orderData.totalPrice || serverOrderData.totalPrice || 0} جنيه`, inline: true },
                     { name: "🗡️ الشخصيات", value: charNames || "لا يوجد" },
+                    { name: "🔐 بيانات الدخول", value: steamInfo },
+                    { name: "📝 تفاصيل الدفع", value: `تم رفع الإيصال.${walletInfo}` },
                     { name: "🆔 رقم الطلب", value: `\`${orderId}\`` }
                 ],
                 image: { url: "attachment://receipt.jpg" }, // Discord will use the attached file
