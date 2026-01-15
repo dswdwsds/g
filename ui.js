@@ -1,4 +1,4 @@
-import { auth, logout, openOperationsModal, closeOperationsModal, handleOpsSearch, closeOpsDetailsModal, closeChat, handleSendMessage, handleSendImage } from './app.js';
+import { auth, logout, openOperationsModal, closeOperationsModal, handleOpsSearch, closeOpsDetailsModal, closeChat, handleSendMessage, handleSendImage, getUserRole, listenToWorkers } from './app.js';
 import { onAuthStateChanged, db, doc, getDoc } from './firebase-config.js';
 
 export const injectNavbar = () => {
@@ -123,14 +123,9 @@ export const refreshUserUI = async () => {
 
     const user = auth.currentUser;
     if (user) {
-        let role = 'client';
-        try {
-            const userDoc = await getDoc(doc(db, "users", user.uid));
-            if (userDoc.exists()) role = userDoc.data().role || 'client';
-        } catch (e) { console.error("Role Error:", e); }
-
+        const role = getUserRole(user.email) || 'client';
         const isAdmin = role === 'admin';
-        const isStaff = role === 'staff' || isAdmin;
+        const isStaff = role === 'staff' || isAdmin || role === 'owner';
 
         userInfo.innerHTML = `
             <div class="user-dropdown">
@@ -160,6 +155,7 @@ export const refreshUserUI = async () => {
 export const initSharedUI = () => {
     injectNavbar();
     injectSharedModals();
+    listenToWorkers(() => refreshUserUI());
     onAuthStateChanged(auth, () => refreshUserUI());
 };
 

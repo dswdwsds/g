@@ -14,16 +14,6 @@ export * from './discord_service.js';
 export * from './ui_utils.js';
 export * from './operations_service.js';
 
-// 2. تصدير وظائف إضافية أو مركبة إذا لزم الأمر
-import { sendPaymentProofToDiscord as discordSendPayment } from './discord_service.js';
-import { updateDoc, doc, db, serverTimestamp } from './firebase-config.js';
-
-export const sendPaymentProofToDiscord = async (orderId, file, orderData, senderWallet) => {
-    // هذه الوظيفة تتواجد هنا للحفاظ على التوافق مع التوقيع القديم إذا لزم الأمر
-    // أو يمكن تصديرها مباشرة من discord_service.js
-    return await discordSendPayment(orderId, file, orderData, senderWallet);
-};
-
 // 3. التعرض العالمي (للحفاظ على عمل الـ onclick في الـ HTML)
 import {
     openOperationsModal, closeOperationsModal, handleOpsSearch, closeOpsDetailsModal
@@ -41,5 +31,7 @@ window.handleSendMessage = handleSendMessage;
 window.handleSendImage = handleSendImage;
 window.showToast = showToast;
 window.showConfirm = showConfirm;
+window.hasUserPurchasedOffer = (uid, tier) => import('./order_service.js').then(m => m.hasUserPurchasedOffer(uid, tier));
+window.listenToUnreadCount = (orderId, userId, callback) => import('./chat_service.js').then(m => m.listenToUnreadCount(orderId, userId, callback));
 
 console.log("PRO GS - Modular App Initialized 🚀");
