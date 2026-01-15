@@ -27,32 +27,36 @@ const uploadToImgBB = async (file) => {
 };
 
 import { getOrderById } from './order_service.js';
+import { getUserRole } from './auth_service.js';
 
 export const openChat = async (orderId) => {
     activeChatOrderId = orderId;
     const modal = document.getElementById('chatModal');
-    if (modal) modal.classList.add('visible');
+    if (modal) {
+        modal.classList.add('visible');
+        const input = document.getElementById('chatInput');
+        if (input) setTimeout(() => input.focus(), 300);
+    }
 
-    const chatMessages = document.getElementById('chatMessages');
-    const input = document.getElementById('chatInput');
-    if (chatMessages) chatMessages.innerHTML = '<div class="chat-empty">جاري تحميل الرسائل...</div>';
-
-    // Update Header Info
+    // Update Header Target Info
     try {
         const order = await getOrderById(orderId);
         if (order) {
-            const isWorker = auth.currentUser?.uid === order.workerId;
-            const targetName = isWorker ? order.userName : (order.workerName || "الموظف");
-            const targetAvatar = isWorker ? order.userAvatar : (order.workerAvatar || "https://ui-avatars.com/api/?name=Staff");
+            const role = getUserRole(auth.currentUser?.email) || 'client';
+            const isStaff = role === 'staff' || role === 'admin' || role === 'owner';
 
-            document.getElementById('chatTargetName').innerText = targetName;
-            document.getElementById('chatTargetAvatar').src = targetAvatar;
+            const targetName = isStaff ? order.userName : (order.workerName || 'الموظف المسؤول');
+            const targetAvatar = isStaff ? order.userAvatar : (order.workerAvatar || 'https://ui-avatars.com/api/?name=Staff&background=00f2fe&color=000');
+
+            const nameEl = document.getElementById('chatTargetName');
+            const avatarEl = document.getElementById('chatTargetAvatar');
+            if (nameEl) nameEl.innerText = targetName;
+            if (avatarEl) avatarEl.src = targetAvatar;
         }
     } catch (e) { console.error("Chat Header Error:", e); }
 
-    if (input) {
-        setTimeout(() => input.focus(), 500);
-    }
+    const chatMessages = document.getElementById('chatMessages');
+    if (chatMessages) chatMessages.innerHTML = '<div class="chat-empty">جاري تحميل الرسائل...</div>';
 
     if (chatUnsubscribe) chatUnsubscribe();
 

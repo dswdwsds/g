@@ -104,7 +104,12 @@ export const injectSharedModals = () => {
     const imageBtn = document.getElementById('chatImageBtn');
     const sendBtn = document.getElementById('sendMessageBtn');
 
-    if (chatInput) chatInput.onkeypress = (e) => e.key === 'Enter' && handleSendMessage();
+    if (chatInput) chatInput.onkeydown = (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            handleSendMessage();
+        }
+    };
     if (sendBtn) sendBtn.onclick = handleSendMessage;
     if (imageBtn) imageBtn.onclick = () => imageInput.click();
     if (imageInput) imageInput.onchange = (e) => handleSendImage(e.target.files[0]);
