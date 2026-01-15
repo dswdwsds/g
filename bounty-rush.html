@@ -425,6 +425,19 @@
 
       document.getElementById('modalStars').innerText = titleChars;
 
+      // Inject Offer Banner if applicable
+      const offerBanner = document.getElementById('offerBanner');
+      if (offerBanner) offerBanner.remove(); // Clean up old one
+
+      if (!selectedTier.startsWith('Bulk')) {
+        const discountPrice = OFFER_PRICES[selectedTier];
+        const banner = document.createElement('div');
+        banner.id = 'offerBanner';
+        banner.style.cssText = "background: rgba(0, 242, 254, 0.1); border: 1px dashed var(--primary); color: var(--text); padding: 10px; margin-bottom: 15px; border-radius: 8px; text-align: center; font-size: 0.9rem;";
+        banner.innerHTML = `🔥 <strong>عرض خاص:</strong> اختر بين 5 و 10 شخصيات ليصبح السعر <span style="color:#00f2fe; font-weight:bold;">${discountPrice} جنيه</span> للشخصية!`;
+        charGrid.parentElement.insertBefore(banner, charGrid);
+      }
+
       if (filteredChars.length === 0) {
         charGrid.innerHTML = `
           <div style="grid-column: 1/-1; padding: 40px; text-align: center; color: var(--text-dim);">
@@ -475,6 +488,7 @@
       let count = selectedChars.size;
       let isValid = true;
       let statusMsg = "";
+      let offerProgressMsg = "";
 
       if (selectedTier === 'BulkMix') {
         total = 100;
@@ -497,15 +511,17 @@
         total = price * count;
 
         if (isOffer) {
-          statusMsg = ` 🔥 عرض الافتتاح مفعل! (سعر الشخصية ${price}ج بدلاً من ${TIER_PRICES[selectedTier]}ج)`;
+          statusMsg = ` <br><span style="color:#00f2fe; font-size:0.8rem;">🔥 العرض مفعل! (السعر ${price}ج بدلاً من ${TIER_PRICES[selectedTier]}ج)</span>`;
+        } else if (count > 0 && count < 5) {
+          const needed = 5 - count;
+          offerProgressMsg = `<div style="margin-top:5px; color: var(--accent); font-size:0.8rem;">💡 اختر <strong>${needed}</strong> شخصيات إضافية لتفعيل العرض الخاص!</div>`;
         }
 
         if (count === 0) isValid = false;
       }
 
-      document.getElementById('totalPrice').innerText = `${total} جنيه${statusMsg}`;
-      // Style logic for status msg to make it small? It's inside h3 usually or span? 
-      // The element is h2 usually. Let's make it simple text.
+      const totalElement = document.getElementById('totalPrice');
+      totalElement.innerHTML = `${total} جنيه${statusMsg} ${offerProgressMsg}`; // Use innerHTML for formatting
 
       const btn = document.getElementById('confirmSelection');
       btn.innerText = `تأكيد (${count})${isValid ? '' : ' ❌'}`;
