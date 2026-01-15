@@ -114,6 +114,7 @@
       <p>رفع سريع للمستوى الأساسي</p>
       <button class="auth-btn" style="margin-top:20px; width: 100%;" onclick="orderNow('Starter')">طلب هذه
         الفئة</button>
+      <div class="offer-ribbon">عرض الافتتاح</div>
     </div>
 
     <div class="tier-card" style="border-color: var(--primary);">
@@ -122,6 +123,7 @@
       <span class="tier-price">9<span class="tier-currency"> جنيه مصري</span></span>
       <p>تحسين كبير لنقاط الشخصية</p>
       <button class="auth-btn" style="margin-top:20px; width: 100%;" onclick="orderNow('Pro')">طلب هذه الفئة</button>
+      <div class="offer-ribbon">عرض الافتتاح</div>
     </div>
 
     <div class="tier-card">
@@ -131,7 +133,37 @@
       <p>الوصول للحد الأقصى من القوة</p>
       <button class="auth-btn" style="margin-top:20px; width: 100%;" onclick="orderNow('Ultimate')">طلب هذه
         الفئة</button>
+      <div class="offer-ribbon">عرض الافتتاح</div>
     </div>
+  </section>
+
+  <!-- Special Bulk Offers -->
+  <section class="character-tiers" style="margin-top: 50px;">
+    <div class="tier-card" style="border-color: #00f2fe; background: rgba(0, 242, 254, 0.05);">
+      <span class="tier-stars">⭐⭐ / ⭐⭐⭐</span>
+      <h3>باقة التوفير</h3>
+      <span class="tier-price">100<span class="tier-currency"> جنيه</span></span>
+      <p>20 شخصية (ميكس نجمتين وثلاث)</p>
+      <p style="font-size:0.8rem; color:#ff4d4d; margin-top:5px;">*مرة واحدة لكل حساب</p>
+      <button class="auth-btn" style="margin-top:20px; width: 100%; background: #00f2fe; color:#000;"
+        onclick="orderNow('BulkMix')">طلب الباقة</button>
+      <div class="offer-ribbon new">عرض خاص</div>
+    </div>
+
+    <div class="tier-card" style="border-color: #ff00c8; background: rgba(255, 0, 200, 0.05);">
+      <span class="tier-stars">⭐⭐⭐⭐</span>
+      <h3>باقة القوة</h3>
+      <span class="tier-price">140<span class="tier-currency"> جنيه</span></span>
+      <p>20 شخصية (أربع نجوم)</p>
+      <p style="font-size:0.8rem; color:#ff4d4d; margin-top:5px;">*مرة واحدة لكل حساب</p>
+      <button class="auth-btn" style="margin-top:20px; width: 100%; background: #ff00c8;"
+        onclick="orderNow('BulkUltimate')">طلب الباقة</button>
+      <div class="offer-ribbon new">عرض خاص</div>
+    </div>
+  </section>
+
+  <section class="character-tiers" style="display:none;">
+    <!-- Hidden original closing tag area placeholder if needed layout adjustment -->
   </section>
 
   <div style="text-align: center; margin-bottom: 100px;">
@@ -314,7 +346,7 @@
 
   <script type="module">
     import { auth, onAuthStateChanged } from './firebase-config.js';
-    import { login, logout, placeOrder, sendPaymentProofToDiscord, updateOrderStatus, listenToQueue, listenToUserOrders, listenToWorkers, getUserRole, submitRating, loadCharacters, getCharacters, sendMessage, listenToMessages, sendImageMessage, listenToUnreadCount, markMessagesAsRead } from './app.js?v=2';
+    import { login, logout, placeOrder, sendPaymentProofToDiscord, updateOrderStatus, listenToQueue, listenToUserOrders, listenToWorkers, getUserRole, submitRating, loadCharacters, getCharacters, sendMessage, listenToMessages, sendImageMessage, listenToUnreadCount, markMessagesAsRead, hasUserPurchasedOffer } from './app.js?v=2';
 
     const userInfo = document.getElementById('userInfo');
     const queueList = document.getElementById('queueList');
@@ -325,36 +357,79 @@
 
     let selectedTier = null;
     let selectedChars = new Set();
+
+    // Base Prices
     const TIER_PRICES = { 'Starter': 8, 'Pro': 9, 'Ultimate': 10 };
-    const TIER_STARS = { 'Starter': 2, 'Pro': 3, 'Ultimate': 4 };
+    // Offer Prices (5-10 chars)
+    const OFFER_PRICES = { 'Starter': 6, 'Pro': 7, 'Ultimate': 8 };
+
+    const TIER_STARS = {
+      'Starter': 2,
+      'Pro': 3,
+      'Ultimate': 4,
+      'BulkMix': [2, 3], // Mix of 2 and 3 stars
+      'BulkUltimate': 4
+    };
 
     // Load characters on page load
     loadCharacters().then(() => {
       console.log('Characters loaded:', getCharacters().length);
     });
 
-    window.orderNow = (tier) => {
+    window.orderNow = async (tier, event) => {
       if (!auth.currentUser) {
         login();
         return;
       }
+
+      // Check for one-time offer eligibility
+      if (tier.startsWith('Bulk')) {
+        const btn = event.target; // Capture button to maybe show loader?
+        const originalText = btn.innerText;
+        btn.innerText = "جاري التحقق...";
+        btn.disabled = true;
+
+        const hasPurchased = await hasUserPurchasedOffer(auth.currentUser.uid, tier);
+
+        btn.innerText = originalText;
+        btn.disabled = false;
+
+        if (hasPurchased) {
+          if (window.showToast) window.showToast("عذراً، هذا العرض متاح مرة واحدة فقط لكل حساب! 🚫", "❌");
+          else alert("عذراً، هذا العرض متاح مرة واحدة فقط لكل حساب! 🚫");
+          return;
+        }
+      }
+
       selectedTier = tier;
       selectedChars.clear();
+
       openCharModal();
     };
 
     const openCharModal = () => {
       const CHARACTERS = getCharacters();
-      const requiredStars = TIER_STARS[selectedTier];
-      const filteredChars = CHARACTERS.filter(char => char.stars === requiredStars);
+      const starsCriteria = TIER_STARS[selectedTier];
 
-      document.getElementById('modalStars').innerText = `${requiredStars} نجوم`;
+      // Filter Logic handling Array (for mix) or Number
+      let filteredChars = [];
+      let titleChars = "";
+
+      if (Array.isArray(starsCriteria)) {
+        filteredChars = CHARACTERS.filter(char => starsCriteria.includes(char.stars));
+        titleChars = starsCriteria.map(s => s + ' نجوم').join(' و ');
+      } else {
+        filteredChars = CHARACTERS.filter(char => char.stars === starsCriteria);
+        titleChars = starsCriteria + ' نجوم';
+      }
+
+      document.getElementById('modalStars').innerText = titleChars;
 
       if (filteredChars.length === 0) {
         charGrid.innerHTML = `
           <div style="grid-column: 1/-1; padding: 40px; text-align: center; color: var(--text-dim);">
             <div style="font-size: 3rem; margin-bottom: 20px;">🔍</div>
-            <p>عذراً، لا يوجد شخصيات فئة ${requiredStars} في قاعدة البيانات حالياً.</p>
+            <p>عذراً، لا يوجد شخصيات مطابقة في قاعدة البيانات حالياً.</p>
           </div>
         `;
       } else {
@@ -379,6 +454,12 @@
     };
 
     window.toggleChar = (charId) => {
+      // Bulk Limit Check
+      if (selectedTier.startsWith('Bulk') && !selectedChars.has(charId) && selectedChars.size >= 20) {
+        alert("يمكنك اختيار 20 شخصية فقط في هذا العرض!");
+        return;
+      }
+
       if (selectedChars.has(charId)) {
         selectedChars.delete(charId);
         document.getElementById(`char-${charId}`).classList.remove('selected');
@@ -390,12 +471,46 @@
     };
 
     const updateSelectionUI = () => {
-      const pricePerChar = TIER_PRICES[selectedTier] || 0;
-      const total = pricePerChar * selectedChars.size;
-      document.getElementById('totalPrice').innerText = `${total} جنيه`;
-      document.getElementById('confirmSelection').innerText = `تأكيد (${selectedChars.size})`;
-      document.getElementById('confirmSelection').disabled = selectedChars.size === 0;
-      document.getElementById('confirmSelection').style.opacity = selectedChars.size === 0 ? '0.5' : '1';
+      let total = 0;
+      let count = selectedChars.size;
+      let isValid = true;
+      let statusMsg = "";
+
+      if (selectedTier === 'BulkMix') {
+        total = 100;
+        if (count !== 20) {
+          isValid = false;
+          statusMsg = ` (يجب اختيار 20 شخصية - اخترت ${count})`;
+        }
+      }
+      else if (selectedTier === 'BulkUltimate') {
+        total = 140;
+        if (count !== 20) {
+          isValid = false;
+          statusMsg = ` (يجب اختيار 20 شخصية - اخترت ${count})`;
+        }
+      }
+      else {
+        // Dynamic Pricing for Standard Tiers (Opening Offer)
+        const isOffer = count >= 5 && count <= 10;
+        const price = isOffer ? OFFER_PRICES[selectedTier] : TIER_PRICES[selectedTier];
+        total = price * count;
+
+        if (isOffer) {
+          statusMsg = ` 🔥 عرض الافتتاح مفعل! (سعر الشخصية ${price}ج بدلاً من ${TIER_PRICES[selectedTier]}ج)`;
+        }
+
+        if (count === 0) isValid = false;
+      }
+
+      document.getElementById('totalPrice').innerText = `${total} جنيه${statusMsg}`;
+      // Style logic for status msg to make it small? It's inside h3 usually or span? 
+      // The element is h2 usually. Let's make it simple text.
+
+      const btn = document.getElementById('confirmSelection');
+      btn.innerText = `تأكيد (${count})${isValid ? '' : ' ❌'}`;
+      btn.disabled = !isValid;
+      btn.style.opacity = !isValid ? '0.5' : '1';
     };
 
     document.getElementById('confirmSelection').onclick = () => {

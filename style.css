@@ -360,6 +360,28 @@ body::after {
     pointer-events: none;
 }
 
+/* Offer Ribbon */
+.offer-ribbon {
+    position: absolute;
+    top: 15px;
+    left: -25px;
+    width: 100px;
+    background: #ff4d4d;
+    color: white;
+    text-align: center;
+    font-size: 0.7rem;
+    font-weight: bold;
+    padding: 5px 0;
+    transform: rotate(-45deg);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    z-index: 10;
+}
+
+.offer-ribbon.new {
+    background: #00f2fe;
+    color: #000;
+}
+
 .user-dropdown:hover .dropdown-menu {
     opacity: 1;
     visibility: visible;
