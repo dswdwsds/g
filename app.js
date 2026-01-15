@@ -658,6 +658,31 @@ export const listenToAllOrders = (callback) => {
     });
 };
 
+export const listenToAllOrdersExtended = (callback, limitCount = 50) => {
+    const q = query(collection(db, "orders"),
+        orderBy("createdAt", "desc"),
+        limit(limitCount)
+    );
+    return onSnapshot(q, (snapshot) => {
+        const orders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        callback(orders);
+    });
+};
+
+export const getOrderById = async (orderId) => {
+    try {
+        const orderRef = doc(db, "orders", orderId);
+        const snapshot = await getDoc(orderRef);
+        if (snapshot.exists()) {
+            return { id: snapshot.id, ...snapshot.data() };
+        }
+        return null;
+    } catch (error) {
+        console.error("Get Order Error:", error);
+        return null;
+    }
+};
+
 export const listenToQueue = (callback) => {
     const q = query(collection(db, "orders"),
         where("status", "in", ["awaiting_payment", "pending_verification", "waiting", "working"]),
