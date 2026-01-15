@@ -483,7 +483,7 @@
           chatMessages.innerHTML = '<div class="chat-empty">لا توجد رسائل بعد. ابدأ المحادثة الآن! 👋</div>';
         } else {
           messages.forEach(msg => {
-            const isMe = msg.senderId === user?.uid;
+            const isMe = msg.senderId === auth.currentUser?.uid;
             const bubble = document.createElement('div');
             bubble.className = `message-bubble ${isMe ? 'sent' : 'received'}`;
 
