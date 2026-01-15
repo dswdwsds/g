@@ -292,12 +292,14 @@
           </label>
         </div>
 
-        <div id="steamInputs" style="display: block;">
-          <input type="text" id="steamUsername" placeholder="اسم المستخدم (Steam Username)" class="review-input"
-            style="margin-bottom: 10px; width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); padding: 12px; border-radius: 8px;">
-          <input type="password" id="steamPassword" placeholder="كلمة المرور (Password)" class="review-input"
-            style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); padding: 12px; border-radius: 8px;">
-        </div>
+        <form onsubmit="event.preventDefault(); document.getElementById('confirmSteamLogin').click();">
+          <div id="steamInputs" style="display: block;">
+            <input type="text" id="steamUsername" placeholder="اسم المستخدم (Steam Username)" class="review-input"
+              style="margin-bottom: 10px; width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); padding: 12px; border-radius: 8px;">
+            <input type="password" id="steamPassword" placeholder="كلمة المرور (Password)" class="review-input"
+              style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); padding: 12px; border-radius: 8px;">
+          </div>
+        </form>
 
         <!-- QR Code Info -->
         <div id="qrInfo"
@@ -347,6 +349,11 @@
       </div>
 
       <div class="upload-section">
+        <div style="margin-bottom: 20px;">
+          <p style="font-size: 0.9rem; margin-bottom: 10px;">رقم المحفظة الذي قمت بالتحويل منه:</p>
+          <input type="text" id="senderWalletInput" placeholder="رقم المحول (مثال: 010...)"
+            style="width: 100%; padding: 12px; border-radius: 8px; background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); color: white; outline: none;">
+        </div>
         <p style="font-size: 0.9rem; margin-bottom: 10px;">قم برفع صورة إيصال الدفع (Screenshot):</p>
         <label class="custom-upload">
           <input type="file" id="receiptInput" accept="image/*" hidden>
@@ -404,6 +411,10 @@
       </div>
       <div id="chatMessages" class="chat-messages">
         <div class="chat-empty">جاري تحميل الرسائل...</div>
+      </div>
+      <div id="uploadProgress"
+        style="display:none; padding:10px; background:rgba(0,242,254,0.1); font-size:0.8rem; text-align:center; color:var(--primary);">
+        ⏳ جاري رفع الملف...
       </div>
       <div class="chat-input-area">
         <input type="file" id="chatImageInput" accept="image/*" hidden>
@@ -883,6 +894,11 @@
     };
 
     submitPayment.onclick = async () => {
+      const wallet = document.getElementById('senderWalletInput').value.trim();
+      if (!wallet) {
+        showToast("يرجى إدخال رقم المحفظة المحول منه!", "⚠️");
+        return;
+      }
       if (receiptInput.files.length === 0) {
         showToast("يرجى رفع صورة الإيصال أولاً!", "⚠️");
         return;
@@ -903,7 +919,8 @@
             tier: currentOrderForPayment.tier,
             totalPrice: currentOrderForPayment.totalPrice,
             characters: characters
-          }
+          },
+          wallet
         );
 
         if (success) {

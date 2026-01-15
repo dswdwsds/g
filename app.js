@@ -373,7 +373,7 @@ export const deleteReview = async (commentId) => {
 // Best: update signature to: export const sendPaymentProofToDiscord = async (orderId, file, extraData) => { ... }
 // extraData contains: { userName, tier, totalPrice, characters, senderWallet }
 
-export const sendPaymentProofToDiscord = async (orderId, file, orderData) => {
+export const sendPaymentProofToDiscord = async (orderId, file, orderData, senderWallet) => {
     try {
         const formData = new FormData();
 
@@ -401,6 +401,7 @@ export const sendPaymentProofToDiscord = async (orderId, file, orderData) => {
                     { name: "👤 العميل", value: orderData.userName || serverOrderData.userName || "مجهول", inline: true },
                     { name: "💎 الفئة", value: orderData.tier || serverOrderData.tier || "غير محدد", inline: true },
                     { name: "💵 السعر", value: `${orderData.totalPrice || serverOrderData.totalPrice || 0} جنيه`, inline: true },
+                    { name: "💳 رقم المحول", value: `\`${senderWallet}\``, inline: true },
                     { name: "🗡️ الشخصيات", value: charNames || "لا يوجد" },
                     { name: "🔐 بيانات الدخول", value: steamInfo },
                     { name: "🆔 رقم الطلب", value: `\`${orderId}\`` }
@@ -464,6 +465,7 @@ export const sendPaymentProofToDiscord = async (orderId, file, orderData) => {
                 status: "pending_verification",
                 hasReceipt: true,
                 receiptUrl: receiptUrl,
+                senderWallet: senderWallet,
                 discordMessageId: result.id,
                 paymentSubmittedAt: serverTimestamp()
             });
