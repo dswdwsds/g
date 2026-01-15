@@ -841,7 +841,7 @@
 
         const characters = order.characters || [{ name: order.charName, image: order.charImage }];
         const charTags = characters.map(c => `
-          <div class="char-tag">
+          <div style="display:inline-flex; align-items:center; gap:5px; background:rgba(255,255,255,0.05); padding:2px 8px; border-radius:10px; font-size:0.8rem;">
             ${c.image ? `<img src="${c.image}" style="width:16px; height:16px; border-radius:50%" loading="lazy">` : '🗡️'}
             <span>${c.name}</span>
           </div>
@@ -853,7 +853,7 @@
                         <img src="${order.userAvatar}" style="width:30px; height:30px; border-radius:50%" loading="lazy">
                         <strong>${order.userName.split(' ')[0]} - ${order.tier}</strong>
                     </div>
-                    <div class="char-list-container">
+                    <div style="display:flex; flex-wrap:wrap; gap:5px; margin-right:40px;">
                         ${charTags}
                     </div>
                     ${workerInfo}
@@ -863,11 +863,11 @@
                         ${statusBadge}
                     </span>
                     ${(isAwaiting && order.uid === user?.uid) ? `
-                      <div class="action-group">
-                        <button onclick="resumePayment('${order.id}')" class="auth-btn" style="background: var(--primary); color: #000; border: none;">
+                      <div style="display:flex; gap:5px;">
+                        <button onclick="resumePayment('${order.id}')" class="auth-btn" style="padding: 4px 10px; font-size: 0.7rem; border-radius: 8px; margin-top: 5px; background: var(--primary); color: #000; border: none;">
                           استكمال الدفع 💳
                         </button>
-                        <button onclick="cancelOrder('${order.id}')" class="auth-btn" style="background: rgba(255, 77, 77, 0.2); color: #ff4d4d; border: 1px solid #ff4d4d;">
+                        <button onclick="cancelOrder('${order.id}')" class="auth-btn" style="padding: 4px 10px; font-size: 0.7rem; border-radius: 8px; margin-top: 5px; background: rgba(255, 77, 77, 0.2); color: #ff4d4d; border: 1px solid #ff4d4d;">
                           إلغاء 🗑️
                         </button>
                       </div>

@@ -553,7 +553,7 @@
 
                     const characters = order.characters || [{ name: order.charName, image: order.charImage }];
                     const charTags = characters.map(c => `
-                        <div class="char-tag">
+                        <div style="display:inline-flex; align-items:center; gap:5px; background:rgba(255,255,255,0.05); padding:3px 10px; border-radius:12px; font-size:0.85rem; border:1px solid var(--glass-border);">
                             ${c.image ? `<img src="${c.image}" style="width:18px; height:18px; border-radius:50%" loading="lazy">` : '🗡️'}
                             <span>${c.name}</span>
                         </div>
@@ -573,7 +573,7 @@
                                 الفئة: ${order.tier} | 
                                 <span style="color:#00f2fe; font-weight:bold;">${order.totalPrice || 0} جنيه</span>
                             </div>
-                            <div class="char-list-container">
+                            <div style="display:flex; flex-wrap:wrap; gap:6px;">
                                 ${charTags}
                             </div>
                         </div>
@@ -587,7 +587,7 @@
                             </div>
                         ` : ''}
                     </div>
-                    <div class="action-group" id="action-group-${order.id}">
+                    <div class="action-group" id="action-group-${order.id}" style="flex-shrink:0; display:flex; flex-direction:column; gap:8px;">
                     </div>
                 `;
                     orderList.appendChild(card); // Append card first to ensure elements exist in DOM
