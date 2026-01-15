@@ -224,51 +224,69 @@
 
   <!-- Character Selection Modal -->
   <div id="charModal" class="notif-overlay">
-    <div class="notif-card" style="max-width: 800px; width: 95%;">
-      <h3>اختر الشخصية التي تريد تلفيلها (<span id="modalStars"></span>) 🗡️</h3>
-      <div id="charGrid" class="char-grid">
+    <div class="notif-card" style="max-width: 850px; width: 95%; padding: 25px;">
+      <!-- Header -->
+      <div style="border-bottom: 2px solid var(--glass-border); padding-bottom: 15px; margin-bottom: 20px;">
+        <h3 style="margin: 0; font-size: 1.3rem;">اختر الشخصيات (<span id="modalStars"></span>) 🗡️</h3>
+      </div>
+
+      <!-- Character Grid -->
+      <div id="charGrid" class="char-grid"
+        style="max-height: 400px; overflow-y: auto; margin-bottom: 20px; padding: 10px;">
         <!-- Characters will be injected here -->
       </div>
-      <div class="modal-footer">
-        <div class="price-display">
-          <div class="price-label">السعر الإجمالي:</div>
-          <div id="totalPrice" class="price-total">0 جنيه</div>
-        </div>
 
-        <!-- Steam Warning & Guarantee -->
-        <div
-          style="margin-bottom: 10px; font-size: 0.8rem; color: #ffeb3b; background: rgba(255, 235, 59, 0.1); padding: 8px; border-radius: 8px; text-align: right;">
-          ⚠️ <strong>تنبيه هام:</strong> الخدمة متاحة وحصرية لمنصة <strong>Steam</strong> فقط.<br>
-          🛡️ <strong>ضمان الموسم:</strong> نضمن لك الحفاظ على التصنيف طوال الموسم. في حال النزول، نقوم بالدخول والرفع
-          مجاناً!
-        </div>
-
-        <!-- Login Method Selection -->
-        <div
-          style="text-align: right; margin-bottom: 15px; border-top: 1px solid var(--glass-border); padding-top: 10px;">
-          <p style="margin-bottom: 8px; font-weight: bold; color: var(--primary);">طريقة الدخول للحساب:</p>
-          <div style="display: flex; gap: 15px; margin-bottom: 10px; flex-wrap: wrap;">
-            <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
-              <input type="radio" name="loginMethod" value="credentials" checked onchange="toggleLoginInputs()">
-              <span>تسليم الحساب (اسم وباسورد)</span>
-            </label>
-            <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
-              <input type="radio" name="loginMethod" value="qr" onchange="toggleLoginInputs()">
-              <span>عن طريق QR (تحدث مع الدعم)</span>
-            </label>
+      <!-- Info Section -->
+      <div
+        style="background: rgba(255, 235, 59, 0.08); border: 1px solid rgba(255, 235, 59, 0.3); border-radius: 12px; padding: 15px; margin-bottom: 20px; text-align: right;">
+        <div style="font-size: 0.85rem; color: #fff; line-height: 1.6;">
+          <div style="margin-bottom: 8px;">
+            ⚠️ <strong style="color: #ffeb3b;">تنبيه:</strong> الخدمة متاحة لمنصة <strong>Steam</strong> فقط
           </div>
-
-          <div id="steamInputs" style="display: block;">
-            <input type="text" id="steamUsername" placeholder="اسم المستخدم (Steam Username)" class="review-input"
-              style="margin-bottom: 8px; width: 100%;">
-            <input type="password" id="steamPassword" placeholder="كلمة المرور (Steam Password)" class="review-input"
-              style="margin-bottom: 8px; width: 100%;">
+          <div>
+            🛡️ <strong style="color: #00f2fe;">ضمان الموسم:</strong> نضمن الحفاظ على التصنيف طوال الموسم + دخول مجاني
+            عند النزول
           </div>
         </div>
+      </div>
 
-        <div id="selectionActions" style="display:flex; gap:10px;">
-          <button id="confirmSelection" class="notif-btn" style="width:auto; padding:12px 30px;">تأكيد (0)</button>
-          <button class="notif-btn" style="background: var(--glass); color: #fff; width:auto; padding:12px 20px;"
+      <!-- Login Section -->
+      <div
+        style="background: rgba(0, 242, 254, 0.05); border: 1px solid var(--glass-border); border-radius: 12px; padding: 15px; margin-bottom: 20px; text-align: right;">
+        <p style="margin: 0 0 12px 0; font-weight: bold; color: var(--primary); font-size: 0.95rem;">🔐 طريقة الدخول
+          للحساب:</p>
+
+        <div style="display: flex; gap: 15px; margin-bottom: 12px; flex-wrap: wrap;">
+          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.9rem;">
+            <input type="radio" name="loginMethod" value="credentials" checked onchange="toggleLoginInputs()">
+            <span>حساب Steam (اسم + باسورد)</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.9rem;">
+            <input type="radio" name="loginMethod" value="qr" onchange="toggleLoginInputs()">
+            <span>QR Code (تواصل دعم)</span>
+          </label>
+        </div>
+
+        <div id="steamInputs" style="display: block;">
+          <input type="text" id="steamUsername" placeholder="اسم المستخدم (Steam Username)" class="review-input"
+            style="margin-bottom: 8px; width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border);">
+          <input type="password" id="steamPassword" placeholder="كلمة المرور (Password)" class="review-input"
+            style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border);">
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="modal-footer" style="border-top: 2px solid var(--glass-border); padding-top: 15px;">
+        <div class="price-display" style="margin-bottom: 15px;">
+          <div class="price-label" style="font-size: 0.9rem; color: var(--text-dim);">السعر الإجمالي:</div>
+          <div id="totalPrice" class="price-total" style="font-size: 1.8rem; font-weight: bold;">0 جنيه</div>
+        </div>
+
+        <div id="selectionActions" style="display:flex; gap:10px; justify-content: center;">
+          <button id="confirmSelection" class="notif-btn"
+            style="flex: 1; max-width: 200px; padding: 14px 25px; font-size: 1.05rem;">تأكيد (0)</button>
+          <button class="notif-btn"
+            style="flex: 1; max-width: 150px; background: var(--glass); color: #fff; padding: 14px 20px;"
             onclick="closeCharModal()">إلغاء</button>
         </div>
       </div>
