@@ -234,6 +234,38 @@
           <div class="price-label">السعر الإجمالي:</div>
           <div id="totalPrice" class="price-total">0 جنيه</div>
         </div>
+
+        <!-- Steam Warning & Guarantee -->
+        <div
+          style="margin-bottom: 10px; font-size: 0.8rem; color: #ffeb3b; background: rgba(255, 235, 59, 0.1); padding: 8px; border-radius: 8px; text-align: right;">
+          ⚠️ <strong>تنبيه هام:</strong> الخدمة متاحة وحصرية لمنصة <strong>Steam</strong> فقط.<br>
+          🛡️ <strong>ضمان الموسم:</strong> نضمن لك الحفاظ على التصنيف طوال الموسم. في حال النزول، نقوم بالدخول والرفع
+          مجاناً!
+        </div>
+
+        <!-- Login Method Selection -->
+        <div
+          style="text-align: right; margin-bottom: 15px; border-top: 1px solid var(--glass-border); padding-top: 10px;">
+          <p style="margin-bottom: 8px; font-weight: bold; color: var(--primary);">طريقة الدخول للحساب:</p>
+          <div style="display: flex; gap: 15px; margin-bottom: 10px; flex-wrap: wrap;">
+            <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+              <input type="radio" name="loginMethod" value="credentials" checked onchange="toggleLoginInputs()">
+              <span>تسليم الحساب (اسم وباسورد)</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+              <input type="radio" name="loginMethod" value="qr" onchange="toggleLoginInputs()">
+              <span>عن طريق QR (تحدث مع الدعم)</span>
+            </label>
+          </div>
+
+          <div id="steamInputs" style="display: block;">
+            <input type="text" id="steamUsername" placeholder="اسم المستخدم (Steam Username)" class="review-input"
+              style="margin-bottom: 8px; width: 100%;">
+            <input type="password" id="steamPassword" placeholder="كلمة المرور (Steam Password)" class="review-input"
+              style="margin-bottom: 8px; width: 100%;">
+          </div>
+        </div>
+
         <div id="selectionActions" style="display:flex; gap:10px;">
           <button id="confirmSelection" class="notif-btn" style="width:auto; padding:12px 30px;">تأكيد (0)</button>
           <button class="notif-btn" style="background: var(--glass); color: #fff; width:auto; padding:12px 20px;"
