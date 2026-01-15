@@ -400,6 +400,61 @@ body::after {
     z-index: 9;
 }
 
+.user-trigger {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 5px 10px;
+    border-radius: 12px;
+    transition: 0.3s;
+}
+
+.user-trigger:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    line-height: 1.2;
+}
+
+.user-role {
+    font-size: 0.7rem;
+    color: var(--primary);
+    font-weight: bold;
+}
+
+.dropdown-menu a,
+.dropdown-btn {
+    padding: 10px 15px;
+    color: white;
+    text-decoration: none;
+    font-size: 0.9rem;
+    border-radius: 10px;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: none;
+    background: transparent;
+    width: 100%;
+    text-align: right;
+    cursor: pointer;
+}
+
+.dropdown-menu a:hover,
+.dropdown-btn:hover {
+    background: rgba(0, 242, 254, 0.1);
+    color: var(--primary);
+}
+
+.logout-btn:hover {
+    background: rgba(255, 77, 77, 0.1) !important;
+    color: #ff4d4d !important;
+}
+
 .dropdown-item {
     padding: 10px 15px;
     border-radius: 10px;

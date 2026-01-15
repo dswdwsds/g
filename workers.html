@@ -625,7 +625,7 @@
 
         function loadEarnings(email, uid) {
             // الاستماع لإحصائيات الموظف مباشرة من مستنده
-            listenToStaffStats(email, uid, (stats) => {
+            listenToStaffStats(uid, (stats) => {
                 if (stats) {
                     totalEarnings.innerText = `${stats.totalEarnings || 0} جنيه`;
                 }

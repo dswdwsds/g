@@ -136,11 +136,11 @@ export const refreshUserUI = async () => {
                     </div>
                     <img src="${user.photoURL}" class="user-avatar">
                 </div>
-                <div class="dropdown-content">
+                <div class="dropdown-menu">
                     <a href="history.html">📦 طلباتي</a>
                     ${isStaff ? `<a href="workers.html">🛠️ لوحة العمل</a>` : ''}
                     <hr style="border:0; border-top:1px solid var(--glass-border); margin:5px 0;">
-                    <button onclick="handleLogout()" class="logout-btn">تسجيل الخروج 🚪</button>
+                    <button onclick="handleLogout()" class="dropdown-btn logout-btn">تسجيل الخروج 🚪</button>
                 </div>
             </div>
             ${isStaff ? `<button onclick="openOperationsModal()" class="auth-btn ops-nav-btn" style="margin-right:10px;">العمليات 📂</button>` : ''}
