@@ -289,8 +289,10 @@
         <form onsubmit="event.preventDefault(); document.getElementById('confirmSteamLogin').click();">
           <div id="steamInputs" style="display: block;">
             <input type="text" id="steamUsername" placeholder="اسم المستخدم (Steam Username)" class="review-input"
+              autocomplete="username"
               style="margin-bottom: 10px; width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); padding: 12px; border-radius: 8px;">
             <input type="password" id="steamPassword" placeholder="كلمة المرور (Password)" class="review-input"
+              autocomplete="current-password"
               style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); padding: 12px; border-radius: 8px;">
           </div>
         </form>
