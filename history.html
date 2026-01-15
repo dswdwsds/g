@@ -175,37 +175,30 @@
                         const date = order.createdAt?.toDate ? new Date(order.createdAt.toDate()).toLocaleDateString('ar-EG') : 'غير معروف';
 
                         const characters = order.characters || [{ name: order.charName, image: order.charImage }];
-                        const charTags = characters.map(c => `
-                        <div style="display:inline-flex; align-items:center; gap:5px; background:rgba(255,255,255,0.05); padding:4px 10px; border-radius:12px; font-size:0.85rem;">
-                            ${c.image ? `<img src="${c.image}" style="width:20px; height:20px; border-radius:50%" loading="lazy">` : '🗡️'}
-                            <span>${c.name}</span>
-                        </div>
-                    `).join(' ');
 
-                        let actionsHtml = '';
-                        if (order.status === 'working') {
-                            const chatBtnId = `history-chat-btn-${order.id}`;
-                            actionsHtml = `
-                            <button id="${chatBtnId}" onclick="openChat('${order.id}')" class="auth-btn" style="padding: 4px 12px; font-size: 0.75rem; border-radius: 8px; margin-top: 5px; background: #4facfe; color: #fff; border: none; display:flex; align-items:center; gap:5px; position: relative;">
-                                <span>تواصل مع الموظف</span> 💬
-                            </button>
+                        // Show More Logic
+                        const limit = 6;
+                        const visibleChars = characters.slice(0, limit);
+                        const hiddenChars = characters.slice(limit);
+
+                        const generateCharTag = (c, hidden = false) => `
+                            <div class="${hidden ? `hidden-char-${order.id}` : ''}" style="${hidden ? 'display:none;' : 'display:inline-flex;'} align-items:center; gap:5px; background:rgba(255,255,255,0.05); padding:4px 10px; border-radius:12px; font-size:0.85rem;">
+                                ${c.image ? `<img src="${c.image}" style="width:20px; height:20px; border-radius:50%" loading="lazy">` : '🗡️'}
+                                <span>${c.name}</span>
+                            </div>
                         `;
 
-                            // Listen to unread messages
-                            listenToUnreadCount(order.id, auth.currentUser.uid, (count) => {
-                                const btn = document.getElementById(chatBtnId);
-                                if (btn) {
-                                    const existingBadge = btn.querySelector('.notification-badge');
-                                    if (existingBadge) existingBadge.remove();
+                        const visibleTags = visibleChars.map(c => generateCharTag(c)).join(' ');
+                        const hiddenTags = hiddenChars.map(c => generateCharTag(c, true)).join(' ');
 
-                                    if (count > 0) {
-                                        const badge = document.createElement('span');
-                                        badge.className = 'notification-badge';
-                                        badge.innerText = count > 9 ? '9+' : count;
-                                        btn.appendChild(badge);
-                                    }
-                                }
-                            });
+                        let moreBtn = '';
+                        if (hiddenChars.length > 0) {
+                            moreBtn = `
+                                <button onclick="document.querySelectorAll('.hidden-char-${order.id}').forEach(el => el.style.display='inline-flex'); this.style.display='none';" 
+                                    style="background:rgba(0, 242, 254, 0.1); border:1px solid var(--primary); color:white; border-radius:12px; padding:4px 10px; font-size:0.75rem; cursor:pointer;">
+                                    عرض المزيد (+${hiddenChars.length})
+                                </button>
+                            `;
                         }
 
                         item.innerHTML = `
@@ -214,7 +207,9 @@
                             <div style="flex:1">
                                 <div style="font-weight:700; color: var(--primary); margin-bottom:5px;">الفئة: ${order.tier}</div>
                                 <div style="display:flex; flex-wrap:wrap; gap:8px;">
-                                    ${charTags}
+                                    ${visibleTags}
+                                    ${hiddenTags}
+                                    ${moreBtn}
                                 </div>
                                 <div style="font-size:0.75rem; color:var(--text-dim); margin-top:8px;">${date}</div>
                             </div>

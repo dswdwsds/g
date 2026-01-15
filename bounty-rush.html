@@ -840,12 +840,31 @@
         }
 
         const characters = order.characters || [{ name: order.charName, image: order.charImage }];
-        const charTags = characters.map(c => `
-          <div style="display:inline-flex; align-items:center; gap:5px; background:rgba(255,255,255,0.05); padding:2px 8px; border-radius:10px; font-size:0.8rem;">
+
+        // Show More Logic
+        const limit = 6;
+        const visibleChars = characters.slice(0, limit);
+        const hiddenChars = characters.slice(limit);
+
+        const generateCharTag = (c, hidden = false) => `
+          <div class="${hidden ? `hidden-char-${order.id}` : ''}" style="${hidden ? 'display:none;' : 'display:inline-flex;'} align-items:center; gap:5px; background:rgba(255,255,255,0.05); padding:2px 8px; border-radius:10px; font-size:0.8rem;">
             ${c.image ? `<img src="${c.image}" style="width:16px; height:16px; border-radius:50%" loading="lazy">` : '🗡️'}
             <span>${c.name}</span>
           </div>
-        `).join(' ');
+        `;
+
+        const visibleTags = visibleChars.map(c => generateCharTag(c)).join(' ');
+        const hiddenTags = hiddenChars.map(c => generateCharTag(c, true)).join(' ');
+
+        let moreBtn = '';
+        if (hiddenChars.length > 0) {
+          moreBtn = `
+                <button onclick="document.querySelectorAll('.hidden-char-${order.id}').forEach(el => el.style.display='inline-flex'); this.style.display='none';" 
+                    style="background:rgba(0, 242, 254, 0.1); border:1px solid var(--primary); color:white; border-radius:10px; padding:2px 8px; font-size:0.75rem; cursor:pointer;">
+                    عرض المزيد (+${hiddenChars.length})
+                </button>
+            `;
+        }
 
         item.innerHTML = `
                 <div style="display:flex; flex-direction:column; flex:1">
@@ -854,7 +873,9 @@
                         <strong>${order.userName.split(' ')[0]} - ${order.tier}</strong>
                     </div>
                     <div style="display:flex; flex-wrap:wrap; gap:5px; margin-right:40px;">
-                        ${charTags}
+                        ${visibleTags}
+                        ${hiddenTags}
+                        ${moreBtn}
                     </div>
                     ${workerInfo}
                 </div>
