@@ -192,21 +192,25 @@
                 const isStaff = !!userRole;
                 const workerBadge = isStaff ? `<span class="worker-badge">${userRole === 'admin' ? 'Admin 👑' : 'Staff 🛡️'}</span>` : '';
                 const workersLink = isStaff
-                    ? `
-                        <a href="workers.html" class="dropdown-item">⚙️ لوحة التحكم</a>
-                        <a href="#" class="dropdown-item" onclick="openOperationsModal()">📂 سجل العمليات</a>
-                    `
+                    ? '<a href="workers.html" class="dropdown-item">⚙️ لوحة التحكم</a>'
+                    : '';
+
+                const opsButton = isStaff
+                    ? '<button class="auth-btn" style="padding: 8px 15px; margin-left: 10px; font-size: 0.85rem;" onclick="openOperationsModal()">📂 العمليات</button>'
                     : '';
 
                 userInfo.innerHTML = `
-                    <div class="user-dropdown">
-                        <div class="user-profile">
-                            <img src="${user.photoURL}" class="user-avatar" loading="lazy">
-                            <span class="user-name">${user.displayName} ${workerBadge}</span>
-                        </div>
-                        <div class="dropdown-menu">
-                            ${workersLink}
-                            <a href="#" class="dropdown-item" onclick="handleLogout()">🚪 تسجيل الخروج</a>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        ${opsButton}
+                        <div class="user-dropdown">
+                            <div class="user-profile">
+                                <img src="${user.photoURL}" class="user-avatar" loading="lazy">
+                                <span class="user-name">${user.displayName} ${workerBadge}</span>
+                            </div>
+                            <div class="dropdown-menu">
+                                ${workersLink}
+                                <a href="#" class="dropdown-item" onclick="handleLogout()">🚪 تسجيل الخروج</a>
+                            </div>
                         </div>
                     </div>
                 `;

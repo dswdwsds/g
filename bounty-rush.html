@@ -308,6 +308,7 @@
           </p>
           <p style="margin: 0 0 12px 0; font-size: 0.85rem; color: #ffeb3b;">
             ⚡ <strong>للأسرع:</strong> إذا أدخلت اسم المستخدم وكلمة المرور، سنبدأ العمل على طلبك فوراً بدون انتظار!
+            (يمكنك متابعة الطلب عبر دردشة الموقع الداخلية أيضاً)
           </p>
           <a href="https://discord.com/channels/1284591581717987422/1284591582187622539" target="_blank"
             style="display: inline-flex; align-items: center; gap: 6px; background: #5865F2; color: white; padding: 10px 16px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 0.9rem;">
@@ -689,7 +690,6 @@
 
     window.closeSteamModal = () => {
       document.getElementById('steamModal').classList.remove('visible');
-      pendingOrderData = null; // Clear pending data
     };
 
     // Confirm Steam Login
@@ -962,22 +962,26 @@
         const isStaff = !!userRole;
         const workerBadge = isStaff ? `<span class="worker-badge">${userRole === 'admin' ? 'Admin 👑' : 'Staff 🛡️'}</span>` : '';
         const workersLink = isStaff
-          ? `
-                        <a href="workers.html" class="dropdown-item">⚙️ لوحة التحكم</a>
-                        <a href="#" class="dropdown-item" onclick="openOperationsModal()">📂 سجل العمليات</a>
-                    `
+          ? '<a href="workers.html" class="dropdown-item">⚙️ لوحة التحكم</a>'
+          : '';
+
+        const opsButton = isStaff
+          ? '<button class="auth-btn" style="padding: 8px 15px; margin-left: 10px; font-size: 0.85rem;" onclick="openOperationsModal()">📂 العمليات</button>'
           : '';
 
         userInfo.innerHTML = `
-                <div class="user-dropdown">
-                    <div class="user-profile">
-                        <img src="${user.photoURL}" class="user-avatar" loading="lazy">
-                        <span class="user-name">${user.displayName} ${workerBadge}</span>
-                    </div>
-                    <div class="dropdown-menu">
-                        <a href="history.html" class="dropdown-item">📋 طلباتي</a>
-                        ${workersLink}
-                        <a href="#" class="dropdown-item" onclick="handleLogout()">🚪 تسجيل الخروج</a>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    ${opsButton}
+                    <div class="user-dropdown">
+                        <div class="user-profile">
+                            <img src="${user.photoURL}" class="user-avatar" loading="lazy">
+                            <span class="user-name">${user.displayName} ${workerBadge}</span>
+                        </div>
+                        <div class="dropdown-menu">
+                            <a href="history.html" class="dropdown-item">📋 طلباتي</a>
+                            ${workersLink}
+                            <a href="#" class="dropdown-item" onclick="handleLogout()">🚪 تسجيل الخروج</a>
+                        </div>
                     </div>
                 </div>
             `;
