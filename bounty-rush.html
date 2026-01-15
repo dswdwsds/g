@@ -267,6 +267,36 @@
   <!-- Toast Container -->
   <div id="toastContainer" class="toast-container"></div>
 
+  <!-- Chat Modal -->
+  <div id="chatModal" class="chat-modal">
+    <div class="chat-container">
+      <div class="chat-header">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="position:relative;">
+            <img id="chatTargetAvatar" src=""
+              style="width:35px; height:35px; border-radius:50%; border:1px solid var(--primary)">
+            <div
+              style="position:absolute; bottom:0; right:0; width:10px; height:10px; background:#00ff00; border-radius:50%; border:2px solid #000;">
+            </div>
+          </div>
+          <div>
+            <div id="chatTargetName" style="font-weight:bold; font-size:0.9rem;">اسم الموظف</div>
+            <div style="font-size:0.7rem; color:var(--text-dim);">متصل الآن</div>
+          </div>
+        </div>
+        <button class="auth-btn" style="background:none; border:none; font-size:1.2rem; padding:0;"
+          onclick="closeChat()">✖</button>
+      </div>
+      <div id="chatMessages" class="chat-messages">
+        <div class="chat-empty">جاري تحميل الرسائل...</div>
+      </div>
+      <div class="chat-input-area">
+        <input type="text" id="chatInput" placeholder="اكتب رسالتك هنا..." autocomplete="off">
+        <button id="sendMessageBtn" class="chat-send-btn">🕊️</button>
+      </div>
+    </div>
+  </div>
+
   <footer>
     <p>© 2026 Professional Game Services. All rights reserved.</p>
   </footer>
@@ -425,6 +455,76 @@
         updateOrderStatus(orderId, 'rejected');
         showToast("تم إلغاء الطلب بنجاح.", "🗑️");
       });
+    };
+
+    let chatUnsubscribe = null;
+    let activeChatOrderId = null;
+
+    window.openChat = (orderId) => {
+      const order = lastOrders.find(o => o.id === orderId);
+      if (!order) return;
+
+      activeChatOrderId = orderId;
+      document.getElementById('chatTargetName').innerText = order.workerName || "الموظف";
+      // We don't have worker avatar easily accessible here without a separate fetch, using a default or order user dummy for now
+      document.getElementById('chatTargetAvatar').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(order.workerName || 'W')}&background=00f2fe&color=000`;
+
+      const modal = document.getElementById('chatModal');
+      modal.classList.add('visible');
+
+      const chatMessages = document.getElementById('chatMessages');
+      chatMessages.innerHTML = '<div class="chat-empty">جاري تحميل الرسائل...</div>';
+
+      if (chatUnsubscribe) chatUnsubscribe();
+
+      chatUnsubscribe = listenToMessages(orderId, (messages) => {
+        chatMessages.innerHTML = '';
+        if (messages.length === 0) {
+          chatMessages.innerHTML = '<div class="chat-empty">لا توجد رسائل بعد. ابدأ المحادثة الآن! 👋</div>';
+        } else {
+          messages.forEach(msg => {
+            const isMe = msg.senderId === user?.uid;
+            const bubble = document.createElement('div');
+            bubble.className = `message-bubble ${isMe ? 'sent' : 'received'}`;
+
+            const time = msg.timestamp ? new Date(msg.timestamp.seconds * 1000).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }) : '...';
+
+            bubble.innerHTML = `
+              <div class="message-info">
+                ${!isMe ? `<img src="${msg.senderAvatar}" style="width:15px; height:15px; border-radius:50%">` : ''}
+                <span>${isMe ? 'أنا' : msg.senderName} • ${time}</span>
+              </div>
+              <div class="message-text">${msg.text}</div>
+            `;
+            chatMessages.appendChild(bubble);
+          });
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+      });
+    };
+
+    window.closeChat = () => {
+      document.getElementById('chatModal').classList.remove('visible');
+      if (chatUnsubscribe) chatUnsubscribe();
+      chatUnsubscribe = null;
+      activeChatOrderId = null;
+    };
+
+    document.getElementById('sendMessageBtn').onclick = async () => {
+      const input = document.getElementById('chatInput');
+      const text = input.value.trim();
+      if (!text || !activeChatOrderId) return;
+
+      input.value = '';
+      const success = await sendMessage(activeChatOrderId, text);
+      if (!success) {
+        showToast("فشل إرسال الرسالة!", "❌");
+        input.value = text;
+      }
+    };
+
+    document.getElementById('chatInput').onkeypress = (e) => {
+      if (e.key === 'Enter') document.getElementById('sendMessageBtn').click();
     };
 
     submitPayment.onclick = async () => {
@@ -722,6 +822,11 @@
                           إلغاء 🗑️
                         </button>
                       </div>
+                    ` : ''}
+                    ${(order.status === 'working' && order.uid === user?.uid) ? `
+                      <button onclick="openChat('${order.id}')" class="auth-btn" style="padding: 4px 12px; font-size: 0.75rem; border-radius: 8px; margin-top: 5px; background: #4facfe; color: #fff; border: none; display:flex; align-items:center; gap:5px;">
+                        <span>تواصل مع الموظف</span> 💬
+                      </button>
                     ` : ''}
                 </div>
             `;

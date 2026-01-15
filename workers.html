@@ -226,6 +226,33 @@
         </div>
     </main>
 
+    <!-- Chat Modal -->
+    <div id="chatModal" class="chat-modal">
+        <div class="chat-container">
+            <div class="chat-header">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <div style="position:relative;">
+                        <img id="chatTargetAvatar" src=""
+                            style="width:35px; height:35px; border-radius:50%; border:1px solid var(--primary)">
+                    </div>
+                    <div>
+                        <div id="chatTargetName" style="font-weight:bold; font-size:0.9rem;">اسم العميل</div>
+                    </div>
+                </div>
+                <button class="auth-btn" style="background:none; border:none; font-size:1.2rem; padding:0;"
+                    onclick="closeChat()">✖</button>
+            </div>
+            <div id="chatMessages" class="chat-messages">
+                <div class="chat-empty">جاري تحميل الرسائل...</div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" id="chatInput" placeholder="اكتب رسالتك هنا..." autocomplete="off">
+                <button id="sendMessageBtn" class="chat-send-btn">🕊️</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toastContainer" class="toast-container"></div>
     <script type="module">
         import { auth, onAuthStateChanged } from './firebase-config.js';
         import { login, logout, listenToAllOrders, updateOrderStatus, isWorker, listenToWorkers, listenToWorkerCompletedOrders, listenToStaffStats, getUserRole, setStaffRole, deleteStaff } from './app.js';
@@ -365,8 +392,79 @@
             updateOrderStatus(id, status);
         };
 
+        let chatUnsubscribe = null;
+        let activeChatOrderId = null;
+        let currentOrders = [];
+
+        window.openChat = (orderId) => {
+            const order = currentOrders.find(o => o.id === orderId);
+            if (!order) return;
+
+            activeChatOrderId = orderId;
+            document.getElementById('chatTargetName').innerText = order.userName || "العميل";
+            document.getElementById('chatTargetAvatar').src = order.userAvatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(order.userName || 'U')}&background=ff00c8&color=fff`;
+
+            const modal = document.getElementById('chatModal');
+            modal.classList.add('visible');
+
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.innerHTML = '<div class="chat-empty">جاري تحميل الرسائل...</div>';
+
+            if (chatUnsubscribe) chatUnsubscribe();
+
+            chatUnsubscribe = listenToMessages(orderId, (messages) => {
+                chatMessages.innerHTML = '';
+                if (messages.length === 0) {
+                    chatMessages.innerHTML = '<div class="chat-empty">لا توجد رسائل بعد. ابدأ المحادثة الآن! 👋</div>';
+                } else {
+                    messages.forEach(msg => {
+                        const isMe = msg.senderId === auth.currentUser?.uid;
+                        const bubble = document.createElement('div');
+                        bubble.className = `message-bubble ${isMe ? 'sent' : 'received'}`;
+
+                        const time = msg.timestamp ? new Date(msg.timestamp.seconds * 1000).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }) : '...';
+
+                        bubble.innerHTML = `
+                            <div class="message-info">
+                                ${!isMe ? `<img src="${msg.senderAvatar}" style="width:15px; height:15px; border-radius:50%">` : ''}
+                                <span>${isMe ? 'أنا' : msg.senderName} • ${time}</span>
+                            </div>
+                            <div class="message-text">${msg.text}</div>
+                        `;
+                        chatMessages.appendChild(bubble);
+                    });
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }
+            });
+        };
+
+        window.closeChat = () => {
+            document.getElementById('chatModal').classList.remove('visible');
+            if (chatUnsubscribe) chatUnsubscribe();
+            chatUnsubscribe = null;
+            activeChatOrderId = null;
+        };
+
+        document.getElementById('sendMessageBtn').onclick = async () => {
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (!text || !activeChatOrderId) return;
+
+            input.value = '';
+            const success = await sendMessage(activeChatOrderId, text);
+            if (!success) {
+                showToast("فشل إرسال الرسالة!", "❌");
+                input.value = text;
+            }
+        };
+
+        document.getElementById('chatInput').onkeypress = (e) => {
+            if (e.key === 'Enter') document.getElementById('sendMessageBtn').click();
+        };
+
         function loadOrders() {
             listenToAllOrders((orders) => {
+                currentOrders = orders;
                 orderList.innerHTML = '';
                 orders.filter(o => o.status !== 'done' && o.status !== 'rejected').forEach(order => {
                     const card = document.createElement('div');
@@ -420,7 +518,10 @@
                         ${order.receiptUrl ? `<button class="auth-btn" style="background:rgba(255,255,255,0.1); border: 1px solid var(--primary); font-size: 0.8rem; padding: 5px;" onclick="viewReceipt('${order.receiptUrl}')">👁️ عرض الإيصال</button>` : ''}
                         ${order.status === 'pending_verification' ? `<button class="auth-btn" style="background:#4facfe" onclick="manageOrder('${order.id}', 'waiting')">تأكيد الدفع ✅</button>` : ''}
                         ${order.status === 'waiting' ? `<button class="auth-btn" style="background:#4facfe" onclick="manageOrder('${order.id}', 'working')">قبول الطلب</button>` : ''}
-                        ${(order.status === 'working' && isOwner) ? `<button class="auth-btn" style="background:#00f2fe; color:#000" onclick="manageOrder('${order.id}', 'done')">إنهاء العمل</button>` : ''}
+                        ${(order.status === 'working' && isOwner) ? `
+                            <button class="auth-btn" style="background:#00f2fe; color:#000" onclick="manageOrder('${order.id}', 'done')">إنهاء العمل</button>
+                            <button class="auth-btn" style="background:#4facfe; color:#fff" onclick="openChat('${order.id}')">محادثة العميل 💬</button>
+                        ` : ''}
                         ${canManage ? `<button class="auth-btn" style="background:#ff00c8" onclick="manageOrder('${order.id}', 'rejected')">رفض</button>` : ''}
                     </div>
                 `;
