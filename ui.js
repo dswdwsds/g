@@ -161,6 +161,15 @@ export const initSharedUI = () => {
     injectSharedModals();
     listenToWorkers(() => refreshUserUI());
     onAuthStateChanged(auth, () => refreshUserUI());
+
+    // Register Service Worker for caching images/gifs
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('🚀 PRO GS - Service Worker Active'))
+                .catch(err => console.log('❌ SW Registration Failed:', err));
+        });
+    }
 };
 
 // Global Exposure for UI actions
