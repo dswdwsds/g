@@ -110,17 +110,17 @@ body::after {
 }
 
 .service-card {
-    background: linear-gradient(135deg, rgba(6, 11, 19, 0.95), rgba(11, 18, 30, 0.95));
+    background: linear-gradient(rgba(6, 11, 19, 0.8), rgba(6, 11, 19, 0.8)), url('GIF/One_Piece_Zoro_Vs_King_GIF_-_One_piece_Zoro_vs_king_King_of_hell_-_Discover__Share_GIFs.gif');
     background-size: cover;
     background-position: center;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
     border: 1px solid var(--glass-border);
     border-radius: 24px;
     padding: 40px;
     text-decoration: none;
     color: var(--text-main);
-    transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.4s ease, background 0.6s ease;
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
     position: relative;
     overflow: hidden;
     display: flex;
@@ -522,6 +522,73 @@ footer {
     .nav-bar {
         padding: 15px 20px;
     }
+}
+
+/* Payment Modal Styles */
+.payment-info-box {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--glass-border);
+    border-radius: 18px;
+    padding: 20px;
+    margin-bottom: 25px;
+}
+
+.price-row,
+.wallet-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    font-size: 0.95rem;
+}
+
+.wallet-row {
+    margin-bottom: 0;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.copy-box {
+    width: 100%;
+    background: rgba(0, 242, 254, 0.1);
+    border: 1px dashed var(--primary);
+    padding: 12px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.copy-box:hover {
+    background: rgba(0, 242, 254, 0.15);
+}
+
+.custom-upload {
+    display: block;
+    cursor: pointer;
+}
+
+.upload-placeholder {
+    border: 2px dashed var(--glass-border);
+    border-radius: 18px;
+    padding: 30px;
+    text-align: center;
+    transition: 0.3s;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.upload-placeholder:hover {
+    border-color: var(--primary);
+    background: rgba(0, 242, 254, 0.05);
+}
+
+.upload-placeholder p {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    margin-top: 10px;
 }
 
 /* Notification Modal Styles */

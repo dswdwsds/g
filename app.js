@@ -2,18 +2,10 @@ import { auth, provider, signInWithPopup, signOut, onAuthStateChanged, db, colle
 
 const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1395038941110866010/MucgrT_399C44lfUVL79HcqR4cfwNbJlL5iG1qPmxdBF47GGbTbmkokZK6YnslmJ63wL";
 
-// Kashier.io Configuration
-const KASHIER_CONFIG = {
-    merchantId: "31511019-29d3-4bbd-be57-8bb2a8f96cbc",
-    apiKey: "31511019-29d3-4bbd-be57-8bb2a8f96cbc", // Often same as MID in simple integrations
-    secretKey: "1adca016e63f09ee221302e51bd27539$d6104854451381712d0cc986f214c6c1fdfe72d7b4bc5fe61e3aaa8346288fa21b8959881f6b2352ef1598cb0999f059",
-    mode: "test" // Change to "live" when ready
-};
-
-// Generate Kashier Hash
-const generateKashierHash = (orderId, amount) => {
-    const path = `/?payment=${KASHIER_CONFIG.merchantId}&amount=${amount}&currency=EGP&orderId=${orderId}&sdk=js`;
-    return CryptoJS.HmacSHA256(path, KASHIER_CONFIG.secretKey).toString();
+// Payment Configuration
+const PAYMENT_CONFIG = {
+    walletNumber: "01015831676",
+    walletType: "Vodafone Cash / InstaPay"
 };
 
 
@@ -215,38 +207,15 @@ export const placeOrder = async (tier, charData) => {
             await updateDoc(orderRef, { discordMessageId: discordRes.id });
         }
 
-        // --- Start Kashier Payment Flow ---
-        const hash = generateKashierHash(orderRef.id, totalPrice);
-
-        if (window.Kashier) {
-            Kashier.init({
-                "merchantId": KASHIER_CONFIG.merchantId,
-                "apiKey": KASHIER_CONFIG.apiKey,
-                "orderId": orderRef.id,
-                "amount": totalPrice,
-                "currency": "EGP",
-                "hash": hash,
-                "mode": KASHIER_CONFIG.mode,
-                "metaData": { "userName": user.displayName, "tier": tier },
-                "customerName": user.displayName,
-                "customerEmail": user.email,
-                "serverType": KASHIER_CONFIG.mode,
-                "display": "ar",
-                "onCompleted": function (result) {
-                    console.log("Payment Completed", result);
-                    if (window.showToast) window.showToast("تم الدفع بنجاح! شكراً لك.", "✅");
-                    // Here we could update Firestore status to 'paid' if needed
-                },
-                "onFailure": function (error) {
-                    console.error("Payment Failed", error);
-                    if (window.showToast) window.showToast("فشلت عملية الدفع. يرجى المحاولة مرة أخرى.", "❌");
-                }
+        if (window.showPaymentModal) {
+            window.showPaymentModal({
+                orderId: orderRef.id,
+                totalPrice: totalPrice,
+                walletNumber: PAYMENT_CONFIG.walletNumber,
+                tier: tier
             });
-
-            Kashier.showCheckout();
         }
 
-        if (window.showToast) window.showToast("تم إنشاء الطلب! يرجى إتمام عملية الدفع...", "💳");
         return orderRef.id;
     } catch (error) {
         console.error("Order Error:", error);
@@ -315,6 +284,46 @@ export const deleteReview = async (commentId) => {
     }
 };
 
+export const sendPaymentProofToDiscord = async (orderId, file, orderData) => {
+    const formData = new FormData();
+
+    const charNames = Array.isArray(orderData.characters)
+        ? orderData.characters.map(c => c.name).join('، ')
+        : "";
+
+    const payload = {
+        content: `📸 **وصل إيصال دفع للطلب: ${orderId}**`,
+        embeds: [{
+            title: "💰 تأكيد الدفع يدوياً",
+            color: 0x00ff00,
+            fields: [
+                { name: "👤 العميل", value: orderData.userName, inline: true },
+                { name: "💎 الفئة", value: orderData.tier, inline: true },
+                { name: "💵 السعر", value: `${orderData.totalPrice} جنيه`, inline: true },
+                { name: "🗡️ الشخصيات", value: charNames },
+                { name: "🆔 رقم الطلب", value: `\`${orderId}\`` }
+            ],
+            footer: { text: "يرجى مراجعة الصورة للتأكيد" },
+            timestamp: new Date().toISOString()
+        }]
+    };
+
+    formData.append("payload_json", JSON.stringify(payload));
+    formData.append("file", file);
+
+    const response = await fetch(DISCORD_WEBHOOK, {
+        method: 'POST',
+        body: formData
+    });
+
+    if (response.ok) {
+        // تحديث حالة الطلب في Firestore إلى 'بانتظار التأكيد'
+        const orderRef = doc(db, "orders", orderId);
+        await updateDoc(orderRef, { status: "pending_verification" });
+        return true;
+    }
+    return false;
+};
 export const listenToStaffStats = (email, uid, callback) => {
     // نحدد الـ ID الصحيح للوثيقة (سواء كان إيميلاً أو UID)
     const staff = authorizedStaff.find(s => s.email === email || s.id === email);

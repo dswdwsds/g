@@ -20,10 +20,6 @@
 
   <link rel="stylesheet" href="style.css">
   <link rel="icon" href="data:;base64,iVBORw0KGgo=">
-
-  <!-- Kashier & Security Libraries -->
-  <script src="https://static.kashier.io/js/kashier.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
   <style>
     .rating-stars {
       display: flex;
@@ -212,6 +208,48 @@
     </div>
   </div>
 
+  <!-- Payment Modal -->
+  <div id="paymentModal" class="notif-overlay">
+    <div class="notif-card" style="max-width: 500px; width: 95%;">
+      <h3>إتمام عملية الدفع 💸</h3>
+      <p style="text-align: center; color: var(--text-dim); margin-bottom: 20px;">يرجى تحويل المبلغ المطلوب للمتابعة.
+      </p>
+
+      <div class="payment-info-box">
+        <div class="price-row">
+          <span>المبلغ المستحق:</span>
+          <strong id="payAmount" style="color: var(--primary); font-size: 1.5rem;">0 جنيه</strong>
+        </div>
+        <div class="wallet-row">
+          <span>رقم المحفظة (Vodafone Cash):</span>
+          <div class="copy-box" onclick="copyWalletNumber()">
+            <strong id="payWallet">01015831676</strong>
+            <span style="font-size: 0.8rem; opacity: 0.7;">📋 نسخ</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="upload-section">
+        <p style="font-size: 0.9rem; margin-bottom: 10px;">قم برفع صورة إيصال الدفع (Screenshot):</p>
+        <label class="custom-upload">
+          <input type="file" id="receiptInput" accept="image/*" hidden>
+          <div class="upload-placeholder" id="uploadPlaceholder">
+            <span style="font-size: 2rem;">📸</span>
+            <p id="fileNameDisplay">اضغط لرفع الصورة</p>
+          </div>
+        </label>
+      </div>
+
+      <div class="modal-footer" style="padding: 0; margin-top: 25px; border: none;">
+        <button id="submitPayment" class="auth-btn" style="width: 100%; height: 50px;">إرسال الإيصال وتأكيد
+          الطلب</button>
+        <button class="notif-btn"
+          style="background: transparent; color: var(--text-dim); width: 100%; margin-top: 10px; border: none;"
+          onclick="closePaymentModal()">إغلاق (سأدفع لاحقاً)</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Custom Confirm Modal -->
   <div id="confirmModal" class="confirm-overlay">
     <div class="confirm-card">
@@ -333,6 +371,71 @@
 
         await placeOrder(selectedTier, selectedData);
       });
+    };
+
+    // --- Manual Payment Logic ---
+    const paymentModal = document.getElementById('paymentModal');
+    const receiptInput = document.getElementById('receiptInput');
+    const fileNameDisplay = document.getElementById('fileNameDisplay');
+    const submitPayment = document.getElementById('submitPayment');
+    let currentOrderForPayment = null;
+
+    window.showPaymentModal = (details) => {
+      currentOrderForPayment = details;
+      document.getElementById('payAmount').innerText = `${details.totalPrice} جنيه`;
+      document.getElementById('payWallet').innerText = details.walletNumber;
+      paymentModal.classList.add('visible');
+    };
+
+    window.closePaymentModal = () => {
+      paymentModal.classList.remove('visible');
+    };
+
+    window.copyWalletNumber = () => {
+      const num = document.getElementById('payWallet').innerText;
+      navigator.clipboard.writeText(num);
+      showToast("تم نسخ الرقم!", "📋");
+    };
+
+    receiptInput.onchange = (e) => {
+      if (e.target.files.length > 0) {
+        fileNameDisplay.innerText = e.target.files[0].name;
+        fileNameDisplay.style.color = 'var(--primary)';
+      }
+    };
+
+    submitPayment.onclick = async () => {
+      if (receiptInput.files.length === 0) {
+        showToast("يرجى رفع صورة الإيصال أولاً!", "⚠️");
+        return;
+      }
+
+      submitPayment.disabled = true;
+      submitPayment.innerText = "جاري الإرسال...";
+
+      try {
+        const success = await sendPaymentProofToDiscord(
+          currentOrderForPayment.orderId,
+          receiptInput.files[0],
+          {
+            userName: auth.currentUser.displayName,
+            tier: currentOrderForPayment.tier,
+            totalPrice: currentOrderForPayment.totalPrice,
+            characters: Array.from(selectedChars).map(id => getCharacters().find(c => c.id === id))
+          }
+        );
+
+        if (success) {
+          showToast("تم إرسال الإيصال بنجاح! سيتم مراجعة طلبك.", "✅");
+          closePaymentModal();
+        } else {
+          throw new Error("Upload failed");
+        }
+      } catch (err) {
+        showToast("فشل في إرسال الإيصال. حاول مرة أخرى.", "❌");
+        submitPayment.disabled = false;
+        submitPayment.innerText = "إرسال الإيصال وتأكيد الطلب";
+      }
     };
 
 
