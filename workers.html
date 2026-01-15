@@ -246,7 +246,10 @@
             <div id="chatMessages" class="chat-messages">
                 <div class="chat-empty">جاري تحميل الرسائل...</div>
             </div>
-            <div class="chat-input-area">
+            <div class="chat-input-area" style="position:relative;">
+                <div id="uploadProgress" class="upload-progress-container">
+                    <div class="upload-progress-bar"></div>
+                </div>
                 <input type="file" id="chatImageInput" accept="image/*" hidden>
                 <button onclick="document.getElementById('chatImageInput').click()" class="chat-send-btn"
                     style="background:rgba(255,255,255,0.1); font-size:1.1rem;">📸</button>
@@ -506,10 +509,19 @@
                 return;
             }
 
-            showToast("جاري رفع الصورة...", "⏳");
+            // Show progress bar
+            const progressBar = document.getElementById('uploadProgress');
+            progressBar.style.display = 'block';
+
+            // showToast("جاري رفع الصورة...", "⏳"); // Replace with bar
+
             const success = await sendImageMessage(activeChatOrderId, file);
+
+            // Hide progress bar
+            progressBar.style.display = 'none';
+
             if (success) {
-                showToast("تم إرسال الصورة!", "✅");
+                // showToast("تم إرسال الصورة!", "✅");
             } else {
                 showToast("فشل رفع الصورة!", "❌");
             }

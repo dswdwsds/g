@@ -1067,3 +1067,53 @@ footer {
     font-style: italic;
     font-size: 0.85rem;
 }
+
+.notification-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #ff0000;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    z-index: 100;
+    pointer-events: none;
+    border: 1px solid #fff;
+}
+
+.upload-progress-container {
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: none;
+    /* Hidden by default */
+    overflow: hidden;
+}
+
+.upload-progress-bar {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, #00f2fe, #4facfe);
+    transform: translateX(-100%);
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
+}

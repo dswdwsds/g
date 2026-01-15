@@ -307,7 +307,7 @@
 
   <script type="module">
     import { auth, onAuthStateChanged } from './firebase-config.js';
-    import { login, logout, placeOrder, sendPaymentProofToDiscord, updateOrderStatus, listenToQueue, listenToUserOrders, listenToWorkers, getUserRole, submitRating, loadCharacters, getCharacters, sendMessage, listenToMessages, sendImageMessage, listenToUnreadCount, markMessagesAsRead } from './app.js?v=2';
+    import { login, logout, placeOrder, sendPaymentProofToDiscord, updateOrderStatus, listenToQueue, listenToUserOrders, listenToWorkers, getUserRole, submitRating, loadCharacters, getCharacters, sendMessage, listenToMessages, sendImageMessage } from './app.js?v=1';
 
     const userInfo = document.getElementById('userInfo');
     const queueList = document.getElementById('queueList');
@@ -482,9 +482,6 @@
       if (chatUnsubscribe) chatUnsubscribe();
 
       chatUnsubscribe = listenToMessages(orderId, (messages) => {
-        // Mark as read when messages load and chat is open
-        markMessagesAsRead(orderId, auth.currentUser.uid);
-
         chatMessages.innerHTML = '';
         if (messages.length === 0) {
           chatMessages.innerHTML = '<div class="chat-empty">لا توجد رسائل بعد. ابدأ المحادثة الآن! 👋</div>';
@@ -550,10 +547,19 @@
         return;
       }
 
-      showToast("جاري رفع الصورة...", "⏳");
+      // Show progress bar
+      const progressBar = document.getElementById('uploadProgress');
+      progressBar.style.display = 'block';
+
+      // showToast("جاري رفع الصورة...", "⏳"); // Replace with bar
+
       const success = await sendImageMessage(activeChatOrderId, file);
+
+      // Hide progress bar
+      progressBar.style.display = 'none';
+
       if (success) {
-        showToast("تم إرسال الصورة!", "✅");
+        // showToast("تم إرسال الصورة!", "✅");
       } else {
         showToast("فشل رفع الصورة!", "❌");
       }
