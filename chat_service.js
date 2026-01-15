@@ -31,7 +31,10 @@ export const openChat = async (orderId) => {
     // but app.js was handling some logic. This service handles the state and listener.
     activeChatOrderId = orderId;
     const modal = document.getElementById('chatModal');
-    if (modal) modal.classList.add('visible');
+    if (modal) {
+        modal.classList.add('visible');
+        setTimeout(() => document.getElementById('chatInput')?.focus(), 300);
+    }
 
     const chatMessages = document.getElementById('chatMessages');
     if (chatMessages) chatMessages.innerHTML = '<div class="chat-empty">جاري تحميل الرسائل...</div>';

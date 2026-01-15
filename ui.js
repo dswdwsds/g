@@ -154,6 +154,7 @@ export const refreshUserUI = async () => {
 export const initSharedUI = () => {
     injectNavbar();
     injectSharedModals();
+    attachChatListeners();
     listenToWorkers(() => refreshUserUI());
     onAuthStateChanged(auth, () => refreshUserUI());
 };
@@ -162,3 +163,30 @@ export const initSharedUI = () => {
 window.handleLogout = logout;
 window.handleLogin = () => import('./app.js').then(m => m.login());
 window.openOperationsModal = openOperationsModal;
+
+export const attachChatListeners = () => {
+    const chatInput = document.getElementById('chatInput');
+    const sendBtn = document.getElementById('sendMessageBtn');
+    const imageBtn = document.getElementById('chatImageBtn');
+    const imageInput = document.getElementById('chatImageInput');
+
+    if (chatInput && sendBtn) {
+        chatInput.onkeydown = (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                handleSendMessage();
+            }
+        };
+        sendBtn.onclick = handleSendMessage;
+    }
+
+    if (imageBtn && imageInput) {
+        imageBtn.onclick = () => imageInput.click();
+        imageInput.onchange = (e) => {
+            if (e.target.files.length > 0) {
+                handleSendImage(e.target.files[0]);
+                e.target.value = ''; // Reset for next selection
+            }
+        };
+    }
+};
