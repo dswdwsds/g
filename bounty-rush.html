@@ -307,7 +307,7 @@
 
   <script type="module">
     import { auth, onAuthStateChanged } from './firebase-config.js';
-    import { login, logout, placeOrder, sendPaymentProofToDiscord, updateOrderStatus, listenToQueue, listenToUserOrders, listenToWorkers, getUserRole, submitRating, loadCharacters, getCharacters, sendMessage, listenToMessages, sendImageMessage } from './app.js?v=1';
+    import { login, logout, placeOrder, sendPaymentProofToDiscord, updateOrderStatus, listenToQueue, listenToUserOrders, listenToWorkers, getUserRole, submitRating, loadCharacters, getCharacters, sendMessage, listenToMessages, sendImageMessage, listenToUnreadCount, markMessagesAsRead } from './app.js?v=2';
 
     const userInfo = document.getElementById('userInfo');
     const queueList = document.getElementById('queueList');
@@ -482,6 +482,9 @@
       if (chatUnsubscribe) chatUnsubscribe();
 
       chatUnsubscribe = listenToMessages(orderId, (messages) => {
+        // Mark as read when messages load and chat is open
+        markMessagesAsRead(orderId, auth.currentUser.uid);
+
         chatMessages.innerHTML = '';
         if (messages.length === 0) {
           chatMessages.innerHTML = '<div class="chat-empty">لا توجد رسائل بعد. ابدأ المحادثة الآن! 👋</div>';
@@ -863,11 +866,30 @@
                       </div>
                     ` : ''}
                     ${(order.status === 'working' && order.uid === user?.uid) ? `
-                      <button onclick="openChat('${order.id}')" class="auth-btn" style="padding: 4px 12px; font-size: 0.75rem; border-radius: 8px; margin-top: 5px; background: #4facfe; color: #fff; border: none; display:flex; align-items:center; gap:5px;">
+                      <button id="customer-chat-btn-${order.id}" onclick="openChat('${order.id}')" class="auth-btn" style="position:relative; padding: 4px 12px; font-size: 0.75rem; border-radius: 8px; margin-top: 5px; background: #4facfe; color: #fff; border: none; display:flex; align-items:center; gap:5px;">
                         <span>تواصل مع الموظف</span> 💬
                       </button>
                     ` : ''}
                 </div>
+            `;
+        queueList.appendChild(item);
+
+        if (isWorking && order.uid === user?.uid) {
+          listenToUnreadCount(order.id, user.uid, (count) => {
+            const btn = document.getElementById(`customer-chat-btn-${order.id}`);
+            if (btn) {
+              const existingBadge = btn.querySelector('.notification-badge');
+              if (existingBadge) existingBadge.remove();
+
+              if (count > 0) {
+                const badge = document.createElement('span');
+                badge.className = 'notification-badge';
+                badge.innerText = count > 9 ? '9+' : count;
+                btn.appendChild(badge);
+              }
+            }
+          });
+        }
             `;
         queueList.appendChild(item);
       });
