@@ -1008,8 +1008,13 @@ footer {
     color: var(--text-dim);
 }
 
+.message-info span:first-of-type {
+    font-weight: bold;
+}
+
 .message-bubble.sent .message-info {
     justify-content: flex-end;
+    color: rgba(0, 0, 0, 0.55);
 }
 
 .chat-input-area {
