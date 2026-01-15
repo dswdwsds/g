@@ -329,13 +329,15 @@ export const sendPaymentProofToDiscord = async (orderId, file, orderData) => {
         if (response.ok) {
             const result = await response.json();
             const attachment = result.attachments?.[0];
-            const receiptUrl = attachment ? attachment.url : null;
+            const receiptUrl = attachment ? (attachment.url || attachment.proxy_url) : null;
+
+            console.log("Saving order with Receipt URL:", receiptUrl);
 
             const orderRef = doc(db, "orders", orderId);
             await updateDoc(orderRef, {
                 status: "pending_verification",
                 hasReceipt: true,
-                receiptUrl: receiptUrl, // حفظ رابط الإيصال من ديسكورد
+                receiptUrl: receiptUrl,
                 discordMessageId: result.id,
                 paymentSubmittedAt: serverTimestamp()
             });
