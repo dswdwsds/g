@@ -331,14 +331,19 @@ export const sendPaymentProofToDiscord = async (orderId, file, orderData) => {
             console.log("Discord Full Response Object:", JSON.stringify(result, null, 2));
 
             let receiptUrl = null;
+
+            // 1. البحث في المرفقات أولاً
             if (result.attachments && result.attachments.length > 0) {
-                // نأخذ المرفق، ونبحث أولاً عن أي واحد فيه كلمة 'receipt' أو 'jpg' أو 'png'
                 const bestAttachment = result.attachments.find(a =>
                     a.filename?.toLowerCase().includes('receipt') ||
                     a.content_type?.includes('image')
                 ) || result.attachments[0];
-
                 receiptUrl = bestAttachment.url || bestAttachment.proxy_url;
+            }
+
+            // 2. إذا لم ينجد في المرفقات، نبحث داخل الـ Embed (لأننا نستخدم attachment://)
+            if (!receiptUrl && result.embeds && result.embeds.length > 0 && result.embeds[0].image) {
+                receiptUrl = result.embeds[0].image.url || result.embeds[0].image.proxy_url;
             }
 
             console.log("Final Receipt URL being saved:", receiptUrl);
