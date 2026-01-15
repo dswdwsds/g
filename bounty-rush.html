@@ -643,8 +643,15 @@
 
       orders.forEach((order, index) => {
         const isWorking = order.status === 'working';
+        const isPending = order.status === 'pending_verification';
+        const isAwaiting = order.status === 'awaiting_payment';
+
         const item = document.createElement('div');
         item.className = `queue-item ${isWorking ? 'active' : ''} ${order.uid === user?.uid ? 'mine' : ''}`;
+
+        let statusBadge = isWorking ? '<span style="font-size:0.8rem">🔥 جارِ العمل</span>' : `#${index + 1}`;
+        if (isPending) statusBadge = '<span style="font-size:0.75rem; color:var(--primary);">⏳ جاري مراجعة الإيصال</span>';
+        if (isAwaiting) statusBadge = '<span style="font-size:0.75rem; color:var(--text-dim);">💸 بانتظار الدفع</span>';
 
         let workerInfo = '';
         if (isWorking && order.workerAvatar) {
@@ -677,7 +684,7 @@
                     ${workerInfo}
                 </div>
                 <span class="pos-tag" style="display:flex; flex-direction:column; align-items:flex-end;">
-                    ${isWorking ? '<span style="font-size:0.8rem">🔥 جارِ العمل</span>' : '#' + (index + 1)}
+                    ${statusBadge}
                 </span>
             `;
         queueList.appendChild(item);

@@ -328,11 +328,15 @@ export const sendPaymentProofToDiscord = async (orderId, file, orderData) => {
 
         if (response.ok) {
             const result = await response.json();
+            const attachment = result.attachments?.[0];
+            const receiptUrl = attachment ? attachment.url : null;
+
             const orderRef = doc(db, "orders", orderId);
             await updateDoc(orderRef, {
                 status: "pending_verification",
                 hasReceipt: true,
-                discordMessageId: result.id, // نُخزن ID الرسالة لتحديثها لاحقاً
+                receiptUrl: receiptUrl, // حفظ رابط الإيصال من ديسكورد
+                discordMessageId: result.id,
                 paymentSubmittedAt: serverTimestamp()
             });
             return true;
@@ -365,16 +369,24 @@ export const updateDiscordMessage = async (orderData, newStatus) => {
     let color = 0x00f2fe;
     let title = "🚀 وصل طلب تلفيل جديد!";
 
-    if (newStatus === 'working') {
+    if (newStatus === 'pending_verification') {
+        statusText = "⏳ جاري مراجعة الإيصال من قِبل الإدارة...";
+        color = 0x00f2fe;
+        title = "💰 فحص عملية الدفع";
+    } else if (newStatus === 'waiting') {
+        statusText = "✅ تم تأكيد الدفع! بانتظار استلام أحد الموظفين للطلب...";
+        color = 0x00ff00;
+        title = "🔔 الطلب جاهز للتنفيذ";
+    } else if (newStatus === 'working') {
         statusText = `🔥 جارِ العمل بواسطة: ${orderData.workerName}`;
         color = 0x4facfe;
         title = "⚡ جاري تنفيذ الطلب الآن!";
     } else if (newStatus === 'done') {
-        statusText = `✅ تم الانتهاء بنجاح!`;
+        statusText = `✅ تم الانتهاء بنجاح! شكراً لتعاملكم معنا.`;
         color = 0x00ff00;
-        title = "🎉 تم إكمال الطلب!";
+        title = "🎉 تم إكمال الطلب بنجاح!";
     } else if (newStatus === 'rejected') {
-        statusText = `❌ تم رفض الطلب`;
+        statusText = `❌ نعتذر، تم رفض الطلب أو الإيصال غير صالح.`;
         color = 0xff00c8;
         title = "🚫 الطلب مرفوض";
     }
@@ -389,13 +401,14 @@ export const updateDiscordMessage = async (orderData, newStatus) => {
             color: color,
             fields: [
                 { name: "👤 اسم العميل", value: orderData.userName, inline: true },
-                { name: "🗡️ الشخصيات", value: charNames, inline: true },
-                { name: "💎 نوع الطلب (الفئة)", value: orderData.tier, inline: true },
-                { name: "🆔 رقم الطلب", value: `\`${orderData.id}\`` },
+                { name: "� الفئة/النوع", value: orderData.tier, inline: true },
+                { name: "� السعر", value: `${orderData.totalPrice || 0} ج.م`, inline: true },
+                { name: "🗡️ الشخصيات", value: charNames },
                 { name: "⏳ الحالة الحالية", value: statusText }
             ],
             thumbnail: { url: orderData.characters?.[0]?.image || orderData.userAvatar },
-            footer: { text: "نظام Professional GS لإدارة الطلبات" },
+            image: orderData.receiptUrl ? { url: orderData.receiptUrl } : null,
+            footer: { text: "Professional GS - نظام التلفيل الآلي" },
             timestamp: new Date().toISOString()
         }]
     };
@@ -462,7 +475,10 @@ export const updateOrderStatus = async (orderId, newStatus) => {
 };
 
 export const listenToAllOrders = (callback) => {
-    const q = query(collection(db, "orders"), orderBy("createdAt", "desc"));
+    const q = query(collection(db, "orders"),
+        where("status", "in", ["awaiting_payment", "pending_verification", "waiting", "working"]),
+        orderBy("createdAt", "desc")
+    );
     return onSnapshot(q, (snapshot) => {
         const orders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         callback(orders);
@@ -470,7 +486,10 @@ export const listenToAllOrders = (callback) => {
 };
 
 export const listenToQueue = (callback) => {
-    const q = query(collection(db, "orders"), where("status", "in", ["waiting", "working"]), orderBy("createdAt", "asc"));
+    const q = query(collection(db, "orders"),
+        where("status", "in", ["awaiting_payment", "pending_verification", "waiting", "working"]),
+        orderBy("createdAt", "asc")
+    );
     return onSnapshot(q,
         (snapshot) => {
             const orders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
