@@ -271,7 +271,7 @@
 
   <script type="module">
     import { auth, onAuthStateChanged } from './firebase-config.js';
-    import { login, logout, placeOrder, updateOrderStatus, listenToQueue, listenToUserOrders, listenToWorkers, getUserRole, submitRating, loadCharacters, getCharacters } from './app.js';
+    import { login, logout, placeOrder, sendPaymentProofToDiscord, updateOrderStatus, listenToQueue, listenToUserOrders, listenToWorkers, getUserRole, submitRating, loadCharacters, getCharacters } from './app.js';
 
     const userInfo = document.getElementById('userInfo');
     const queueList = document.getElementById('queueList');

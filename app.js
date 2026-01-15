@@ -191,21 +191,9 @@ export const placeOrder = async (tier, charData) => {
                 name: c.name,
                 image: c.image || ""
             })),
-            status: "waiting",
+            status: "awaiting_payment",
             createdAt: serverTimestamp()
         });
-
-        const discordRes = await sendToDiscord({
-            orderId: orderRef.id,
-            userName: user.displayName,
-            userAvatar: user.photoURL,
-            tier: tier,
-            characters: characters
-        });
-
-        if (discordRes && discordRes.id) {
-            await updateDoc(orderRef, { discordMessageId: discordRes.id });
-        }
 
         if (window.showPaymentModal) {
             window.showPaymentModal({
@@ -285,44 +273,78 @@ export const deleteReview = async (commentId) => {
 };
 
 export const sendPaymentProofToDiscord = async (orderId, file, orderData) => {
-    const formData = new FormData();
+    try {
+        const formData = new FormData();
 
-    const charNames = Array.isArray(orderData.characters)
-        ? orderData.characters.map(c => c.name).join('، ')
-        : "";
+        const charNames = (Array.isArray(orderData.characters) && orderData.characters.length > 0)
+            ? orderData.characters.map(c => c.name).join('، ')
+            : "غير محدد";
 
-    const payload = {
-        content: `📸 **وصل إيصال دفع للطلب: ${orderId}**`,
-        embeds: [{
-            title: "💰 تأكيد الدفع يدوياً",
-            color: 0x00ff00,
-            fields: [
-                { name: "👤 العميل", value: orderData.userName, inline: true },
-                { name: "💎 الفئة", value: orderData.tier, inline: true },
-                { name: "💵 السعر", value: `${orderData.totalPrice} جنيه`, inline: true },
-                { name: "🗡️ الشخصيات", value: charNames },
-                { name: "🆔 رقم الطلب", value: `\`${orderId}\`` }
-            ],
-            footer: { text: "يرجى مراجعة الصورة للتأكيد" },
-            timestamp: new Date().toISOString()
-        }]
-    };
+        const payload = {
+            content: `� **وصل طلب جديد مع إيصال الدفع!**`,
+            embeds: [{
+                title: "� طلب تلفيل جديد (انتظار التأكيد)",
+                color: 0x00f2fe,
+                fields: [
+                    { name: "👤 العميل", value: orderData.userName || "مجهول", inline: true },
+                    { name: "💎 الفئة", value: orderData.tier || "غير محدد", inline: true },
+                    { name: "💵 السعر", value: `${orderData.totalPrice || 0} جنيه`, inline: true },
+                    { name: "🗡️ الشخصيات", value: charNames || "لا يوجد" },
+                    { name: "🆔 رقم الطلب", value: `\`${orderId}\`` }
+                ],
+                image: { url: "attachment://receipt.jpg" }, // Discord will use the attached file
+                footer: { text: "Professional GS - نظام إدارة المدفوعات المستقل" },
+                timestamp: new Date().toISOString()
+            }],
+            components: [
+                {
+                    type: 1,
+                    components: [
+                        {
+                            type: 2,
+                            label: "تأكيد واستلام الطلب ✅",
+                            style: 3,
+                            custom_id: `start_${orderId}`
+                        },
+                        {
+                            type: 2,
+                            label: "رفض الإيصال ❌",
+                            style: 4,
+                            custom_id: `reject_${orderId}`
+                        }
+                    ]
+                }
+            ]
+        };
 
-    formData.append("payload_json", JSON.stringify(payload));
-    formData.append("file", file);
+        formData.append("payload_json", JSON.stringify(payload));
+        formData.append("file", file, "receipt.jpg");
 
-    const response = await fetch(DISCORD_WEBHOOK, {
-        method: 'POST',
-        body: formData
-    });
+        console.log("Sending proof to Discord...");
+        const response = await fetch(DISCORD_WEBHOOK + "?wait=true", {
+            method: 'POST',
+            body: formData
+        });
 
-    if (response.ok) {
-        // تحديث حالة الطلب في Firestore إلى 'بانتظار التأكيد'
-        const orderRef = doc(db, "orders", orderId);
-        await updateDoc(orderRef, { status: "pending_verification" });
-        return true;
+        if (response.ok) {
+            const result = await response.json();
+            const orderRef = doc(db, "orders", orderId);
+            await updateDoc(orderRef, {
+                status: "pending_verification",
+                hasReceipt: true,
+                discordMessageId: result.id, // نُخزن ID الرسالة لتحديثها لاحقاً
+                paymentSubmittedAt: serverTimestamp()
+            });
+            return true;
+        } else {
+            const errorText = await response.text();
+            console.error("Discord Webhook Error:", response.status, errorText);
+            return false;
+        }
+    } catch (error) {
+        console.error("sendPaymentProofToDiscord exception:", error);
+        return false;
     }
-    return false;
 };
 export const listenToStaffStats = (email, uid, callback) => {
     // نحدد الـ ID الصحيح للوثيقة (سواء كان إيميلاً أو UID)
