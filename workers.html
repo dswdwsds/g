@@ -3,7 +3,7 @@
 
 <head>
     <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.firebaseapp.com https://*.googleapis.com https://apis.google.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.gstatic.com; img-src 'self' data: https://*.discordapp.com https://*.discordapp.net https://*.googleusercontent.com https://lh3.googleusercontent.com https://via.placeholder.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://*.firebaseio.com https://*.googleapis.com https://discord.com https://*.discordapp.com https://www.gstatic.com; frame-src 'self' https://*.firebaseapp.com https://*.googleapis.com https://apis.google.com;">
+        content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.firebaseapp.com https://*.googleapis.com https://apis.google.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.gstatic.com; img-src 'self' data: https://*.discordapp.com https://*.discordapp.net https://*.googleusercontent.com https://lh3.googleusercontent.com https://via.placeholder.com https://ui-avatars.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://*.firebaseio.com https://*.googleapis.com https://discord.com https://*.discordapp.com https://www.gstatic.com; frame-src 'self' https://*.firebaseapp.com https://*.googleapis.com https://apis.google.com;">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
@@ -255,7 +255,7 @@
     <div id="toastContainer" class="toast-container"></div>
     <script type="module">
         import { auth, onAuthStateChanged } from './firebase-config.js';
-        import { login, logout, listenToAllOrders, updateOrderStatus, isWorker, listenToWorkers, listenToWorkerCompletedOrders, listenToStaffStats, getUserRole, setStaffRole, deleteStaff } from './app.js';
+        import { login, logout, listenToAllOrders, updateOrderStatus, isWorker, listenToWorkers, listenToWorkerCompletedOrders, listenToStaffStats, getUserRole, setStaffRole, deleteStaff, sendMessage, listenToMessages } from './app.js';
 
         const userInfo = document.getElementById('userInfo');
         const adminContent = document.getElementById('adminContent');

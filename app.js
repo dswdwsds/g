@@ -1,4 +1,4 @@
-import { auth, provider, signInWithPopup, signOut, onAuthStateChanged, db, collection, addDoc, serverTimestamp, query, where, orderBy, onSnapshot, doc, updateDoc, getDoc, limit, increment, setDoc, deleteDoc } from './firebase-config.js';
+import { auth, provider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, db, collection, addDoc, serverTimestamp, query, where, orderBy, onSnapshot, doc, updateDoc, getDoc, limit, increment, setDoc, deleteDoc } from './firebase-config.js';
 
 const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1395038941110866010/MucgrT_399C44lfUVL79HcqR4cfwNbJlL5iG1qPmxdBF47GGbTbmkokZK6YnslmJ63wL";
 
@@ -8,12 +8,21 @@ const PAYMENT_CONFIG = {
     walletType: "Vodafone Cash / InstaPay"
 };
 
+// Handle redirection result on page load
+getRedirectResult(auth).catch(err => console.error("Redirect Auth Error:", err));
 
 export const login = async () => {
     try {
+        // Try popup first
         await signInWithPopup(auth, provider);
     } catch (error) {
-        console.error("Login Error:", error);
+        console.warn("Popup blocked or COOP error, falling back to redirect...", error);
+        try {
+            // Fallback to redirect if popup fails
+            await signInWithRedirect(auth, provider);
+        } catch (redirError) {
+            console.error("Critical Auth Error:", redirError);
+        }
     }
 };
 
