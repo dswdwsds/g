@@ -1,0 +1,120 @@
+/* Navbar Styles */
+.nav-bar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    padding: 15px 40px;
+    background: rgba(6, 11, 19, 0.8);
+    backdrop-filter: blur(10px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1000;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+/* Service & Tier Cards */
+.services {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px 100px;
+}
+
+.service-card {
+    background: rgba(6, 11, 19, 0.8);
+    backdrop-filter: blur(5px);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    padding: 40px;
+    text-decoration: none;
+    color: var(--text-main);
+    transition: 0.3s;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.service-card:hover {
+    transform: translateY(-10px);
+    border-color: var(--primary);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+}
+
+.tier-card {
+    background: rgba(6, 11, 19, 0.85);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    padding: 30px;
+    text-align: center;
+    width: 280px;
+    transition: 0.4s;
+    backdrop-filter: blur(5px);
+}
+
+.tier-card:hover {
+    transform: translateY(-10px);
+    border-color: var(--primary);
+}
+
+/* Buttons */
+.auth-btn,
+.btn,
+.notif-btn {
+    padding: 12px 24px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-family: var(--font-ar);
+    transition: 0.3s;
+    font-weight: 700;
+    border: none;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.auth-btn {
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    color: #fff;
+}
+
+.btn,
+.notif-btn {
+    background: linear-gradient(45deg, var(--secondary), var(--primary));
+    color: #000;
+}
+
+.auth-btn:hover,
+.btn:hover,
+.notif-btn:hover {
+    transform: scale(1.05);
+    background: var(--primary);
+    color: #000;
+}
+
+/* Character Selection */
+.char-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 15px;
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.char-item {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--glass-border);
+    border-radius: 15px;
+    padding: 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.char-item.selected {
+    background: rgba(0, 242, 254, 0.15);
+    border-color: var(--primary);
+}

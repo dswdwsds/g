@@ -26,18 +26,33 @@ const uploadToImgBB = async (file) => {
     }
 };
 
+import { getOrderById } from './order_service.js';
+
 export const openChat = async (orderId) => {
-    // Note: The UI part (templates) should ideally be in ui.js, 
-    // but app.js was handling some logic. This service handles the state and listener.
     activeChatOrderId = orderId;
     const modal = document.getElementById('chatModal');
-    if (modal) {
-        modal.classList.add('visible');
-        setTimeout(() => document.getElementById('chatInput')?.focus(), 300);
-    }
+    if (modal) modal.classList.add('visible');
 
     const chatMessages = document.getElementById('chatMessages');
+    const input = document.getElementById('chatInput');
     if (chatMessages) chatMessages.innerHTML = '<div class="chat-empty">جاري تحميل الرسائل...</div>';
+
+    // Update Header Info
+    try {
+        const order = await getOrderById(orderId);
+        if (order) {
+            const isWorker = auth.currentUser?.uid === order.workerId;
+            const targetName = isWorker ? order.userName : (order.workerName || "الموظف");
+            const targetAvatar = isWorker ? order.userAvatar : (order.workerAvatar || "https://ui-avatars.com/api/?name=Staff");
+
+            document.getElementById('chatTargetName').innerText = targetName;
+            document.getElementById('chatTargetAvatar').src = targetAvatar;
+        }
+    } catch (e) { console.error("Chat Header Error:", e); }
+
+    if (input) {
+        setTimeout(() => input.focus(), 500);
+    }
 
     if (chatUnsubscribe) chatUnsubscribe();
 
