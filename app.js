@@ -541,8 +541,31 @@ export const updateOrderStatus = async (orderId, newStatus) => {
 
         if (newStatus === 'working' && auth.currentUser) {
             updateData.workerId = auth.currentUser.uid;
-            updateData.workerName = auth.currentUser.displayName;
-            updateData.workerAvatar = auth.currentUser.photoURL;
+
+            // Multi-worker logic: Append name if someone else worked on it before
+            // We need to fetch the current order data first to check efficiently or do it blindly?
+            // Since we need to read 'workerName', it's better to read first or use a transaction.
+            // For simplicity/speed in this context, we'll do a read-then-write or just rely on client info?
+            // Actually, we can get the document snapshot first.
+
+            // Let's optimize: We already have 'updateOrderStatus' called. Let's get the doc.
+            const snapshot = await getDoc(orderRef);
+            if (snapshot.exists()) {
+                const currentData = snapshot.data();
+                const currentName = currentData.workerName;
+                const newName = auth.currentUser.displayName;
+
+                if (currentName && !currentName.includes(newName)) {
+                    updateData.workerName = `${currentName} & ${newName}`;
+                } else if (!currentName) {
+                    updateData.workerName = newName;
+                }
+                // If already included, do nothing to name
+            } else {
+                updateData.workerName = auth.currentUser.displayName;
+            }
+
+            updateData.workerAvatar = auth.currentUser.photoURL; // Updates to latest worker avatar
         }
 
         await updateDoc(orderRef, updateData);
@@ -580,6 +603,28 @@ export const updateOrderStatus = async (orderId, newStatus) => {
         console.error("Update Error:", error);
         if (window.showToast) window.showToast("فشل تحديث الحالة.", "❌");
         else alert("فشل تحديث الحالة.");
+    }
+};
+
+export const leaveOrder = async (orderId) => {
+    try {
+        const orderRef = doc(db, "orders", orderId);
+        // Revert to waiting, clear active worker ID so others can take it, but KEEP workerName
+        await updateDoc(orderRef, {
+            status: "waiting",
+            workerId: null
+            // workerName intentionally left untouched to preserve history
+        });
+
+        // Fetch to update Discord
+        const snapshot = await getDoc(orderRef);
+        if (snapshot.exists()) {
+            await updateDiscordMessage({ id: orderId, ...snapshot.data() }, "waiting");
+        }
+        return true;
+    } catch (error) {
+        console.error("Leave Order Error:", error);
+        return false;
     }
 };
 

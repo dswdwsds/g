@@ -269,7 +269,7 @@
 
     <script type="module">
         import { auth, onAuthStateChanged } from './firebase-config.js';
-        import { login, logout, listenToAllOrders, updateOrderStatus, isWorker, listenToWorkers, listenToWorkerCompletedOrders, listenToStaffStats, getUserRole, setStaffRole, deleteStaff, sendMessage, listenToMessages, sendImageMessage, listenToUnreadCount, markMessagesAsRead } from './app.js?v=2';
+        import { login, logout, listenToAllOrders, updateOrderStatus, isWorker, listenToWorkers, listenToWorkerCompletedOrders, listenToStaffStats, getUserRole, setStaffRole, deleteStaff, sendMessage, listenToMessages, sendImageMessage, listenToUnreadCount, markMessagesAsRead, leaveOrder } from './app.js?v=2';
 
         const userInfo = document.getElementById('userInfo');
         const adminContent = document.getElementById('adminContent');
@@ -426,6 +426,13 @@
 
         window.manageOrder = (id, status) => {
             updateOrderStatus(id, status);
+        };
+
+        window.handleLeaveOrder = async (id) => {
+            if (confirm("هل تريد ترك هذا الطلب؟ سيتمكن موظف آخر من استلامه.")) {
+                const success = await leaveOrder(id);
+                if (!success) alert("فشل في ترك الطلب.");
+            }
         };
 
         let chatUnsubscribe = null;
@@ -629,6 +636,9 @@
                             <button id="${chatBtnId}" style="position:relative; background: var(--glass); border: 1px solid var(--glass-border); color: #fff; padding: 5px 15px; border-radius: 8px; cursor: pointer;" onclick="openChat('${order.id}')">
                                 💬 محادثة
                             </button>
+                            ${order.workerId === auth.currentUser.uid ? `
+                                <button onclick="handleLeaveOrder('${order.id}')" style="background: rgba(255, 77, 77, 0.2); color: #ff4d4d; border: 1px solid #ff4d4d; padding: 5px 15px; border-radius: 8px; cursor: pointer;">ترك الطلب 🏃‍♂️</button>
+                            ` : ''}
                             <button onclick="manageOrder('${order.id}', 'done')" style="background: #00f2fe; color: #000; border: none; padding: 5px 15px; border-radius: 8px; cursor: pointer;">إنهاء العمل</button>
                         `;
 
