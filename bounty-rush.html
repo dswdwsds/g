@@ -305,6 +305,13 @@
     <p>© 2026 Professional Game Services. All rights reserved.</p>
   </footer>
 
+  <!-- Floating Support Button -->
+  <a href="https://discord.com/channels/1284591581717987422/1284591582187622539" target="_blank"
+    class="floating-support-btn">
+    <span>🎧</span>
+    <span>تحدث مع الدعم</span>
+  </a>
+
   <script type="module">
     import { auth, onAuthStateChanged } from './firebase-config.js';
     import { login, logout, placeOrder, sendPaymentProofToDiscord, updateOrderStatus, listenToQueue, listenToUserOrders, listenToWorkers, getUserRole, submitRating, loadCharacters, getCharacters, sendMessage, listenToMessages, sendImageMessage, listenToUnreadCount, markMessagesAsRead } from './app.js?v=2';
@@ -890,8 +897,6 @@
             }
           });
         }
-            `;
-        queueList.appendChild(item);
       });
     }
 

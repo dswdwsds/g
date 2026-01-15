@@ -260,6 +260,12 @@
     </div>
 
     <div id="toastContainer" class="toast-container"></div>
+    <!-- Floating Support Button -->
+    <a href="https://discord.com/channels/1284591581717987422/1284591582187622539" target="_blank" class="floating-support-btn">
+        <span>🎧</span>
+        <span>تحدث مع الدعم</span>
+    </a>
+
     <script type="module">
         import { auth, onAuthStateChanged } from './firebase-config.js';
         import { login, logout, listenToAllOrders, updateOrderStatus, isWorker, listenToWorkers, listenToWorkerCompletedOrders, listenToStaffStats, getUserRole, setStaffRole, deleteStaff, sendMessage, listenToMessages, sendImageMessage, listenToUnreadCount, markMessagesAsRead } from './app.js?v=2';
