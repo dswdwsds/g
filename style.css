@@ -157,16 +157,26 @@ body::after {
 
 .service-card span {
     margin-top: auto;
-    font-weight: 600;
-    color: var(--primary);
+    font-weight: 700;
+    color: #fff;
     display: flex;
     align-items: center;
-    gap: 8px;
-    transition: gap 0.3s;
+    justify-content: center;
+    gap: 10px;
+    padding: 12px 25px;
+    border-radius: 12px;
+    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('GIF/One_Piece_Zoro_Vs_King_GIF_-_One_piece_Zoro_vs_king_King_of_hell_-_Discover__Share_GIFs.gif');
+    background-size: cover;
+    background-position: center;
+    border: 1px solid var(--primary);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .service-card:hover span {
     gap: 15px;
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(0, 242, 254, 0.3);
 }
 
 /* Bounty Rush Specifics */
@@ -179,19 +189,25 @@ body::after {
 }
 
 .tier-card {
-    background: var(--glass);
+    background: linear-gradient(rgba(6, 11, 19, 0.85), rgba(6, 11, 19, 0.85)), url('IMAGE/FsMfvk8WcAEbc_0.jpg');
+    background-size: cover;
+    background-position: center;
     border: 1px solid var(--glass-border);
     border-radius: 24px;
     padding: 30px;
     text-align: center;
     width: 280px;
-    transition: 0.3s;
+    transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     animation: fadeIn 0.8s ease-out;
+    backdrop-filter: blur(5px);
+    position: relative;
+    overflow: hidden;
 }
 
 .tier-card:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: var(--secondary);
+    transform: translateY(-10px) scale(1.02);
+    border-color: var(--primary);
+    box-shadow: 0 15px 30px rgba(0, 242, 254, 0.15);
 }
 
 .tier-stars {
@@ -698,6 +714,7 @@ footer {
     margin-bottom: 5px;
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
