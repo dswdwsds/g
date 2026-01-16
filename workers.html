@@ -274,7 +274,7 @@
             getUserRole, setStaffRole, deleteStaff, listenToUnreadCount,
             markMessagesAsRead, leaveOrder, openChat, showToast, showConfirm,
             listenToAllReviews, deleteReview, listenToRoles, updateRoleData, deleteRoleData,
-            hasPermission
+            hasPermission, loadEarnings
         } from './app.js';
         import { initSharedUI } from './ui.js';
 
@@ -911,52 +911,7 @@
             });
         }
 
-        function loadEarnings(email, uid) {
-            // الاستماع لإحصائيات الموظف مباشرة من مستنده
-            listenToStaffStats(uid, (stats) => {
-                if (stats) {
-                    totalEarnings.innerText = `${stats.totalEarnings || 0} جنيه`;
-                }
-            });
 
-            // الاستماع لسجل الطلبات لعرضها في المودال
-            listenToWorkerCompletedOrders(uid, (orders) => {
-                orderCount.innerText = orders.length;
-                completedOrdersList.innerHTML = '';
-
-                if (orders.length === 0) {
-                    completedOrdersList.innerHTML = '<p style="text-align:center; color:var(--text-dim);">لا يوجد أرباح مسجلة بعد</p>';
-                    return;
-                }
-
-                orders.forEach(order => {
-                    const item = document.createElement('div');
-                    item.style.cssText = 'background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;';
-
-                    const charTags = (order.characters || []).map(c => `
-                        <span style="font-size:0.75rem; background:rgba(255,255,255,0.05); padding:2px 6px; border-radius:5px;">${c.name}</span>
-                    `).join(' ');
-
-                    const stars = order.rating ? '⭐'.repeat(order.rating) : '';
-                    const review = order.review ? `<div style="font-size:0.8rem; color:var(--primary); font-style:italic; margin-top:8px; background:rgba(255,255,255,0.05); padding:8px; border-radius:8px;">"${order.review}"</div>` : '';
-
-                    item.innerHTML = `
-                        <div style="flex:1">
-                            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                                <div style="font-weight:bold; margin-bottom:5px;">${order.tier} ${stars}</div>
-                                <div style="color:var(--primary); font-weight:bold; font-size:1.1rem;">${order.totalPrice || 0} ج.م</div>
-                            </div>
-                            <div style="display:flex; flex-wrap:wrap; gap:4px;">${charTags}</div>
-                            ${review}
-                            <div style="font-size:0.75rem; color:var(--text-dim); margin-top:10px;">
-                                👤 لـ: ${order.userName} | 📅 ${new Date(order.createdAt?.seconds * 1000).toLocaleDateString('ar-EG')}
-                            </div>
-                        </div>
-                    `;
-                    completedOrdersList.appendChild(item);
-                });
-            });
-        }
     </script>
 </body>
 
