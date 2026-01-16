@@ -137,7 +137,9 @@ export const refreshUserUI = async () => {
                 <div class="user-trigger">
                     <div class="user-details">
                         <span class="user-name">${user.displayName}</span>
-                        <span class="user-role">${role === 'admin' ? 'مدير النظام' : (role === 'staff' ? 'موظف' : 'عميل')}</span>
+                        <span class="user-role ${role === 'owner' ? 'role-owner' : (role === 'admin' ? 'role-admin' : (role === 'staff' ? 'role-staff' : 'role-client'))}">
+                            ${role === 'owner' ? '👑 المالك' : (role === 'admin' ? '🛡️ مدير النظام' : (role === 'staff' ? '🛠️ موظف' : '👤 عميل'))}
+                        </span>
                     </div>
                     <img src="${user.photoURL}" class="user-avatar">
                 </div>

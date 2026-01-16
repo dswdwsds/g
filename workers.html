@@ -461,7 +461,9 @@
                     <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
                         <div>
                             <div style="font-weight: bold;">${s.email}</div>
-                            <div style="font-size: 0.8rem; color: var(--primary);">${s.role === 'admin' ? 'Admin 👑' : (s.role === 'owner' ? 'Owner 💎' : 'Staff 🛡️')}</div>
+                            <div class="user-role ${s.role === 'owner' ? 'role-owner' : (s.role === 'admin' ? 'role-admin' : 'role-staff')}" style="font-size: 0.8rem;">
+                                ${s.role === 'owner' ? '👑 Owner' : (s.role === 'admin' ? '🛡️ Admin' : '🛠️ Staff')}
+                            </div>
                         </div>
                         <button onclick="handleDeleteStaff('${s.id}')" style="background: #ff4d4d22; color: #ff4d4d; border: 1px solid #ff4d4d; padding: 5px 12px; border-radius: 8px; font-size: 0.8rem; cursor: pointer;">حذف 🗑️</button>
                     </div>

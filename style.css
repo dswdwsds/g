@@ -423,9 +423,13 @@ body::after {
 
 .user-role {
     font-size: 0.7rem;
-    color: var(--primary);
     font-weight: bold;
 }
+
+.role-owner { color: #ffd700 !important; text-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
+.role-admin { color: #4facfe !important; }
+.role-staff { color: #00ff9d !important; }
+.role-client { color: var(--text-dim) !important; }
 
 .dropdown-menu a,
 .dropdown-btn {
