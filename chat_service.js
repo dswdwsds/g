@@ -60,8 +60,18 @@ export const openChat = async (orderId) => {
 
     if (chatUnsubscribe) chatUnsubscribe();
 
-    chatUnsubscribe = listenToMessages(orderId, (messages) => {
-        markMessagesAsRead(orderId, auth.currentUser?.uid);
+    chatUnsubscribe = listenToMessages(orderId, (data) => {
+        const messages = data.messages || [];
+        const userId = auth.currentUser?.uid;
+
+        // Only mark as read if there are messages and the lastRead is outdated
+        if (userId && messages.length > 0) {
+            const lastMsgTime = messages[messages.length - 1].timestamp;
+            const currentLastRead = data[`lastRead_${userId}`] || 0;
+            if (lastMsgTime > currentLastRead) {
+                markMessagesAsRead(orderId, userId);
+            }
+        }
 
         if (!chatMessages) return;
 
@@ -204,14 +214,13 @@ export const listenToMessages = (orderId, callback) => {
     const chatRef = doc(db, "chats", orderId);
     return onSnapshot(chatRef, (snapshot) => {
         if (snapshot.exists()) {
-            const data = snapshot.data();
-            callback(data.messages || []);
+            callback(snapshot.data());
         } else {
-            callback([]);
+            callback({ messages: [] });
         }
     }, (error) => {
         console.error("Chat Listener Error:", error);
-        callback([]);
+        callback({ messages: [] });
     });
 };
 
