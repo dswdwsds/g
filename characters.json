@@ -171,28 +171,32 @@
         "name": "كوروبي - ضابط أرلونغ",
         "stars": 3,
         "role": "مدافع",
-        "element": "أزرق"
+        "element": "أزرق",
+        "image": "3stars/123123.png"
     },
     {
         "id": "021",
         "name": "تشو - ضابط أرلونغ",
         "stars": 3,
         "role": "مهاجم",
-        "element": "أخضر"
+        "element": "أخضر",
+        "image": "3stars/78979.png"
     },
     {
         "id": "022",
         "name": "هاتشان - ضابط أرلونغ",
         "stars": 3,
         "role": "مهاجم",
-        "element": "أحمر"
+        "element": "أحمر",
+        "image": "3stars/65756.png"
     },
     {
         "id": "023",
         "name": "كابتن كورو - القائد السابق",
         "stars": 3,
         "role": "مهاجم",
-        "element": "أخضر"
+        "element": "أخضر",
+        "image": "3stars/3123123.png"
     },
     {
         "id": "024",
@@ -206,63 +210,232 @@
         "name": "دون كريج - أدميرال الأسطول",
         "stars": 3,
         "role": "مدافع",
-        "element": "أخضر"
+        "element": "أخضر",
+        "image": "3stars/354.png"
     },
     {
         "id": "026",
         "name": "زيف - رئيس طهاة باراتي",
         "stars": 3,
         "role": "مدافع",
-        "element": "أحمر"
+        "element": "أحمر",
+        "image": "3stars/2423.png"
     },
     {
         "id": "027",
         "name": "باجي - كابتن القراصنة",
         "stars": 3,
         "role": "عداء",
-        "element": "أحمر"
+        "element": "أحمر",
+        "image": "3stars/567.png"
     },
     {
         "id": "028",
         "name": "ألفيدا - فاكهة الانزلاق",
         "stars": 3,
         "role": "عداء",
-        "element": "أخضر"
+        "element": "أخضر",
+        "image": "3stars/44456.png"
     },
     {
         "id": "029",
         "name": "تاشيغي - ضابط صف البحرية",
         "stars": 3,
         "role": "عداء",
-        "element": "أزرق"
+        "element": "أزرق",
+        "image": "3stars/33.png"
     },
     {
         "id": "030",
         "name": "فيفي - الآنسة وينزداي",
         "stars": 3,
         "role": "عداء",
-        "element": "أزرق"
+        "element": "أزرق",
+        "image": "3stars/441.png"
     },
     {
         "id": "031",
         "name": "يوسوب - مطرقة الـ5 طن",
         "stars": 3,
         "role": "مهاجم",
-        "element": "أزرق"
+        "element": "أزرق",
+        "image": "3stars/54564.png"
     },
     {
         "id": "032",
         "name": "سانجي - ركلة فيو فينجيانس",
         "stars": 3,
         "role": "مدافع",
-        "element": "أزرق"
+        "element": "أزرق",
+        "image": "3stars/53453.png"
     },
     {
         "id": "033",
         "name": "نامي - عصا المناخ",
         "stars": 3,
         "role": "مهاجم",
-        "element": "أخضر"
+        "element": "أخضر",
+        "image": "3stars/687.png"
+    },
+    {
+        "id": "033b",
+        "name": "ديمارو بلاك - لوفي المزيف",
+        "stars": 3,
+        "role": "مهاجم",
+        "element": "أخضر",
+        "image": "3stars/11.png"
+    },
+    {
+        "id": "033c",
+        "name": "ريبيكا - الفتاة المصارعة",
+        "stars": 3,
+        "role": "عداء",
+        "element": "أزرق",
+        "image": "3stars/12.png"
+    },
+    {
+        "id": "033d",
+        "name": "باسيل هوكينز - الساحر",
+        "stars": 3,
+        "role": "مهاجم",
+        "element": "أخضر",
+        "image": "3stars/21.png"
+    },
+    {
+        "id": "033e",
+        "name": "توني توني تشوبر - نسخة النينجا",
+        "stars": 3,
+        "role": "عداء",
+        "element": "أخضر",
+        "image": "3stars/22.png"
+    },
+    {
+        "id": "033f",
+        "name": "كونغ فو دوغونغ",
+        "stars": 3,
+        "role": "مدافع",
+        "element": "أخضر",
+        "image": "3stars/44.png"
+    },
+    {
+        "id": "033g",
+        "name": "وايبر - مقاتل الشانديا",
+        "stars": 3,
+        "role": "مهاجم",
+        "element": "أخضر",
+        "image": "3stars/55.png"
+    },
+    {
+        "id": "033h",
+        "name": "كيلر - جندي المجزرة",
+        "stars": 3,
+        "role": "عداء",
+        "element": "أزرق",
+        "image": "3stars/66.png"
+    },
+    {
+        "id": "033i",
+        "name": "غايمون - الرجل في الصندوق",
+        "stars": 3,
+        "role": "مدافع",
+        "element": "أخضر",
+        "image": "3stars/image.png"
+    },
+    {
+        "id": "033j",
+        "name": "رورونوا زورو - رونين",
+        "stars": 3,
+        "role": "مهاجم",
+        "element": "أخضر",
+        "image": "3stars/111.png"
+    },
+    {
+        "id": "033k",
+        "name": "مورغان - نسخة البحرية",
+        "stars": 3,
+        "role": "مدافع",
+        "element": "أحمر",
+        "image": "3stars/121.png"
+    },
+    {
+        "id": "033l",
+        "name": "فرانكي - بشعر النجمة",
+        "stars": 3,
+        "role": "مدافع",
+        "element": "أحمر",
+        "image": "3stars/122.png"
+    },
+    {
+        "id": "033m",
+        "name": "جولري بوني - الشرهة",
+        "stars": 3,
+        "role": "عداء",
+        "element": "أحمر",
+        "image": "3stars/1234.png"
+    },
+    {
+        "id": "033n",
+        "name": "ريوما - الساموراي الزومبي",
+        "stars": 3,
+        "role": "مهاجم",
+        "element": "أزرق",
+        "image": "3stars/2223.png"
+    },
+    {
+        "id": "033o",
+        "name": "تاشيغي - نسخة G-5",
+        "stars": 3,
+        "role": "عداء",
+        "element": "أزرق",
+        "image": "3stars/23432.png"
+    },
+    {
+        "id": "033p",
+        "name": "مونكي دي لوفي - نسخة البحرية",
+        "stars": 3,
+        "role": "مهاجم",
+        "element": "أحمر",
+        "image": "3stars/312312.png"
+    },
+    {
+        "id": "033q",
+        "name": "كابوني 'غانغ' بيجي",
+        "stars": 3,
+        "role": "مدافع",
+        "element": "أزرق",
+        "image": "3stars/321.png"
+    },
+    {
+        "id": "033r",
+        "name": "مونكي دي غارب - بطل البحرية",
+        "stars": 3,
+        "role": "مدافع",
+        "element": "أحمر",
+        "image": "3stars/331.png"
+    },
+    {
+        "id": "033s",
+        "name": "مونكي دي لوفي - قمة الحرب",
+        "stars": 3,
+        "role": "مهاجم",
+        "element": "أزرق",
+        "image": "3stars/4314.png"
+    },
+    {
+        "id": "033t",
+        "name": "كابتن كورو - نسخة النصل",
+        "stars": 3,
+        "role": "مهاجم",
+        "element": "أخضر",
+        "image": "3stars/4554.png"
+    },
+    {
+        "id": "033u",
+        "name": "نيفيرتاري فيفي - نسخة الأميرة",
+        "stars": 3,
+        "role": "عداء",
+        "element": "أحمر",
+        "image": "3stars/79789.png"
     },
     {
         "id": "034",
