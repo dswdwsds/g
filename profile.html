@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="icon" href="https://ui-avatars.com/api/?name=TEAM+GS&background=00f2fe&color=000">
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&family=Noto+Sans+Arabic:wght@400;700;800&display=swap"
         rel="stylesheet">
@@ -159,6 +160,10 @@
             <div class="avatar-section">
                 <img id="avatarPreview" src="https://ui-avatars.com/api/?name=User&background=00f2fe&color=000"
                     class="profile-avatar" onclick="document.getElementById('avatarInput').click()">
+                <div id="nicknamePreview"
+                    style="font-weight: 800; font-size: 1.2rem; color: var(--primary); margin-bottom: 5px;">User</div>
+                <div style="font-size: 0.8rem; color: var(--text-dim); margin-bottom: 15px;">(معاينة الاسم المستعار)
+                </div>
                 <button class="change-avatar-btn" onclick="document.getElementById('avatarInput').click()">تغيير الصورة
                     📷</button>
                 <input type="file" id="avatarInput" hidden accept="image/*">
@@ -186,8 +191,12 @@
 
     <script type="module">
         import { auth, db, doc, getDoc, setDoc, onAuthStateChanged, updateProfile } from './firebase-config.js';
-        import { refreshUserUI } from './ui.js';
+        import { initSharedUI, refreshUserUI } from './ui.js';
         import { showToast } from './ui_utils.js';
+        import { isWorker } from './auth_service.js';
+
+        // Initialize Shared UI
+        initSharedUI();
 
         const avatarPreview = document.getElementById('avatarPreview');
         const avatarInput = document.getElementById('avatarInput');
@@ -205,8 +214,10 @@
             }
 
             // Load Auth Data
+            const name = user.displayName || 'User';
             displayNameInput.value = user.displayName || '';
-            avatarPreview.src = user.photoURL || `https://ui-avatars.com/api/?name=${user.displayName}&background=00f2fe&color=000`;
+            document.getElementById('nicknamePreview').innerText = name;
+            avatarPreview.src = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=00f2fe&color=000`;
 
             // Load Firestore Data
             try {
@@ -218,6 +229,14 @@
                 }
             } catch (error) {
                 console.error("Profile Load Error:", error);
+            }
+        });
+
+        displayNameInput.addEventListener('input', () => {
+            const name = displayNameInput.value || 'User';
+            document.getElementById('nicknamePreview').innerText = name;
+            if (!selectedAvatarBase64) {
+                avatarPreview.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=00f2fe&color=000`;
             }
         });
 
@@ -261,13 +280,22 @@
                 });
 
                 // 3. Update Firestore Users Collection
-                await setDoc(doc(db, "users", user.uid), {
+                const userData = {
                     displayName: displayNameInput.value,
                     photoURL: photoURL,
                     birthDate: birthDateInput.value,
                     bio: bioInput.value,
                     updatedAt: new Date()
-                }, { merge: true });
+                };
+                await setDoc(doc(db, "users", user.uid), userData, { merge: true });
+
+                // 4. Update Staff Collection if worker to sync nicknames/avatars
+                if (isWorker(user.email)) {
+                    await setDoc(doc(db, "staff", user.email), {
+                        displayName: displayNameInput.value,
+                        photoURL: photoURL
+                    }, { merge: true });
+                }
 
                 showToast("تم تحديث ملفك الشخصي بنجاح!", "✅");
                 refreshUserUI();
@@ -280,9 +308,6 @@
             }
         };
 
-        // Initialize Navbar
-        import { initNavbar } from './ui.js';
-        initNavbar();
     </script>
 </body>
 

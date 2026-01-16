@@ -387,6 +387,18 @@
         </div>
     </div>
 
+    <!-- Character Lightbox Modal -->
+    <div id="charLightbox" class="notif-overlay" onclick="closeCharLightbox()">
+        <div class="notif-card"
+            style="max-width: 400px; text-align: center; background: rgba(0,0,0,0.8); border: 2px solid var(--primary); padding: 10px;"
+            onclick="event.stopPropagation()">
+            <img id="lightboxImg" src=""
+                style="width: 100%; border-radius: 15px; margin-bottom: 10px; box-shadow: 0 0 20px var(--primary);">
+            <div id="lightboxName" style="font-weight: 800; font-size: 1.2rem; color: #fff; margin-bottom: 15px;"></div>
+            <button class="notif-btn" style="width: 100%;" onclick="closeCharLightbox()">إغلاق</button>
+        </div>
+    </div>
+
     <script type="module">
         import { auth, onAuthStateChanged } from './firebase-config.js';
         import {
@@ -511,10 +523,59 @@
             document.getElementById('orderDetailsModal').classList.remove('visible');
         };
 
+        window.openCharLightbox = (img, name) => {
+            const lightbox = document.getElementById('charLightbox');
+            document.getElementById('lightboxImg').src = img || '2stars/3333.png';
+            document.getElementById('lightboxName').innerText = name;
+            lightbox.classList.add('visible');
+        };
+
+        window.closeCharLightbox = () => {
+            document.getElementById('charLightbox').classList.remove('visible');
+        };
+
         // UI Helper Functions
 
         let currentOrders = [];
         let cachedStaff = [];
+
+        // Global member sync for role management
+        listenToWorkers((staff) => {
+            cachedStaff = staff;
+            // If roles modal is open and editing, refresh member list
+            const currentId = document.getElementById('currentEditingId')?.innerText;
+            if (currentId && document.getElementById('rolesModal').classList.contains('visible')) {
+                refreshRoleMembers(currentId);
+            }
+        });
+
+        const refreshRoleMembers = (id) => {
+            if (!cachedStaff || cachedStaff.length === 0) {
+                document.getElementById('roleMembersList').innerHTML = '<div style="color: var(--text-dim); text-align: center; padding: 10px; font-size: 0.85rem;">جاري تحميل قائمة الموظفين...</div>';
+                document.getElementById('roleMembersSection').classList.remove('hidden');
+                return;
+            }
+
+            const members = cachedStaff.filter(s => (s.role || '').split(',').map(r => r.trim()).includes(id));
+            const membersList = document.getElementById('roleMembersList');
+            const membersSection = document.getElementById('roleMembersSection');
+
+            if (members.length > 0) {
+                membersList.innerHTML = members.map(m => `
+                    <div style="background: rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 10px; border: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center;">
+                        <div style="display: flex; align-items: center; gap: 10px; overflow: hidden;">
+                            <img src="${m.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(m.displayName || m.email.split('@')[0])}&background=00f2fe&color=000`}" style="width: 24px; height: 24px; border-radius: 50%;">
+                            <span style="font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px;">${m.displayName || m.email}</span>
+                        </div>
+                        <button onclick="handleEditStaff('${m.email}', '${m.role}')" style="background: var(--primary); color: #000; border: none; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; cursor: pointer; white-space: nowrap;">تعديل ✏️</button>
+                    </div>
+                `).join('');
+                membersSection.classList.remove('hidden');
+            } else {
+                membersList.innerHTML = '<div style="color: var(--text-dim); text-align: center; padding: 10px; font-size: 0.85rem;">لا يوجد موظفين بهذه الرتبة حالياً.</div>';
+                membersSection.classList.remove('hidden');
+            }
+        };
 
 
         const checkAccess = () => {
@@ -658,25 +719,7 @@
             });
 
             // Show Members
-            const members = cachedStaff.filter(s => (s.role || '').split(',').map(r => r.trim()).includes(id));
-            const membersList = document.getElementById('roleMembersList');
-            const membersSection = document.getElementById('roleMembersSection');
-
-            if (members.length > 0) {
-                membersList.innerHTML = members.map(m => `
-                    <div style="background: rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 10px; border: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center;">
-                        <div style="display: flex; align-items: center; gap: 10px; overflow: hidden;">
-                            <img src="https://ui-avatars.com/api/?name=${m.email.split('@')[0]}&background=00f2fe&color=000" style="width: 24px; height: 24px; border-radius: 50%;">
-                            <span style="font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px;">${m.email}</span>
-                        </div>
-                        <button onclick="handleEditStaff('${m.email}', '${m.role}')" style="background: var(--primary); color: #000; border: none; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; cursor: pointer; white-space: nowrap;">تعديل ✏️</button>
-                    </div>
-                `).join('');
-                membersSection.classList.remove('hidden');
-            } else {
-                membersList.innerHTML = '<div style="color: var(--text-dim); text-align: center; padding: 10px; font-size: 0.85rem;">لا يوجد موظفين بهذه الرتبة حالياً.</div>';
-                membersSection.classList.remove('hidden');
-            }
+            refreshRoleMembers(id);
 
             document.getElementById('cancelRoleEdit').classList.remove('hidden');
             document.getElementById('rolesModal').scrollTop = 0;
@@ -779,7 +822,6 @@
 
         function renderStaffList() {
             listenToWorkers(async (staff) => {
-                cachedStaff = staff;
                 const rolesData = await import('./auth_service.js').then(m => m.getRolesData());
 
                 staffList.innerHTML = staff.map(s => {
@@ -918,9 +960,11 @@
                     const hiddenChars = characters.slice(limit);
 
                     const generateCharTag = (c, hidden = false) => `
-                        <div class="${hidden ? `hidden-char-${order.id}` : ''}" style="${hidden ? 'display:none;' : 'display:inline-flex;'} align-items:center; gap:5px; background:rgba(255,255,255,0.05); padding:3px 10px; border-radius:12px; font-size:0.85rem; border:1px solid var(--glass-border);">
-                            ${c.image ? `<img src="${c.image}" style="width:18px; height:18px; border-radius:50%" loading="lazy">` : '🗡️'}
-                            <span>${c.name}</span>
+                        <div class="${hidden ? `hidden-char-${order.id}` : ''}" 
+                             style="${hidden ? 'display:none;' : 'display:inline-flex;'} align-items:center; gap:8px; background:rgba(255,255,255,0.08); padding:5px 12px; border-radius:15px; font-size:0.9rem; border:1px solid var(--glass-border); cursor:pointer; transition: 0.3s;"
+                             onclick="openCharLightbox('${c.image}', '${c.name || 'شخصية'}')">
+                            ${c.image ? `<img src="${c.image}" style="width:30px; height:30px; border-radius:50%; border:1px solid var(--primary);" loading="lazy">` : '🗡️'}
+                            <span style="font-weight: 700;">${c.name}</span>
                         </div>
                     `;
 

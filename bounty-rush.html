@@ -379,6 +379,18 @@
     <span>تحدث مع الدعم</span>
   </a>
 
+  <!-- Character Lightbox Modal -->
+  <div id="charLightbox" class="notif-overlay" onclick="closeCharLightbox()">
+    <div class="notif-card"
+      style="max-width: 400px; text-align: center; background: rgba(0,0,0,0.8); border: 2px solid var(--primary); padding: 10px;"
+      onclick="event.stopPropagation()">
+      <img id="lightboxImg" src=""
+        style="width: 100%; border-radius: 15px; margin-bottom: 10px; box-shadow: 0 0 20px var(--primary);">
+      <div id="lightboxName" style="font-weight: 800; font-size: 1.2rem; color: #fff; margin-bottom: 15px;"></div>
+      <button class="notif-btn" style="width: 100%;" onclick="closeCharLightbox()">إغلاق</button>
+    </div>
+  </div>
+
   <script type="module">
     import { auth, onAuthStateChanged, db, doc, getDoc } from './firebase-config.js';
     import {
@@ -866,6 +878,16 @@
       document.getElementById('notificationModal').classList.remove('visible');
     };
 
+    window.openCharLightbox = (img, name) => {
+      const lightbox = document.getElementById('charLightbox');
+      document.getElementById('lightboxImg').src = img || '2stars/3333.png';
+      document.getElementById('lightboxName').innerText = name;
+      lightbox.classList.add('visible');
+    };
+
+    window.closeCharLightbox = () => {
+      document.getElementById('charLightbox').classList.remove('visible');
+    };
 
     window.handleLogin = login;
     window.handleLogout = logout;
@@ -920,9 +942,11 @@
         const hiddenChars = characters.slice(limit);
 
         const generateCharTag = (c, hidden = false) => `
-          <div class="${hidden ? `hidden-char-${order.id}` : ''}" style="${hidden ? 'display:none;' : 'display:inline-flex;'} align-items:center; gap:5px; background:rgba(255,255,255,0.05); padding:2px 8px; border-radius:10px; font-size:0.8rem;">
-            ${c.image ? `<img src="${c.image}" style="width:16px; height:16px; border-radius:50%" loading="lazy">` : '🗡️'}
-            <span>${c.name}</span>
+          <div class="${hidden ? `hidden-char-${order.id}` : ''}" 
+               style="${hidden ? 'display:none;' : 'display:inline-flex;'} align-items:center; gap:8px; background:rgba(255,255,255,0.08); padding:4px 10px; border-radius:12px; font-size:0.85rem; border:1px solid var(--glass-border); cursor:pointer; transition: 0.3s;"
+               onclick="openCharLightbox('${c.image}', '${c.name || 'شخصية'}')">
+            ${c.image ? `<img src="${c.image}" style="width:30px; height:30px; border-radius:50%; border:1px solid var(--primary);" loading="lazy">` : '🗡️'}
+            <span style="font-weight: 700;">${c.name}</span>
           </div>
         `;
 
@@ -973,12 +997,12 @@
                       </button>
                     ` : ''}
                 </div>
-            `;
+    `;
         queueList.appendChild(item);
 
         if (isWorking && order.uid === user?.uid) {
           listenToUnreadCount(order.id, user.uid, (count) => {
-            const btn = document.getElementById(`customer-chat-btn-${order.id}`);
+            const btn = document.getElementById(`customer - chat - btn - ${order.id}`);
             if (btn) {
               const existingBadge = btn.querySelector('.notification-badge');
               if (existingBadge) existingBadge.remove();

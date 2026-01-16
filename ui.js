@@ -176,6 +176,8 @@ export const initSharedUI = () => {
     onAuthStateChanged(auth, () => refreshUserUI());
 };
 
+export const initNavbar = initSharedUI; // Alias for backward compatibility
+
 // Global Exposure for UI actions
 window.handleLogout = logout;
 window.handleLogin = () => import('./app.js').then(m => m.login());

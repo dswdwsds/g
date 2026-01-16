@@ -23,7 +23,9 @@ export const listenToWorkers = (callback) => {
         authorizedStaff = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         if (callback) callback(authorizedStaff);
     }, (error) => {
-        console.warn("Staff Listener Error (Likely Unauthenticated):", error);
+        if (error.code !== 'permission-denied') {
+            console.warn("Staff Listener Error:", error);
+        }
         if (callback) callback([]);
     });
 };
@@ -64,11 +66,32 @@ export const deleteStaff = async (docId) => {
 };
 
 let availableRoles = [];
-onSnapshot(collection(db, "roles"), (snapshot) => {
-    availableRoles = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-}, (error) => {
-    console.warn("Roles Listener Permission Error (Likely Client):", error.message);
-    availableRoles = [];
+let rolesUnsubscribe = null;
+
+export const listenToRoles = (callback) => {
+    if (rolesUnsubscribe) rolesUnsubscribe();
+    rolesUnsubscribe = onSnapshot(collection(db, "roles"), (snapshot) => {
+        availableRoles = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        if (callback) callback(availableRoles);
+    }, (error) => {
+        if (error.code !== 'permission-denied') {
+            console.warn("Roles Listener Error:", error.message);
+        }
+        availableRoles = [];
+        if (callback) callback([]);
+    });
+    return rolesUnsubscribe;
+};
+
+// Start roles listener when auth state changes if possible
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        listenToRoles();
+    } else {
+        if (rolesUnsubscribe) rolesUnsubscribe();
+        rolesUnsubscribe = null;
+        availableRoles = [];
+    }
 });
 
 export const hasPermission = (email, permission) => {
