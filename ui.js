@@ -1,4 +1,4 @@
-import { auth, logout, openOperationsModal, closeOperationsModal, handleOpsSearch, closeOpsDetailsModal, closeChat, handleSendMessage, handleSendImage, getUserRole, listenToWorkers } from './app.js';
+import { auth, logout, openOperationsModal, closeOperationsModal, handleOpsSearch, closeOpsDetailsModal, closeChat, handleSendMessage, handleSendImage, getUserRole, listenToWorkers, isWorker, hasPermission } from './app.js';
 import { onAuthStateChanged, db, doc, getDoc } from './firebase-config.js';
 
 export const injectNavbar = () => {

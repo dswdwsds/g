@@ -445,40 +445,21 @@
         };
 
 
-        const checkAccess = () => {
+        const checkAccess = async () => {
             const user = auth.currentUser;
             if (user) {
-                const canManageStaff = hasPermission(user.email, 'manage_staff');
-                const canManageReviews = hasPermission(user.email, 'manage_reviews');
-                const canManageRoles = hasPermission(user.email, 'manage_roles');
-
-                if (canManageStaff || canManageRoles) {
-                    document.getElementById('toggleOwnerBtn').classList.toggle('hidden', !canManageStaff);
-                    document.getElementById('toggleRolesBtn').classList.toggle('hidden', !canManageRoles);
-                    renderStaffList();
-                    if (canManageRoles) renderAllRoles();
-                }
-
-                if (canManageReviews) {
-                    document.getElementById('toggleReviewsBtn').classList.remove('hidden');
-                    renderAllReviews();
-                }
-
-                if (isWorker(user.email)) {
-                    adminContent.classList.remove('hidden');
-                    accessDenied.classList.add('hidden');
-                    statsContainer.classList.remove('hidden');
+                if (await isWorker(user.email)) {
+                    document.getElementById('adminContent').classList.remove('hidden');
+                    document.getElementById('accessDenied').classList.add('hidden');
                     loadOrders();
                     loadEarnings(user.email, user.uid);
                 } else {
-                    adminContent.classList.add('hidden');
-                    accessDenied.classList.remove('hidden');
-                    statsContainer.classList.add('hidden');
+                    document.getElementById('adminContent').classList.add('hidden');
+                    document.getElementById('accessDenied').classList.remove('hidden');
                 }
             } else {
-                adminContent.classList.add('hidden');
-                accessDenied.classList.remove('hidden');
-                statsContainer.classList.add('hidden');
+                document.getElementById('adminContent').classList.add('hidden');
+                document.getElementById('accessDenied').classList.remove('hidden');
             }
         };
 
