@@ -6,7 +6,7 @@ const IMGBB_API_KEY = "22d2abeb6052c5dbee3c353e6aa617c0";
 let chatUnsubscribe = null;
 let activeChatOrderId = null;
 
-const uploadToImgBB = async (file) => {
+export const uploadToImgBB = async (file) => {
     const formData = new FormData();
     formData.append("image", file);
 

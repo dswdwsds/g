@@ -66,6 +66,9 @@ export const deleteStaff = async (docId) => {
 let availableRoles = [];
 onSnapshot(collection(db, "roles"), (snapshot) => {
     availableRoles = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+}, (error) => {
+    console.warn("Roles Listener Permission Error (Likely Client):", error.message);
+    availableRoles = [];
 });
 
 export const hasPermission = (email, permission) => {

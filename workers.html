@@ -214,9 +214,10 @@
                     <button class="auth-btn" style="background:none; border:none; padding:5px; min-width:auto;"
                         onclick="toggleReviewsPanel()">✖</button>
                 </div>
-
+                <div id="allReviewsList" style="display: grid; gap: 10px; text-align: right;">
+                    <div style="text-align:center; padding: 20px;">جاري تحميل التعليقات...</div>
+                </div>
             </div>
-        </div>
         </div>
 
         <!-- لوحة إدارة الرتب (Roles Management) -->
@@ -230,12 +231,23 @@
                         onclick="toggleRolesPanel()">✖</button>
                 </div>
 
+                <!-- Role Selector -->
+                <div id="roleSelector"
+                    style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-bottom: 20px; border-bottom: 1px solid var(--glass-border); padding-bottom: 20px;">
+                    <!-- ستظهر الرتب هنا كأزرار سريعة -->
+                </div>
+
                 <!-- Form to Add/Edit Role -->
                 <div
                     style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: right;">
                     <div style="display: grid; gap: 10px; margin-bottom: 15px;">
-                        <input type="text" id="roleIdInput" placeholder="كود الرتبة (بالإنجليزي - مثلا: mod)"
-                            style="width:100%; height:45px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:white; padding:0 10px;">
+                        <div id="roleIdContainer">
+                            <input type="text" id="roleIdInput" placeholder="كود الرتبة (بالإنجليزي - مثلا: mod)"
+                                style="width:100%; height:45px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:white; padding:0 10px;">
+                        </div>
+                        <div id="editingRoleLabel" class="hidden"
+                            style="font-size: 0.8rem; color: var(--primary); margin-bottom: 5px; font-weight: bold;">
+                            جاري تعديل رتبة: <span id="currentEditingId"></span></div>
                         <input type="text" id="roleNameInput" placeholder="اسم الرتبة (بالعربي)"
                             style="width:100%; height:45px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:white; padding:0 10px;">
                         <div style="display:flex; gap:10px; align-items:center;">
@@ -259,6 +271,17 @@
                         </div>
                     </div>
 
+                    <!-- Staff with this role List -->
+                    <div id="roleMembersSection" class="hidden"
+                        style="margin-bottom: 20px; border-top: 1px solid var(--glass-border); padding-top: 15px;">
+                        <div style="font-weight:bold; margin-bottom:10px; font-size:0.9rem; color: var(--primary);">👤
+                            الموظفون بهذه الرتبة:</div>
+                        <div id="roleMembersList"
+                            style="display: grid; gap: 8px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 12px;">
+                            <!-- ستظهر إيميلات الموظفين هنا -->
+                        </div>
+                    </div>
+
                     <button class="auth-btn" style="width:100%; background:var(--primary); color:#000; font-weight:800;"
                         onclick="handleSaveRole()">حفظ الرتبة ✨</button>
                     <button id="cancelRoleEdit" class="auth-btn hidden"
@@ -266,16 +289,34 @@
                         onclick="resetRoleForm()">إلغاء التعديل</button>
                 </div>
 
-                <div id="allRolesList" style="display: grid; gap: 10px; text-align: right;">
-                    <!-- ستظهر قائمة الرتب هنا -->
-                </div>
+                <!-- Hidden List (moved to selector) -->
+                <div id="allRolesList" class="hidden"></div>
             </div>
         </div>
 
-        <div id="allReviewsList" style="display: grid; gap: 10px; text-align: right;">
-            <div style="text-align:center; padding: 20px;">جاري تحميل التعليقات...</div>
-        </div>
-        </div>
+        <!-- مودال تعديل رتب الموظف (Staff Multi-Role Edit) -->
+        <div id="staffEditModal" class="notif-overlay">
+            <div class="notif-card" style="max-width: 500px; width: 95%;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+                    <h3 style="color: var(--primary); margin: 0;">تعديل رتب الموظف ✏️</h3>
+                    <button class="auth-btn" style="background:none; border:none; padding:5px; min-width:auto;"
+                        onclick="closeStaffEditModal()">✖</button>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <div style="font-size: 0.9rem; color: var(--text-dim); margin-bottom: 5px;">الإيميل:</div>
+                    <div id="editStaffEmail" style="font-weight: bold; font-size: 1.1rem; color: #fff;"></div>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <div style="font-weight:bold; margin-bottom:10px; font-size:1rem;">اختر الرتب:</div>
+                    <div id="editStaffRolesList"
+                        style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-height: 250px; overflow-y: auto;">
+                        <!-- ستظهر الرتب المتاحة هنا كـ checkboxes -->
+                    </div>
+                </div>
+                <button class="auth-btn"
+                    style="width:100%; background:var(--primary); color:#000; font-weight:800; height: 50px;"
+                    onclick="saveStaffRoles()">حفظ التغييرات ✨</button>
+            </div>
         </div>
 
         <div id="accessDenied" class="hidden" style="text-align:center; padding: 50px;">
@@ -473,6 +514,7 @@
         // UI Helper Functions
 
         let currentOrders = [];
+        let cachedStaff = [];
 
 
         const checkAccess = () => {
@@ -546,29 +588,35 @@
         window.resetRoleForm = () => {
             document.getElementById('roleIdInput').value = '';
             document.getElementById('roleIdInput').disabled = false;
+            document.getElementById('roleIdContainer').classList.remove('hidden');
+            document.getElementById('editingRoleLabel').classList.add('hidden');
             document.getElementById('roleNameInput').value = '';
             document.getElementById('roleIconInput').value = '';
             document.getElementById('roleColorInput').value = '#00f2fe';
             document.querySelectorAll('#rolesModal input[type="checkbox"]').forEach(c => c.checked = false);
             document.getElementById('cancelRoleEdit').classList.add('hidden');
+            document.getElementById('roleMembersSection').classList.add('hidden');
+
+            // Unhighlight all selectors
+            document.querySelectorAll('.role-chip').forEach(c => c.style.borderColor = 'var(--glass-border)');
         };
 
         function renderAllRoles() {
             listenToRoles((roles) => {
-                const list = document.getElementById('allRolesList');
-                list.innerHTML = roles.map(r => `
-                    <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
-                        <div style="display:flex; align-items:center; gap:10px;">
-                            <div style="width:12px; height:12px; border-radius:50%; background:${r.color}"></div>
-                            <div style="font-weight:bold;">${r.icon} ${r.name}</div>
-                            <div style="font-size:0.75rem; color:var(--text-dim);">(${r.id})</div>
-                        </div>
-                        <div style="display:flex; gap:5px;">
-                            <button onclick="editRole('${r.id}')" style="background:#4facfe22; color:#4facfe; border:1px solid #4facfe; padding:4px 8px; border-radius:6px; font-size:0.75rem; cursor:pointer;">تعديل</button>
-                            <button onclick="handleDeleteRole('${r.id}')" style="background:#ff4d4d22; color:#ff4d4d; border:1px solid #ff4d4d; padding:4px 8px; border-radius:6px; font-size:0.75rem; cursor:pointer;">حذف</button>
-                        </div>
+                const selector = document.getElementById('roleSelector');
+                selector.innerHTML = `
+                    <div onclick="resetRoleForm()" style="cursor: pointer; background: var(--primary); color: #000; padding: 15px; border-radius: 12px; text-align: center; font-weight: bold; border: 2px solid transparent; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.3s;">
+                        <span>جديد</span> <span style="font-size: 1.2rem;">+</span>
                     </div>
-                `).join('');
+                    ${roles.map(r => `
+                        <div class="role-chip" id="chip-${r.id}" onclick="editRole('${r.id}')" style="cursor: pointer; background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px; border: 2px solid var(--glass-border); display: flex; flex-direction: column; align-items: center; transition: 0.3s; position: relative;">
+                            <span style="font-size: 1.5rem; margin-bottom: 5px;">${r.icon}</span>
+                            <span style="font-size: 0.85rem; font-weight: bold; color:${r.color}">${r.name}</span>
+                            <div style="font-size: 0.65rem; color: var(--text-dim); margin-top: 2px;">(${r.id})</div>
+                            <button onclick="event.stopPropagation(); handleDeleteRole('${r.id}')" style="position: absolute; top: -8px; right: -8px; background: #ff4d4d; color: #fff; border: 2px solid #000; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.7rem; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">✕</button>
+                        </div>
+                    `).join('')}
+                `;
 
                 // Update Staff Selector as well
                 const staffSelector = document.getElementById('newStaffRole');
@@ -590,8 +638,16 @@
             const role = roles.find(r => r.id === id);
             if (!role) return;
 
+            // Highlight selected chip
+            document.querySelectorAll('.role-chip').forEach(c => c.style.borderColor = 'var(--glass-border)');
+            const chip = document.getElementById(`chip-${id}`);
+            if (chip) chip.style.borderColor = 'var(--primary)';
+
             document.getElementById('roleIdInput').value = role.id;
-            document.getElementById('roleIdInput').disabled = true;
+            document.getElementById('roleIdContainer').classList.add('hidden');
+            document.getElementById('editingRoleLabel').classList.remove('hidden');
+            document.getElementById('currentEditingId').innerText = role.id;
+
             document.getElementById('roleNameInput').value = role.name;
             document.getElementById('roleIconInput').value = role.icon;
             document.getElementById('roleColorInput').value = role.color || '#00f2fe';
@@ -601,14 +657,41 @@
                 c.checked = role.permissions && role.permissions.includes(c.value);
             });
 
+            // Show Members
+            const members = cachedStaff.filter(s => (s.role || '').split(',').map(r => r.trim()).includes(id));
+            const membersList = document.getElementById('roleMembersList');
+            const membersSection = document.getElementById('roleMembersSection');
+
+            if (members.length > 0) {
+                membersList.innerHTML = members.map(m => `
+                    <div style="background: rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 10px; border: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center;">
+                        <div style="display: flex; align-items: center; gap: 10px; overflow: hidden;">
+                            <img src="https://ui-avatars.com/api/?name=${m.email.split('@')[0]}&background=00f2fe&color=000" style="width: 24px; height: 24px; border-radius: 50%;">
+                            <span style="font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px;">${m.email}</span>
+                        </div>
+                        <button onclick="handleEditStaff('${m.email}', '${m.role}')" style="background: var(--primary); color: #000; border: none; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; cursor: pointer; white-space: nowrap;">تعديل ✏️</button>
+                    </div>
+                `).join('');
+                membersSection.classList.remove('hidden');
+            } else {
+                membersList.innerHTML = '<div style="color: var(--text-dim); text-align: center; padding: 10px; font-size: 0.85rem;">لا يوجد موظفين بهذه الرتبة حالياً.</div>';
+                membersSection.classList.remove('hidden');
+            }
+
             document.getElementById('cancelRoleEdit').classList.remove('hidden');
             document.getElementById('rolesModal').scrollTop = 0;
         };
 
         window.handleDeleteRole = async (id) => {
-            if (!confirm(`هل أنت متأكد من حذف رتبة (${id})؟ سيعود أي موظف بهذه الرتبة إلى رتبة "عميل".`)) return;
-            const success = await deleteRoleData(id);
-            if (success) showToast("تم حذف الرتبة", "✅");
+            showConfirm(`هل أنت متأكد من حذف رتبة (${id})؟ سيعود أي موظف بهذه الرتبة إلى رتبة "عميل".`, async () => {
+                const success = await deleteRoleData(id);
+                if (success) {
+                    showToast("تم حذف الرتبة بنجاح", "✅");
+                    resetRoleForm();
+                } else {
+                    showToast("فشل في حذف الرتبة", "❌");
+                }
+            });
         };
 
         window.handleAddStaff = async (event) => {
@@ -639,28 +722,75 @@
             if (!success) alert("فشل في حذف الموظف.");
         };
 
-        window.handleEditStaff = (email, role) => {
-            newStaffEmail.value = email;
-            newStaffRole.value = role.split(',')[0] || 'staff'; // Default to first role in list if editing
-            showToast("جاري التعديل: يمكنك الآن تغيير الرتبة والضغط على حفظ", "✏️");
-            newStaffEmail.scrollIntoView({ behavior: 'smooth' });
+        window.handleEditStaff = async (email, currentRoles) => {
+            const editModal = document.getElementById('staffEditModal');
+            const emailDisplay = document.getElementById('editStaffEmail');
+            const rolesList = document.getElementById('editStaffRolesList');
+            const rolesData = await import('./auth_service.js').then(m => m.getRolesData());
+
+            emailDisplay.innerText = email;
+            const userRoles = currentRoles.split(',').map(r => r.trim()).filter(r => r);
+
+            rolesList.innerHTML = `
+                <label style="display:flex; align-items:center; gap:8px; padding:8px; background:rgba(255,255,255,0.05); border-radius:8px; cursor:pointer;">
+                    <input type="checkbox" value="owner" ${userRoles.includes('owner') ? 'checked' : ''}>
+                    <span>👑 Owner</span>
+                </label>
+                <label style="display:flex; align-items:center; gap:8px; padding:8px; background:rgba(255,255,255,0.05); border-radius:8px; cursor:pointer;">
+                    <input type="checkbox" value="admin" ${userRoles.includes('admin') ? 'checked' : ''}>
+                    <span>🛡️ Admin</span>
+                </label>
+                <label style="display:flex; align-items:center; gap:8px; padding:8px; background:rgba(255,255,255,0.05); border-radius:8px; cursor:pointer;">
+                    <input type="checkbox" value="staff" ${userRoles.includes('staff') ? 'checked' : ''}>
+                    <span>🛠️ Staff</span>
+                </label>
+                ${rolesData.map(r => `
+                    <label style="display:flex; align-items:center; gap:8px; padding:8px; background:rgba(255,255,255,0.05); border-radius:8px; cursor:pointer;">
+                        <input type="checkbox" value="${r.id}" ${userRoles.includes(r.id) ? 'checked' : ''}>
+                        <span style="color:${r.color}">${r.icon} ${r.name}</span>
+                    </label>
+                `).join('')}
+            `;
+
+            editModal.classList.add('visible');
+        };
+
+        window.closeStaffEditModal = () => {
+            document.getElementById('staffEditModal').classList.remove('visible');
+        };
+
+        window.saveStaffRoles = async () => {
+            const email = document.getElementById('editStaffEmail').innerText;
+            const checked = Array.from(document.querySelectorAll('#editStaffRolesList input[type="checkbox"]:checked')).map(c => c.value);
+            const rolesString = checked.join(',');
+
+            if (checked.length === 0) {
+                if (!confirm("لم يتم اختيار أي رتبة، هل تريد حذف هذا الموظف تماماً؟")) return;
+            }
+
+            const success = await setStaffRole(email, rolesString);
+            if (success) {
+                showToast("تم تحديث رتب الموظف بنجاح", "✅");
+                closeStaffEditModal();
+            } else {
+                showToast("فشل في تحديث الرتب", "❌");
+            }
         };
 
         function renderStaffList() {
-            listenToWorkers((staff) => {
-                const roleMap = {
-                    owner: { label: 'Owner', icon: '👑', class: 'role-owner' },
-                    dev: { label: 'Developer', icon: '💻', class: 'role-dev' },
-                    admin: { label: 'Admin', icon: '🛡️', class: 'role-admin' },
-                    staff: { label: 'Staff', icon: '🛠️', class: 'role-staff' },
-                    creator: { label: 'Creator', icon: '🎬', class: 'role-creator' }
-                };
+            listenToWorkers(async (staff) => {
+                cachedStaff = staff;
+                const rolesData = await import('./auth_service.js').then(m => m.getRolesData());
 
                 staffList.innerHTML = staff.map(s => {
                     const roles = (s.role || '').split(',').map(r => r.trim()).filter(r => r);
                     const rolesHtml = roles.map(r => {
-                        const info = roleMap[r] || { label: r, icon: '❓', class: 'role-client' };
-                        return `<span class="${info.class}">${info.icon} ${info.label}</span>`;
+                        if (r === 'owner') return `<span class="role-owner">👑 Owner</span>`;
+                        const rData = rolesData.find(rd => rd.id === r);
+                        if (rData) {
+                            return `<span style="color: ${rData.color || 'var(--primary)'}">${rData.icon || '🛡️'} ${rData.name}</span>`;
+                        }
+                        return `<span class="role-client">👤 Client (${r})</span>`;
                     }).join(', ');
 
                     return `

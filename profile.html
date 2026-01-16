@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEAM GS - ملفي الشخصي</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&family=Noto+Sans+Arabic:wght@400;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        .profile-container {
+            max-width: 800px;
+            margin: 120px auto 40px;
+            padding: 20px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .profile-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 40px;
+            backdrop-filter: blur(15px);
+            text-align: right;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .avatar-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .profile-avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 4px solid var(--primary);
+            object-fit: cover;
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.3);
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .profile-avatar:hover {
+            transform: scale(1.05);
+        }
+
+        .change-avatar-btn {
+            background: var(--primary);
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-group label {
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 0.9rem;
+        }
+
+        .input-group input,
+        .input-group textarea {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 12px 15px;
+            color: #fff;
+            outline: none;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+
+        .input-group input:focus,
+        .input-group textarea:focus {
+            border-color: var(--primary);
+        }
+
+        .save-btn {
+            margin-top: 30px;
+            width: 100%;
+            padding: 15px;
+            background: var(--primary);
+            color: #000;
+            border: none;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(0, 242, 254, 0.2);
+        }
+
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(0, 242, 254, 0.4);
+        }
+
+        .save-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="navbarContainer"></div>
+
+    <main class="profile-container">
+        <div class="profile-card">
+            <h2
+                style="margin-bottom: 30px; font-weight: 800; border-bottom: 1px solid var(--glass-border); padding-bottom: 15px;">
+                👤 تعديل الملف الشخصي</h2>
+
+            <div class="avatar-section">
+                <img id="avatarPreview" src="https://ui-avatars.com/api/?name=User&background=00f2fe&color=000"
+                    class="profile-avatar" onclick="document.getElementById('avatarInput').click()">
+                <button class="change-avatar-btn" onclick="document.getElementById('avatarInput').click()">تغيير الصورة
+                    📷</button>
+                <input type="file" id="avatarInput" hidden accept="image/*">
+            </div>
+
+            <div class="form-grid">
+                <div class="input-group">
+                    <label>الاسم المستعار</label>
+                    <input type="text" id="displayNameInput" placeholder="اكتب اسمك هنا...">
+                </div>
+                <div class="input-group">
+                    <label>تاريخ الميلاد</label>
+                    <input type="date" id="birthDateInput">
+                </div>
+            </div>
+
+            <div class="input-group" style="margin-top: 20px;">
+                <label>عني (نبذة تعريفية)</label>
+                <textarea id="bioInput" rows="4" placeholder="أخبرنا قليلاً عن نفسك..."></textarea>
+            </div>
+
+            <button id="saveProfileBtn" class="save-btn">حفظ التغييرات ✨</button>
+        </div>
+    </main>
+
+    <script type="module">
+        import { auth, db, doc, getDoc, setDoc, onAuthStateChanged, updateProfile } from './firebase-config.js';
+        import { refreshUserUI } from './ui.js';
+        import { showToast } from './ui_utils.js';
+
+        const avatarPreview = document.getElementById('avatarPreview');
+        const avatarInput = document.getElementById('avatarInput');
+        const displayNameInput = document.getElementById('displayNameInput');
+        const birthDateInput = document.getElementById('birthDateInput');
+        const bioInput = document.getElementById('bioInput');
+        const saveProfileBtn = document.getElementById('saveProfileBtn');
+
+        let selectedAvatarBase64 = null;
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Load Auth Data
+            displayNameInput.value = user.displayName || '';
+            avatarPreview.src = user.photoURL || `https://ui-avatars.com/api/?name=${user.displayName}&background=00f2fe&color=000`;
+
+            // Load Firestore Data
+            try {
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                if (userDoc.exists()) {
+                    const data = userDoc.data();
+                    birthDateInput.value = data.birthDate || '';
+                    bioInput.value = data.bio || '';
+                }
+            } catch (error) {
+                console.error("Profile Load Error:", error);
+            }
+        });
+
+        avatarInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    selectedAvatarBase64 = event.target.result;
+                    avatarPreview.src = selectedAvatarBase64;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        saveProfileBtn.onclick = async () => {
+            const user = auth.currentUser;
+            if (!user) return;
+
+            saveProfileBtn.disabled = true;
+            saveProfileBtn.innerText = "جاري الحفظ...";
+
+            try {
+                let photoURL = user.photoURL;
+
+                // 1. If new avatar selected, upload to ImgBB (or similar) through chat_service or use base64 (if small)
+                // For simplicity here, we'll use base64 if it's small or just stay with old if no upload service
+                // But wait, it's better to use an upload service.
+                // The current app uses ImgBB in chat_service.
+
+                if (selectedAvatarBase64) {
+                    const { uploadToImgBB } = await import('./chat_service.js');
+                    const uploadResult = await uploadToImgBB(avatarInput.files[0]);
+                    if (uploadResult) photoURL = uploadResult;
+                }
+
+                // 2. Update Firebase Auth
+                await updateProfile(user, {
+                    displayName: displayNameInput.value,
+                    photoURL: photoURL
+                });
+
+                // 3. Update Firestore Users Collection
+                await setDoc(doc(db, "users", user.uid), {
+                    displayName: displayNameInput.value,
+                    photoURL: photoURL,
+                    birthDate: birthDateInput.value,
+                    bio: bioInput.value,
+                    updatedAt: new Date()
+                }, { merge: true });
+
+                showToast("تم تحديث ملفك الشخصي بنجاح!", "✅");
+                refreshUserUI();
+            } catch (error) {
+                console.error("Profile Save Error:", error);
+                showToast("فشل في حفظ البيانات!", "❌");
+            } finally {
+                saveProfileBtn.disabled = false;
+                saveProfileBtn.innerText = "حفظ التغييرات ✨";
+            }
+        };
+
+        // Initialize Navbar
+        import { initNavbar } from './ui.js';
+        initNavbar();
+    </script>
+</body>
+
+</html>

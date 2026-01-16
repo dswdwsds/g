@@ -154,6 +154,7 @@ export const refreshUserUI = async () => {
                     <img src="${user.photoURL}" class="user-avatar">
                 </div>
                 <div class="dropdown-menu">
+                    <a href="profile.html">👤 ملفي الشخصي</a>
                     <a href="history.html">📦 طلباتي</a>
                     ${isStaff ? `<a href="workers.html">🛠️ لوحة العمل</a>` : ''}
                     <hr style="border:0; border-top:1px solid var(--glass-border); margin:5px 0;">

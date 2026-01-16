@@ -343,7 +343,7 @@ body::after {
     position: absolute;
     top: 100%;
     right: 0;
-    background: var(--glass);
+    background: rgba(6, 11, 19, 0.8);
     backdrop-filter: blur(20px);
     border: 1px solid var(--glass-border);
     border-radius: 15px;
