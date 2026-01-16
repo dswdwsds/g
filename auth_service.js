@@ -1,4 +1,4 @@
-import { auth, provider, signInWithPopup, signInWithRedirect, signOut } from './firebase-config.js';
+import { auth, provider, signInWithPopup, signInWithRedirect, signOut, onAuthStateChanged } from './firebase-config.js';
 import { db, doc, setDoc, deleteDoc, serverTimestamp, onSnapshot, collection } from './firebase-config.js';
 
 export const login = async () => {
