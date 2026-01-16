@@ -64,9 +64,15 @@ export const openChat = async (orderId) => {
         markMessagesAsRead(orderId, auth.currentUser?.uid);
 
         if (!chatMessages) return;
-        chatMessages.innerHTML = '';
+
+        // Use DocumentFragment to batch DOM updates and avoid Layout Thrashing (Forced Reflow)
+        const fragment = document.createDocumentFragment();
+
         if (!messages || messages.length === 0) {
-            chatMessages.innerHTML = '<div class="chat-empty">لا توجد رسائل بعد. ابدأ المحادثة الآن! 👋</div>';
+            const emptyDiv = document.createElement('div');
+            emptyDiv.className = 'chat-empty';
+            emptyDiv.textContent = 'لا توجد رسائل بعد. ابدأ المحادثة الآن! 👋';
+            fragment.appendChild(emptyDiv);
         } else {
             messages.forEach(msg => {
                 const isMe = msg.senderId === auth.currentUser?.uid;
@@ -77,22 +83,26 @@ export const openChat = async (orderId) => {
 
                 bubble.innerHTML = `
                   <div class="message-info">
-                    ${!isMe ? `<img src="${msg.senderAvatar}" style="width:15px; height:15px; border-radius:50%">` : ''}
+                    ${!isMe ? `<img src="${msg.senderAvatar}" style="width:15px; height:15px; border-radius:50%" loading="lazy">` : ''}
                     <span>${isMe ? 'أنا' : msg.senderName} • ${time}</span>
                   </div>
                   <div class="message-text">
                     ${msg.text ? `<div>${msg.text}</div>` : ''}
                     ${msg.image ? `
                       <a href="${msg.image}" target="_blank">
-                        <img src="${msg.image}" style="max-width:100%; border-radius:10px; margin-top:5px; border:1px solid var(--glass-border); cursor:pointer;">
+                        <img src="${msg.image}" style="max-width:100%; border-radius:10px; margin-top:5px; border:1px solid var(--glass-border); cursor:pointer;" loading="lazy">
                       </a>
                     ` : ''}
                   </div>
                 `;
-                chatMessages.appendChild(bubble);
+                fragment.appendChild(bubble);
             });
-            chatMessages.scrollTop = chatMessages.scrollHeight;
         }
+
+        // Single DOM update
+        chatMessages.innerHTML = '';
+        chatMessages.appendChild(fragment);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
     });
 };
 
