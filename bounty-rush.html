@@ -478,19 +478,23 @@
       openCharModal();
     };
 
+    // Pagination State
+    let currentFilteredChars = [];
+    let currentRenderCount = 0;
+    const BATCH_SIZE = 50;
+
     const openCharModal = () => {
       const CHARACTERS = getCharacters();
       const starsCriteria = TIER_STARS[selectedTier];
 
       // Filter Logic handling Array (for mix) or Number
-      let filteredChars = [];
       let titleChars = "";
 
       if (Array.isArray(starsCriteria)) {
-        filteredChars = CHARACTERS.filter(char => starsCriteria.includes(char.stars));
+        currentFilteredChars = CHARACTERS.filter(char => starsCriteria.includes(char.stars));
         titleChars = starsCriteria.map(s => s + ' نجوم').join(' و ');
       } else {
-        filteredChars = CHARACTERS.filter(char => char.stars === starsCriteria);
+        currentFilteredChars = CHARACTERS.filter(char => char.stars === starsCriteria);
         titleChars = starsCriteria + ' نجوم';
       }
 
@@ -509,20 +513,38 @@
         charGrid.parentElement.insertBefore(banner, charGrid);
       }
 
-      if (filteredChars.length === 0) {
-        charGrid.innerHTML = `
-          <div style="grid-column: 1/-1; padding: 40px; text-align: center; color: var(--text-dim);">
-            <div style="font-size: 3rem; margin-bottom: 20px;">🔍</div>
-            <p>عذراً، لا يوجد شخصيات مطابقة في قاعدة البيانات حالياً.</p>
-          </div>
-        `;
-      } else {
-        charGrid.innerHTML = filteredChars.map(char => {
-          const imageHtml = char.image
-            ? `<img src="${char.image}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;" loading="lazy">`
-            : `<span style="font-size:1.5rem;">${char.stars === 5 ? '🌟' : '⭐'.repeat(char.stars)}</span>`;
+      // Reset Pagination
+      currentRenderCount = 0;
+      charGrid.innerHTML = '';
 
-          return `
+      // Initial Render
+      renderNextBatch();
+
+      updateSelectionUI();
+      charModal.classList.add('visible');
+    };
+
+    const renderNextBatch = () => {
+      const start = currentRenderCount;
+      const end = Math.min(start + BATCH_SIZE, currentFilteredChars.length);
+      const batch = currentFilteredChars.slice(start, end);
+
+      if (batch.length === 0 && start === 0) {
+        charGrid.innerHTML = `
+              <div style="grid-column: 1/-1; padding: 40px; text-align: center; color: var(--text-dim);">
+                <div style="font-size: 3rem; margin-bottom: 20px;">🔍</div>
+                <p>عذراً، لا يوجد شخصيات مطابقة في قاعدة البيانات حالياً.</p>
+              </div>
+            `;
+        return;
+      }
+
+      const batchHTML = batch.map(char => {
+        const imageHtml = char.image
+          ? `<img src="${char.image}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;" loading="lazy">`
+          : `<span style="font-size:1.5rem;">${char.stars === 5 ? '🌟' : '⭐'.repeat(char.stars)}</span>`;
+
+        return `
           <div class="char-item ${selectedChars.has(char.id) ? 'selected' : ''}" id="char-${char.id}" onclick="toggleChar('${char.id}')">
             <div style="width:110px; height:110px; border-radius:50%; border:2px solid var(--glass-border); background: linear-gradient(135deg, var(--primary), var(--accent)); display:flex; align-items:center; justify-content:center; margin:0 auto 10px; overflow:hidden;">
               ${imageHtml}
@@ -531,12 +553,39 @@
               <div class="char-name">${char.name}</div>
               <div class="char-meta">${char.stars}★ | ${char.role}</div>
             </div>
+            <div style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.6); padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; pointer-events: none;">
+                ${selectedChars.has(char.id) ? '✅' : '➕'}
+            </div>
           </div>
         `;
-        }).join('');
+      }).join('');
+
+      // Append to grid using insertAdjacentHTML to keep existing event listeners intact if any (though here we use onclick attribute)
+      charGrid.insertAdjacentHTML('beforeend', batchHTML);
+      currentRenderCount = end;
+
+      // Manage Load More Button
+      manageLoadMoreButton();
+    };
+
+    const manageLoadMoreButton = () => {
+      let loadMoreBtn = document.getElementById('loadMoreBtn');
+      if (currentRenderCount < currentFilteredChars.length) {
+        if (!loadMoreBtn) {
+          loadMoreBtn = document.createElement('button');
+          loadMoreBtn.id = 'loadMoreBtn';
+          loadMoreBtn.innerText = 'عرض المزيد ⬇️';
+          loadMoreBtn.className = 'auth-btn';
+          loadMoreBtn.style.cssText = "grid-column: 1/-1; margin: 20px auto; width: fit-content; min-width: 200px;";
+          loadMoreBtn.onclick = renderNextBatch;
+          charGrid.parentElement.appendChild(loadMoreBtn); // Append after grid
+        } else {
+          loadMoreBtn.style.display = 'block';
+          // Move to end if needed, but it's outside grid so it stays at bottom
+        }
+      } else {
+        if (loadMoreBtn) loadMoreBtn.remove();
       }
-      updateSelectionUI();
-      charModal.classList.add('visible');
     };
 
     window.closeCharModal = () => {
