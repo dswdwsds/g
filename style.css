@@ -848,7 +848,6 @@ footer {
     height: 80px;
     border-radius: 50%;
     border: 2px solid var(--glass-border);
-    margin-bottom: 10px;
     background: #000;
 }
 
