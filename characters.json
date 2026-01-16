@@ -442,7 +442,8 @@
         "name": "شانكس - كابتن الشعر الأحمر",
         "stars": 4,
         "role": "مهاجم",
-        "element": "أحمر"
+        "element": "أحمر",
+        "image": "4stars/shanks_v3.png"
     },
     {
         "id": "035",
@@ -457,7 +458,8 @@
         "name": "أرلونغ - كابتن القراصنة",
         "stars": 4,
         "role": "مهاجم",
-        "element": "أزرق"
+        "element": "أزرق",
+        "image": "4stars/arlong.png"
     },
     {
         "id": "037",
@@ -494,7 +496,8 @@
         "name": "لوفي - 30 مليون بيري",
         "stars": 4,
         "role": "مهاجم",
-        "element": "أحمر"
+        "element": "أحمر",
+        "image": "4stars/luffy_v4.png"
     },
     {
         "id": "042",
@@ -532,14 +535,16 @@
         "name": "فيفي - قاطعة الطاووس",
         "stars": 4,
         "role": "عداء",
-        "element": "أزرق"
+        "element": "أزرق",
+        "image": "4stars/vivi_v2.png"
     },
     {
         "id": "047",
         "name": "لوفي - غوم غوم ستورم",
         "stars": 4,
         "role": "مهاجم",
-        "element": "أزرق"
+        "element": "أزرق",
+        "image": "4stars/luffy_v4.png"
     },
     {
         "id": "048",
@@ -568,7 +573,8 @@
         "name": "روبين - الآنسة أول صنداي",
         "stars": 4,
         "role": "عداء",
-        "element": "أزرق"
+        "element": "أزرق",
+        "image": "4stars/robin_v2.png"
     },
     {
         "id": "052",
@@ -596,14 +602,16 @@
         "name": "تشوبر - نقطة الذراع",
         "stars": 4,
         "role": "مهاجم",
-        "element": "أخضر"
+        "element": "أخضر",
+        "image": "4stars/chopper_v2.png"
     },
     {
         "id": "056",
         "name": "زورو - فينيكس 108 رطل",
         "stars": 4,
         "role": "مهاجم",
-        "element": "أحمر"
+        "element": "أحمر",
+        "image": "4stars/zoro_v4.png"
     },
     {
         "id": "057",
@@ -631,42 +639,48 @@
         "name": "لوفي - بعد سنتين (القبطان)",
         "stars": 4,
         "role": "مهاجم",
-        "element": "أزرق"
+        "element": "أزرق",
+        "image": "4stars/luffy_v4.png"
     },
     {
         "id": "061",
         "name": "زورو - بعد سنتين (المقاتل)",
         "stars": 4,
         "role": "مدافع",
-        "element": "أخضر"
+        "element": "أخضر",
+        "image": "4stars/zoro_v4.png"
     },
     {
         "id": "062",
         "name": "فيفي - أميرة ألاباستا",
         "stars": 4,
         "role": "عداء",
-        "element": "أزرق"
+        "element": "أزرق",
+        "image": "4stars/vivi_v2.png"
     },
     {
         "id": "063",
         "name": "نامي - بعد سنتين (الملاحة)",
         "stars": 4,
         "role": "عداء",
-        "element": "أزرق"
+        "element": "أزرق",
+        "image": "4stars/nami_wedding.png"
     },
     {
         "id": "064",
         "name": "سابو - رئيس أركان الثورة",
         "stars": 4,
         "role": "مهاجم",
-        "element": "أحمر"
+        "element": "أحمر",
+        "image": "4stars/sabo_v3.png"
     },
     {
         "id": "065",
         "name": "سانجي - بعد سنتين (الطباخ)",
         "stars": 4,
         "role": "مهاجم",
-        "element": "أحمر"
+        "element": "أحمر",
+        "image": "4stars/sanji_v2.png"
     },
     {
         "id": "066",
@@ -687,35 +701,40 @@
         "name": "كيزارو (بورسالينو) - أدميرال",
         "stars": 4,
         "role": "عداء",
-        "element": "أخضر"
+        "element": "أخضر",
+        "image": "4stars/kizaru_v2.png"
     },
     {
         "id": "069",
         "name": "تشوبر - بعد سنتين (الطبيب)",
         "stars": 4,
         "role": "عداء",
-        "element": "أزرق"
+        "element": "أزرق",
+        "image": "4stars/chopper_v2.png"
     },
     {
         "id": "070",
         "name": "روبين - بعد سنتين (عالمة الآثار)",
         "stars": 4,
         "role": "مهاجم",
-        "element": "أحمر"
+        "element": "أحمر",
+        "image": "4stars/robin_v2.png"
     },
     {
         "id": "071",
         "name": "بروك - بعد سنتين (الموسيقار)",
         "stars": 4,
         "role": "عداء",
-        "element": "أخضر"
+        "element": "أخضر",
+        "image": "4stars/brook_v2.png"
     },
     {
         "id": "072",
         "name": "فرانكي - بعد سنتين (النجار)",
         "stars": 4,
         "role": "مدافع",
-        "element": "أحمر"
+        "element": "أحمر",
+        "image": "4stars/frankymonosuke.png"
     },
     {
         "id": "073",
@@ -730,7 +749,8 @@
         "name": "هانكوك - نسخة البيكيني",
         "stars": 4,
         "role": "مهاجم",
-        "element": "أخضر"
+        "element": "أخضر",
+        "image": "4stars/hancock_v4.png"
     },
     {
         "id": "075",
@@ -744,7 +764,8 @@
         "name": "إيس - متسلل البحرية",
         "stars": 4,
         "role": "مهاجم",
-        "element": "أحمر"
+        "element": "أحمر",
+        "image": "4stars/ace_v2.png"
     },
     {
         "id": "078",
@@ -1843,83 +1864,6 @@
         "image": "4stars/sabo_v2.png"
     },
     {
-        "id": "ex_ace_yamato",
-        "name": "إيس وياماتو - نبضة النار",
-        "stars": 5,
-        "role": "مهاجم ثنائي",
-        "element": "أحمر"
-    },
-    {
-        "id": "ex_whitebeard_old",
-        "name": "إدوارد نيوجيت - القرصان العظيم",
-        "stars": 5,
-        "role": "مدافع",
-        "element": "ضوء"
-    },
-    {
-        "id": "ex_roger_old",
-        "name": "غول دي روجر - القرصان العظيم",
-        "stars": 5,
-        "role": "عداء",
-        "element": "ظلام"
-    },
-    {
-        "id": "ex_s_snake",
-        "name": "إس-سنيك - السيرابيم",
-        "stars": 5,
-        "role": "مدافع",
-        "element": "أزرق"
-    },
-    {
-        "id": "ex_lucci",
-        "name": "روب لوتشي - الهيئة المستيقظة",
-        "stars": 5,
-        "role": "عداء/مهاجم",
-        "element": "أزرق"
-    },
-    {
-        "id": "ex_shanks_god",
-        "name": "شانكس - المغادرة الإلهية",
-        "stars": 5,
-        "role": "عداء",
-        "element": "ضوء"
-    },
-    {
-        "id": "ex_garp",
-        "name": "مونكي دي غارب - البطل الأسطوري",
-        "stars": 5,
-        "role": "مدافع",
-        "element": "ضوء"
-    },
-    {
-        "id": "ex_kuzan_bb",
-        "name": "كوزان - قراصنة اللحية السوداء",
-        "stars": 5,
-        "role": "مهاجم",
-        "element": "ظلام"
-    },
-    {
-        "id": "ex_sabo_emperor",
-        "name": "سابو - إمبراطور اللهب",
-        "stars": 5,
-        "role": "مهاجم",
-        "element": "أحمر"
-    },
-    {
-        "id": "ex_kizaru_sword",
-        "name": "بورسالينو - أمانو موراكومو",
-        "stars": 5,
-        "role": "عداء",
-        "element": "أخضر"
-    },
-    {
-        "id": "ex_law_female",
-        "name": "ترافلغار لاو - الهيئة الأنثوية",
-        "stars": 5,
-        "role": "عداء",
-        "element": "ضوء"
-    },
-    {
         "id": "215",
         "name": "ياسوب (قراصنة الشعر الأحمر)",
         "stars": 4,
@@ -1950,14 +1894,6 @@
         "role": "مهاجم",
         "element": "أحمر",
         "image": "4stars/baby_5.png"
-    },
-    {
-        "id": "219",
-        "name": "نامي (فستان الزفاف)",
-        "stars": 4,
-        "role": "عداء",
-        "element": "أزرق",
-        "image": "4stars/nami_wedding.png"
     },
     {
         "id": "220",
@@ -2000,14 +1936,6 @@
         "image": "4stars/kaku_v2.png"
     },
     {
-        "id": "225",
-        "name": "فيفي (ألاباستا)",
-        "stars": 4,
-        "role": "عداء",
-        "element": "أزرق",
-        "image": "4stars/vivi_v2.png"
-    },
-    {
         "id": "226",
         "name": "جينبي (وانو/أونيغاشيما)",
         "stars": 4,
@@ -2022,14 +1950,6 @@
         "role": "مدافع",
         "element": "أزرق",
         "image": "4stars/jinbe_v3.png"
-    },
-    {
-        "id": "228",
-        "name": "زورو (وانو/رونين)",
-        "stars": 4,
-        "role": "مهاجم",
-        "element": "أخضر",
-        "image": "4stars/zoro_v4.png"
     },
     {
         "id": "229",
@@ -2048,14 +1968,6 @@
         "image": "4stars/nami_v5.png"
     },
     {
-        "id": "231",
-        "name": "تشوبر (العالم الجديد)",
-        "stars": 4,
-        "role": "عداء",
-        "element": "أزرق",
-        "image": "4stars/chopper_v2.png"
-    },
-    {
         "id": "232",
         "name": "إينواراشي (نسخة وانو)",
         "stars": 4,
@@ -2064,28 +1976,12 @@
         "image": "4stars/dogstorm_v3.png"
     },
     {
-        "id": "233",
-        "name": "روبين (أوروبي/وانو)",
-        "stars": 4,
-        "role": "عداء",
-        "element": "أزرق",
-        "image": "4stars/robin_v2.png"
-    },
-    {
         "id": "234",
         "name": "رايلي (العجوز/القياسي)",
         "stars": 4,
         "role": "مهاجم",
         "element": "أخضر",
         "image": "4stars/rayleigh_v2.png"
-    },
-    {
-        "id": "235",
-        "name": "لوفي (سنيكمان/المحرك الرابع)",
-        "stars": 4,
-        "role": "عداء",
-        "element": "أحمر",
-        "image": "4stars/luffy_v4.png"
     },
     {
         "id": "236",
@@ -2160,14 +2056,6 @@
         "image": "4stars/queen_v2.png"
     },
     {
-        "id": "245",
-        "name": "كيزارو (بورسالينو)",
-        "stars": 4,
-        "role": "عداء",
-        "element": "أخضر",
-        "image": "4stars/kizaru_v2.png"
-    },
-    {
         "id": "246",
         "name": "غان فور (إله سكايبيا)",
         "stars": 4,
@@ -2200,14 +2088,6 @@
         "image": "4stars/nami_v7.png"
     },
     {
-        "id": "250",
-        "name": "إيس (مارينفورد/القياسي)",
-        "stars": 4,
-        "role": "مهاجم",
-        "element": "أحمر",
-        "image": "4stars/ace_v2.png"
-    },
-    {
         "id": "251",
         "name": "أودين (وانو/القياسي)",
         "stars": 4,
@@ -2238,14 +2118,6 @@
         "role": "مهاجم",
         "element": "أزرق",
         "image": "4stars/katakuri_v3.png"
-    },
-    {
-        "id": "255",
-        "name": "شانكس (فيلم ريد/القياسي)",
-        "stars": 4,
-        "role": "مهاجم",
-        "element": "أزرق",
-        "image": "4stars/shanks_v3.png"
     },
     {
         "id": "256",
@@ -2294,14 +2166,6 @@
         "role": "عداء",
         "element": "أزرق",
         "image": "4stars/kuzan_v4.png"
-    },
-    {
-        "id": "262",
-        "name": "سابو (الجيش الثوري)",
-        "stars": 4,
-        "role": "مهاجم",
-        "element": "أحمر",
-        "image": "4stars/sabo_v3.png"
     },
     {
         "id": "263",
@@ -2384,14 +2248,6 @@
         "image": "4stars/kinemon_v4.png"
     },
     {
-        "id": "273",
-        "name": "سانجي (البذلة الجيرما)",
-        "stars": 4,
-        "role": "عداء",
-        "element": "أزرق",
-        "image": "4stars/sanji_v2.png"
-    },
-    {
         "id": "274",
         "name": "لاو (دريسروزا)",
         "stars": 4,
@@ -2406,14 +2262,6 @@
         "role": "مدافع",
         "element": "أخضر",
         "image": "4stars/black_maria_v2.png"
-    },
-    {
-        "id": "276",
-        "name": "بروك (ملك الروح)",
-        "stars": 4,
-        "role": "عداء",
-        "element": "أخضر",
-        "image": "4stars/brook_v2.png"
     },
     {
         "id": "277",
@@ -2446,14 +2294,6 @@
         "role": "مهاجم",
         "element": "أزرق",
         "image": "4stars/luffy_v7.png"
-    },
-    {
-        "id": "281",
-        "name": "هانكوك (القياسية)",
-        "stars": 4,
-        "role": "مهاجم",
-        "element": "أحمر",
-        "image": "4stars/hancock_v4.png"
     },
     {
         "id": "282",
@@ -2552,14 +2392,6 @@
         "image": "4stars/nekomamushi_v3.png"
     },
     {
-        "id": "294",
-        "name": "فرانكي (وانو/فرانسوكي)",
-        "stars": 4,
-        "role": "مهاجم",
-        "element": "أخضر",
-        "image": "4stars/frankymonosuke.png"
-    },
-    {
         "id": "295",
         "name": "كاروت (سولونغ)",
         "stars": 4,
@@ -2606,14 +2438,6 @@
         "role": "مهاجم",
         "element": "أخضر",
         "image": "4stars/enel_v3.png"
-    },
-    {
-        "id": "301",
-        "name": "أرلونغ (القياسي)",
-        "stars": 4,
-        "role": "مهاجم",
-        "element": "أزرق",
-        "image": "4stars/arlong.png"
     },
     {
         "id": "302",
