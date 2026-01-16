@@ -155,7 +155,7 @@
     <main class="admin-container">
         <div
             style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px; gap: 15px; flex-wrap: wrap;">
-            <h1 style="margin: 0;">إدارة الطلبات المباشرة 💼</h1>
+            <h1 style="margin: 0;">لوحة الموظفين 💼</h1>
             <div style="display: flex; gap: 10px; align-items: center;">
                 <!-- Search by Order ID -->
                 <div style="position: relative;">
@@ -169,190 +169,29 @@
                         style="padding: 10px 18px; margin-right: 10px; background: var(--secondary);">العمليات
                         📂</button>
                 </div>
-                <button id="toggleOwnerBtn" class="auth-btn hidden"
-                    style="background: var(--accent); white-space: nowrap;" onclick="toggleOwnerPanel()">⚙️ إدارة
-                    الطاقم</button>
-                <button id="toggleReviewsBtn" class="auth-btn hidden" style="background: #4facfe; white-space: nowrap;"
-                    onclick="toggleReviewsPanel()">💬 إدارة التعليقات</button>
-                <button id="toggleRolesBtn" class="auth-btn hidden" style="background: #bb86fc; white-space: nowrap;"
-                    onclick="toggleRolesPanel()">🎭 إدارة الرتب</button>
-            </div>
-        </div>
-
-        <div id="statsContainer" class="stats-grid hidden" style="margin-top: 20px;">
-            <div class="stat-card">
-                <div class="stat-value" id="totalEarnings">0 جنيه</div>
-                <div class="stat-label">أرباحك الإجمالية 💰</div>
-            </div>
-            <div class="stat-card" style="cursor: pointer;" onclick="openCompletedOrdersModal()">
-                <div class="stat-value" id="orderCount">0</div>
-                <div class="stat-label">طلبات منتهية ✅</div>
-            </div>
-        </div>
-
-        <!-- لوحة تحكم المالك (Owner) -->
-        <div id="ownerModal" class="notif-overlay">
-            <div class="notif-card" style="max-width: 600px; width: 95%; max-height: 80vh; overflow-y: auto;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
-                    <h3 style="color: var(--primary); margin: 0; display: flex; align-items: center; gap: 10px;">
-                        👑 إدارة طاقم العمل
-                    </h3>
-                    <button class="auth-btn" style="background:none; border:none; padding:5px; min-width:auto;"
-                        onclick="toggleOwnerPanel()">✖</button>
-                </div>
-
-                <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-direction: column;">
-                    <div style="display:flex; gap:10px;">
-                        <input type="email" id="newStaffEmail" placeholder="إيميل الموظف الجديد..."
-                            style="flex: 1; height: 50px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 12px; color: white; padding: 0 15px;">
-                        <select id="newStaffRole"
-                            style="height: 50px; background: var(--glass); border: 1px solid var(--glass-border); border-radius: 12px; color: white; padding: 0 10px;">
-                            <option value="staff">Staff 🛡️</option>
-                            <option value="admin">Admin 👑</option>
-                            <option value="owner">Owner 💎</option>
-                            <option value="dev">Developer 💻</option>
-                            <option value="creator">Creator 🎬</option>
-                        </select>
-                    </div>
-                    <button class="auth-btn"
-                        style="width:100%; padding:15px; background: var(--primary); color:#000; font-weight:800;"
-                        onclick="handleAddStaff(event)">حفظ بيانات الموظف</button>
-                </div>
-
-                <div id="staffList" style="display: grid; gap: 10px; text-align: left;">
-                    <!-- ستظهر قائمة الموظفين هنا -->
-                </div>
-            </div>
-        </div>
-
-        <!-- لوحة إدارة التعليقات (Reviews Management) -->
-        <div id="reviewsModal" class="notif-overlay">
-            <div class="notif-card" style="max-width: 600px; width: 95%; max-height: 80vh; overflow-y: auto;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
-                    <h3 style="color: var(--primary); margin: 0; display: flex; align-items: center; gap: 10px;">
-                        💬 إدارة تعليقات العملاء
-                    </h3>
-                    <button class="auth-btn" style="background:none; border:none; padding:5px; min-width:auto;"
-                        onclick="toggleReviewsPanel()">✖</button>
-                </div>
-                <div id="allReviewsList" style="display: grid; gap: 10px; text-align: right;">
-                    <div style="text-align:center; padding: 20px;">جاري تحميل التعليقات...</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- لوحة إدارة الرتب (Roles Management) -->
-        <div id="rolesModal" class="notif-overlay">
-            <div class="notif-card" style="max-width: 600px; width: 95%; max-height: 80vh; overflow-y: auto;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
-                    <h3 style="color: var(--primary); margin: 0; display: flex; align-items: center; gap: 10px;">
-                        🎭 إدارة الرتب والصلاحيات
-                    </h3>
-                    <button class="auth-btn" style="background:none; border:none; padding:5px; min-width:auto;"
-                        onclick="toggleRolesPanel()">✖</button>
-                </div>
-
-                <!-- Role Selector -->
-                <div id="roleSelector"
-                    style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-bottom: 20px; border-bottom: 1px solid var(--glass-border); padding-bottom: 20px;">
-                    <div onclick="resetRoleForm()"
-                        style="cursor: pointer; background: var(--primary); color: #000; padding: 15px; border-radius: 12px; text-align: center; font-weight: bold; border: 2px solid transparent; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.3s;">
-                        <span>جديد</span> <span style="font-size: 1.2rem;">+</span>
-                    </div>
-                </div>
-
-                <!-- Form to Add/Edit Role -->
-                <div
-                    style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: right;">
-                    <div style="display: grid; gap: 10px; margin-bottom: 15px;">
-                        <div id="roleIdContainer">
-                            <input type="text" id="roleIdInput" placeholder="كود الرتبة (بالإنجليزي - مثلا: mod)"
-                                style="width:100%; height:45px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:white; padding:0 10px;">
-                        </div>
-                        <div id="editingRoleLabel" class="hidden"
-                            style="font-size: 0.8rem; color: var(--primary); margin-bottom: 5px; font-weight: bold;">
-                            جاري تعديل رتبة: <span id="currentEditingId"></span></div>
-                        <input type="text" id="roleNameInput" placeholder="اسم الرتبة (بالعربي)"
-                            style="width:100%; height:45px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:white; padding:0 10px;">
-                        <div style="display:flex; gap:10px; align-items:center;">
-                            <input type="text" id="roleIconInput" placeholder="الأيقونة (Emoji)"
-                                style="flex:1; height:45px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:white; padding:0 10px;">
-                            <input type="color" id="roleColorInput"
-                                style="width:50px; height:45px; border:none; background:none; cursor:pointer;"
-                                value="#00f2fe">
-                        </div>
-                    </div>
-
-                    <div style="margin-bottom: 15px;">
-                        <div style="font-weight:bold; margin-bottom:8px; font-size:0.9rem;">الصلاحيات:</div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.85rem;">
-                            <label><input type="checkbox" value="manage_orders"> إدارة الطلبات</label>
-                            <label><input type="checkbox" value="manage_staff"> إدارة الطاقم</label>
-                            <label><input type="checkbox" value="manage_reviews"> إدارة التعليقات</label>
-                            <label><input type="checkbox" value="view_stats"> إحصائيات العمل</label>
-                            <label><input type="checkbox" value="manage_roles"> إدارة الرتب ⚠️</label>
-                            <label><input type="checkbox" value="view_ops"> سجل العمليات</label>
-                        </div>
-                    </div>
-
-                    <!-- Staff with this role List -->
-                    <div id="roleMembersSection" class="hidden"
-                        style="margin-bottom: 20px; border-top: 1px solid var(--glass-border); padding-top: 15px;">
-                        <div style="font-weight:bold; margin-bottom:10px; font-size:0.9rem; color: var(--primary);">👤
-                            الموظفون بهذه الرتبة:</div>
-                        <div id="roleMembersList"
-                            style="display: grid; gap: 8px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 12px;">
-                            <!-- ستظهر إيميلات الموظفين هنا -->
-                        </div>
-                    </div>
-
-                    <button class="auth-btn" style="width:100%; background:var(--primary); color:#000; font-weight:800;"
-                        onclick="handleSaveRole()">حفظ الرتبة ✨</button>
-                    <button id="cancelRoleEdit" class="auth-btn hidden"
-                        style="width:100%; margin-top:5px; background:rgba(255,255,255,0.1);"
-                        onclick="resetRoleForm()">إلغاء التعديل</button>
-                </div>
-                <button id="cancelRoleEdit" class="auth-btn hidden"
-                    style="width:100%; margin-top:5px; background:rgba(255,255,255,0.1);"
-                    onclick="resetRoleForm()">إلغاء التعديل</button>
-            </div>
-
-            <!-- Hidden List (moved to selector) -->
-            <div id="allRolesList" class="hidden"></div>
-        </div>
-        </div>
-
-        <!-- مودال تعديل رتب الموظف (Staff Multi-Role Edit) -->
-        <div id="staffEditModal" class="notif-overlay">
-            <div class="notif-card" style="max-width: 500px; width: 95%;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
-                    <h3 style="color: var(--primary); margin: 0;">تعديل رتب الموظف ✏️</h3>
-                    <button class="auth-btn" style="background:none; border:none; padding:5px; min-width:auto;"
-                        onclick="closeStaffEditModal()">✖</button>
-                </div>
-                <div style="margin-bottom: 20px;">
-                    <div style="font-size: 0.9rem; color: var(--text-dim); margin-bottom: 5px;">الإيميل:</div>
-                    <div id="editStaffEmail" style="font-weight: bold; font-size: 1.1rem; color: #fff;"></div>
-                </div>
-                <div style="margin-bottom: 15px;">
-                    <div style="font-weight:bold; margin-bottom:10px; font-size:1rem;">اختر الرتب:</div>
-                    <div id="editStaffRolesList"
-                        style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-height: 250px; overflow-y: auto;">
-                        <!-- ستظهر الرتب المتاحة هنا كـ checkboxes -->
-                    </div>
-                </div>
-                <button class="auth-btn"
-                    style="width:100%; background:var(--primary); color:#000; font-weight:800; height: 50px;"
-                    onclick="saveStaffRoles()">حفظ التغييرات ✨</button>
             </div>
         </div>
 
         <div id="accessDenied" class="hidden" style="text-align:center; padding: 50px;">
             <h2>عذراً، ليس لديك صلاحية الوصول لهذه الصفحة 🔒</h2>
-            <p>يرجى التأكد من تسجيل الدخول بالإيميل المعتمد.</p>
+            <p>يرجى التأكد من تسجيل الدخول بحساب موظف معتمد.</p>
         </div>
 
+        <!-- Order Content -->
         <div id="adminContent" class="hidden">
+            <!-- Personal Stats (Mini) -->
+            <div
+                style="background: var(--glass); padding: 15px; border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--glass-border);">
+                <div>
+                    <span style="color: var(--text-dim); font-size: 0.9rem;">أرباحك الحالية:</span>
+                    <span id="totalEarnings"
+                        style="color: var(--primary); font-weight: bold; font-size: 1.2rem; margin-right: 5px;">0
+                        جنيه</span>
+                </div>
+                <button onclick="openCompletedOrdersModal()" class="auth-btn" style="font-size: 0.8rem;">سجل عملياتي
+                    ✅</button>
+            </div>
+
             <div class="order-list" id="orderList">
                 <!-- Orders will load here -->
             </div>

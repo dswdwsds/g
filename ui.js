@@ -128,11 +128,11 @@ export const refreshUserUI = async () => {
 
     const user = auth.currentUser;
     if (user) {
-        const role = getUserRole(user.email) || 'client';
-        const isAdmin = role === 'admin';
-        const isStaff = role === 'staff' || isAdmin || role === 'owner';
-
         const rolesData = await import('./auth_service.js').then(m => m.getRolesData());
+        const isStaff = await isWorker(user.email);
+        const userRoles = (getUserRole(user.email) || 'client').split(',').map(r => r.trim());
+        const hasAccessToOwner = hasPermission(user.email, 'access_owner_dashboard') ||
+            userRoles.some(r => ['owner', 'admin', 'dev', 'creator'].includes(r));
 
         userInfo.innerHTML = `
             <div class="user-dropdown">
@@ -140,7 +140,7 @@ export const refreshUserUI = async () => {
                     <div class="user-details">
                         <span class="user-name">${user.displayName}</span>
                         <div class="user-role" style="display: flex; gap: 5px; flex-wrap: wrap;">
-                            ${(role || 'client').split(',').map(r => {
+                            ${userRoles.map(r => {
             const roleId = r.trim();
             const rData = rolesData.find(rd => rd.id === roleId);
             if (roleId === 'owner') return `<span class="role-owner">👑 المالك</span>`;
@@ -157,6 +157,7 @@ export const refreshUserUI = async () => {
                     <a href="profile.html">👤 ملفي الشخصي</a>
                     <a href="history.html">📦 طلباتي</a>
                     ${isStaff ? `<a href="workers.html">🛠️ لوحة العمل</a>` : ''}
+                    ${hasAccessToOwner ? `<a href="owner_dashboard.html" style="color: var(--accent);">🗝️ لوحة المالك</a>` : ''}
                     <hr style="border:0; border-top:1px solid var(--glass-border); margin:5px 0;">
                     <button onclick="handleLogout()" class="dropdown-btn logout-btn">تسجيل الخروج 🚪</button>
                 </div>
