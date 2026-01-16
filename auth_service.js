@@ -62,3 +62,30 @@ export const deleteStaff = async (docId) => {
         return false;
     }
 };
+
+let availableRoles = [];
+onSnapshot(collection(db, "roles"), (snapshot) => {
+    availableRoles = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+});
+
+export const hasPermission = (email, permission) => {
+    const staff = authorizedStaff.find(s => s.email === email || s.id === email);
+    if (!staff || !staff.role) return false;
+
+    // Owner always has all permissions
+    if (staff.role.split(',').map(r => r.trim()).includes('owner')) return true;
+
+    const userRoles = staff.role.split(',').map(r => r.trim());
+    const userPermissions = new Set();
+
+    userRoles.forEach(r => {
+        const roleData = availableRoles.find(role => role.id === r);
+        if (roleData && roleData.permissions) {
+            roleData.permissions.forEach(p => userPermissions.add(p));
+        }
+    });
+
+    return userPermissions.has(permission);
+};
+
+export const getRolesData = () => availableRoles;

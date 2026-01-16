@@ -151,6 +151,10 @@
                 <button id="toggleOwnerBtn" class="auth-btn hidden"
                     style="background: var(--accent); white-space: nowrap;" onclick="toggleOwnerPanel()">⚙️ إدارة
                     الطاقم</button>
+                <button id="toggleReviewsBtn" class="auth-btn hidden" style="background: #4facfe; white-space: nowrap;"
+                    onclick="toggleReviewsPanel()">💬 إدارة التعليقات</button>
+                <button id="toggleRolesBtn" class="auth-btn hidden" style="background: #bb86fc; white-space: nowrap;"
+                    onclick="toggleRolesPanel()">🎭 إدارة الرتب</button>
             </div>
         </div>
 
@@ -185,6 +189,8 @@
                             <option value="staff">Staff 🛡️</option>
                             <option value="admin">Admin 👑</option>
                             <option value="owner">Owner 💎</option>
+                            <option value="dev">Developer 💻</option>
+                            <option value="creator">Creator 🎬</option>
                         </select>
                     </div>
                     <button class="auth-btn"
@@ -196,6 +202,80 @@
                     <!-- ستظهر قائمة الموظفين هنا -->
                 </div>
             </div>
+        </div>
+
+        <!-- لوحة إدارة التعليقات (Reviews Management) -->
+        <div id="reviewsModal" class="notif-overlay">
+            <div class="notif-card" style="max-width: 600px; width: 95%; max-height: 80vh; overflow-y: auto;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+                    <h3 style="color: var(--primary); margin: 0; display: flex; align-items: center; gap: 10px;">
+                        💬 إدارة تعليقات العملاء
+                    </h3>
+                    <button class="auth-btn" style="background:none; border:none; padding:5px; min-width:auto;"
+                        onclick="toggleReviewsPanel()">✖</button>
+                </div>
+
+            </div>
+        </div>
+        </div>
+
+        <!-- لوحة إدارة الرتب (Roles Management) -->
+        <div id="rolesModal" class="notif-overlay">
+            <div class="notif-card" style="max-width: 600px; width: 95%; max-height: 80vh; overflow-y: auto;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+                    <h3 style="color: var(--primary); margin: 0; display: flex; align-items: center; gap: 10px;">
+                        🎭 إدارة الرتب والصلاحيات
+                    </h3>
+                    <button class="auth-btn" style="background:none; border:none; padding:5px; min-width:auto;"
+                        onclick="toggleRolesPanel()">✖</button>
+                </div>
+
+                <!-- Form to Add/Edit Role -->
+                <div
+                    style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: right;">
+                    <div style="display: grid; gap: 10px; margin-bottom: 15px;">
+                        <input type="text" id="roleIdInput" placeholder="كود الرتبة (بالإنجليزي - مثلا: mod)"
+                            style="width:100%; height:45px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:white; padding:0 10px;">
+                        <input type="text" id="roleNameInput" placeholder="اسم الرتبة (بالعربي)"
+                            style="width:100%; height:45px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:white; padding:0 10px;">
+                        <div style="display:flex; gap:10px; align-items:center;">
+                            <input type="text" id="roleIconInput" placeholder="الأيقونة (Emoji)"
+                                style="flex:1; height:45px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:white; padding:0 10px;">
+                            <input type="color" id="roleColorInput"
+                                style="width:50px; height:45px; border:none; background:none; cursor:pointer;"
+                                value="#00f2fe">
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 15px;">
+                        <div style="font-weight:bold; margin-bottom:8px; font-size:0.9rem;">الصلاحيات:</div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.85rem;">
+                            <label><input type="checkbox" value="manage_orders"> إدارة الطلبات</label>
+                            <label><input type="checkbox" value="manage_staff"> إدارة الطاقم</label>
+                            <label><input type="checkbox" value="manage_reviews"> إدارة التعليقات</label>
+                            <label><input type="checkbox" value="view_stats"> إحصائيات العمل</label>
+                            <label><input type="checkbox" value="manage_roles"> إدارة الرتب ⚠️</label>
+                            <label><input type="checkbox" value="view_ops"> سجل العمليات</label>
+                        </div>
+                    </div>
+
+                    <button class="auth-btn" style="width:100%; background:var(--primary); color:#000; font-weight:800;"
+                        onclick="handleSaveRole()">حفظ الرتبة ✨</button>
+                    <button id="cancelRoleEdit" class="auth-btn hidden"
+                        style="width:100%; margin-top:5px; background:rgba(255,255,255,0.1);"
+                        onclick="resetRoleForm()">إلغاء التعديل</button>
+                </div>
+
+                <div id="allRolesList" style="display: grid; gap: 10px; text-align: right;">
+                    <!-- ستظهر قائمة الرتب هنا -->
+                </div>
+            </div>
+        </div>
+
+        <div id="allReviewsList" style="display: grid; gap: 10px; text-align: right;">
+            <div style="text-align:center; padding: 20px;">جاري تحميل التعليقات...</div>
+        </div>
+        </div>
         </div>
 
         <div id="accessDenied" class="hidden" style="text-align:center; padding: 50px;">
@@ -272,7 +352,9 @@
             login, logout, listenToAllOrders, updateOrderStatus, isWorker,
             listenToWorkers, listenToWorkerCompletedOrders, listenToStaffStats,
             getUserRole, setStaffRole, deleteStaff, listenToUnreadCount,
-            markMessagesAsRead, leaveOrder, openChat, showToast, showConfirm
+            markMessagesAsRead, leaveOrder, openChat, showToast, showConfirm,
+            listenToAllReviews, deleteReview, listenToRoles, updateRoleData, deleteRoleData,
+            hasPermission
         } from './app.js';
         import { initSharedUI } from './ui.js';
 
@@ -396,15 +478,20 @@
         const checkAccess = () => {
             const user = auth.currentUser;
             if (user) {
-                const userRole = getUserRole(user.email);
-                const isOwnerOrAdmin = userRole === 'owner' || userRole === 'admin';
+                const canManageStaff = hasPermission(user.email, 'manage_staff');
+                const canManageReviews = hasPermission(user.email, 'manage_reviews');
+                const canManageRoles = hasPermission(user.email, 'manage_roles');
 
-                if (isOwnerOrAdmin) {
-                    document.getElementById('toggleOwnerBtn').classList.remove('hidden');
+                if (canManageStaff || canManageRoles) {
+                    document.getElementById('toggleOwnerBtn').classList.toggle('hidden', !canManageStaff);
+                    document.getElementById('toggleRolesBtn').classList.toggle('hidden', !canManageRoles);
                     renderStaffList();
-                } else {
-                    document.getElementById('toggleOwnerBtn').classList.add('hidden');
-                    ownerModal.classList.remove('visible');
+                    if (canManageRoles) renderAllRoles();
+                }
+
+                if (canManageReviews) {
+                    document.getElementById('toggleReviewsBtn').classList.remove('hidden');
+                    renderAllReviews();
                 }
 
                 if (isWorker(user.email)) {
@@ -427,6 +514,103 @@
 
         // مزامنة العمال المستمرة
         // وظائف المالك
+        window.toggleRolesPanel = () => {
+            document.getElementById('rolesModal').classList.toggle('visible');
+        };
+
+        window.handleSaveRole = async () => {
+            const roleId = document.getElementById('roleIdInput').value.trim();
+            const roleName = document.getElementById('roleNameInput').value.trim();
+            const roleIcon = document.getElementById('roleIconInput').value.trim();
+            const roleColor = document.getElementById('roleColorInput').value;
+            const checkboxes = document.querySelectorAll('#rolesModal input[type="checkbox"]:checked');
+            const permissions = Array.from(checkboxes).map(c => c.value);
+
+            if (!roleId || !roleName) return showToast("يرجى إكمال البيانات الأساسية!", "⚠️");
+
+            const success = await updateRoleData(roleId, {
+                name: roleName,
+                icon: roleIcon || '🛡️',
+                color: roleColor,
+                permissions: permissions
+            });
+
+            if (success) {
+                showToast("تم حفظ الرتبة بنجاح", "✅");
+                resetRoleForm();
+            } else {
+                showToast("فشل في حفظ الرتبة", "❌");
+            }
+        };
+
+        window.resetRoleForm = () => {
+            document.getElementById('roleIdInput').value = '';
+            document.getElementById('roleIdInput').disabled = false;
+            document.getElementById('roleNameInput').value = '';
+            document.getElementById('roleIconInput').value = '';
+            document.getElementById('roleColorInput').value = '#00f2fe';
+            document.querySelectorAll('#rolesModal input[type="checkbox"]').forEach(c => c.checked = false);
+            document.getElementById('cancelRoleEdit').classList.add('hidden');
+        };
+
+        function renderAllRoles() {
+            listenToRoles((roles) => {
+                const list = document.getElementById('allRolesList');
+                list.innerHTML = roles.map(r => `
+                    <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <div style="width:12px; height:12px; border-radius:50%; background:${r.color}"></div>
+                            <div style="font-weight:bold;">${r.icon} ${r.name}</div>
+                            <div style="font-size:0.75rem; color:var(--text-dim);">(${r.id})</div>
+                        </div>
+                        <div style="display:flex; gap:5px;">
+                            <button onclick="editRole('${r.id}')" style="background:#4facfe22; color:#4facfe; border:1px solid #4facfe; padding:4px 8px; border-radius:6px; font-size:0.75rem; cursor:pointer;">تعديل</button>
+                            <button onclick="handleDeleteRole('${r.id}')" style="background:#ff4d4d22; color:#ff4d4d; border:1px solid #ff4d4d; padding:4px 8px; border-radius:6px; font-size:0.75rem; cursor:pointer;">حذف</button>
+                        </div>
+                    </div>
+                `).join('');
+
+                // Update Staff Selector as well
+                const staffSelector = document.getElementById('newStaffRole');
+                if (staffSelector) {
+                    const currentVal = staffSelector.value;
+                    staffSelector.innerHTML = `
+                        <option value="staff">Staff 🛡️</option>
+                        <option value="admin">Admin 👑</option>
+                        <option value="owner">Owner 💎</option>
+                        ${roles.map(r => `<option value="${r.id}">${r.icon} ${r.name}</option>`).join('')}
+                    `;
+                    staffSelector.value = currentVal;
+                }
+            });
+        }
+
+        window.editRole = async (id) => {
+            const roles = await import('./auth_service.js').then(m => m.getRolesData());
+            const role = roles.find(r => r.id === id);
+            if (!role) return;
+
+            document.getElementById('roleIdInput').value = role.id;
+            document.getElementById('roleIdInput').disabled = true;
+            document.getElementById('roleNameInput').value = role.name;
+            document.getElementById('roleIconInput').value = role.icon;
+            document.getElementById('roleColorInput').value = role.color || '#00f2fe';
+
+            const checkboxes = document.querySelectorAll('#rolesModal input[type="checkbox"]');
+            checkboxes.forEach(c => {
+                c.checked = role.permissions && role.permissions.includes(c.value);
+            });
+
+            document.getElementById('cancelRoleEdit').classList.remove('hidden');
+            document.getElementById('rolesModal').scrollTop = 0;
+        };
+
+        window.handleDeleteRole = async (id) => {
+            if (!confirm(`هل أنت متأكد من حذف رتبة (${id})؟ سيعود أي موظف بهذه الرتبة إلى رتبة "عميل".`)) return;
+            const success = await deleteRoleData(id);
+            if (success) showToast("تم حذف الرتبة", "✅");
+        };
+
         window.handleAddStaff = async (event) => {
             const email = newStaffEmail.value.trim();
             const role = newStaffRole.value;
@@ -455,23 +639,91 @@
             if (!success) alert("فشل في حذف الموظف.");
         };
 
+        window.handleEditStaff = (email, role) => {
+            newStaffEmail.value = email;
+            newStaffRole.value = role.split(',')[0] || 'staff'; // Default to first role in list if editing
+            showToast("جاري التعديل: يمكنك الآن تغيير الرتبة والضغط على حفظ", "✏️");
+            newStaffEmail.scrollIntoView({ behavior: 'smooth' });
+        };
+
         function renderStaffList() {
             listenToWorkers((staff) => {
-                staffList.innerHTML = staff.map(s => `
-                    <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <div style="font-weight: bold;">${s.email}</div>
-                            <div class="user-role ${s.role === 'owner' ? 'role-owner' : (s.role === 'admin' ? 'role-admin' : 'role-staff')}" style="font-size: 0.8rem;">
-                                ${s.role === 'owner' ? '👑 Owner' : (s.role === 'admin' ? '🛡️ Admin' : '🛠️ Staff')}
+                const roleMap = {
+                    owner: { label: 'Owner', icon: '👑', class: 'role-owner' },
+                    dev: { label: 'Developer', icon: '💻', class: 'role-dev' },
+                    admin: { label: 'Admin', icon: '🛡️', class: 'role-admin' },
+                    staff: { label: 'Staff', icon: '🛠️', class: 'role-staff' },
+                    creator: { label: 'Creator', icon: '🎬', class: 'role-creator' }
+                };
+
+                staffList.innerHTML = staff.map(s => {
+                    const roles = (s.role || '').split(',').map(r => r.trim()).filter(r => r);
+                    const rolesHtml = roles.map(r => {
+                        const info = roleMap[r] || { label: r, icon: '❓', class: 'role-client' };
+                        return `<span class="${info.class}">${info.icon} ${info.label}</span>`;
+                    }).join(', ');
+
+                    return `
+                    <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+                        <div style="flex:1">
+                            <div style="font-weight: bold; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px;">${s.email}</div>
+                            <div class="user-role" style="font-size: 0.8rem; display: flex; flex-wrap: wrap; gap: 5px;">
+                                ${rolesHtml || '<span class="role-client">👤 Client</span>'}
                             </div>
                         </div>
-                        <button onclick="handleDeleteStaff('${s.id}')" style="background: #ff4d4d22; color: #ff4d4d; border: 1px solid #ff4d4d; padding: 5px 12px; border-radius: 8px; font-size: 0.8rem; cursor: pointer;">حذف 🗑️</button>
+                        <div style="display:flex; gap: 5px;">
+                            <button onclick="handleEditStaff('${s.email}', '${s.role}')" style="background: #4facfe22; color: #4facfe; border: 1px solid #4facfe; padding: 5px 10px; border-radius: 8px; font-size: 0.8rem; cursor: pointer;">تعديل ✏️</button>
+                            <button onclick="handleDeleteStaff('${s.id}')" style="background: #ff4d4d22; color: #ff4d4d; border: 1px solid #ff4d4d; padding: 5px 10px; border-radius: 8px; font-size: 0.8rem; cursor: pointer;">حذف 🗑️</button>
+                        </div>
                     </div>
-                `).join('');
+                `}).join('');
             });
         }
         listenToWorkers(() => checkAccess());
         onAuthStateChanged(auth, () => checkAccess());
+
+        window.toggleReviewsPanel = () => {
+            document.getElementById('reviewsModal').classList.toggle('visible');
+        };
+
+        function renderAllReviews() {
+            listenToAllReviews((reviews) => {
+                const list = document.getElementById('allReviewsList');
+                if (reviews.length === 0) {
+                    list.innerHTML = '<div style="text-align:center; padding: 20px; color: var(--text-dim);">لا توجد تعليقات بعد</div>';
+                    return;
+                }
+
+                list.innerHTML = reviews.map(r => `
+                    <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 15px; border-radius: 12px;">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <img src="${r.userAvatar || 'https://ui-avatars.com/api/?name=' + r.userName}" style="width:30px; height:30px; border-radius:50%; border:1px solid var(--primary);">
+                                <div>
+                                    <div style="font-weight:bold; font-size:0.9rem;">${r.userName}</div>
+                                    <div style="color:var(--text-dim); font-size:0.75rem;">${new Date(r.createdAt?.seconds * 1000).toLocaleString('ar-EG')}</div>
+                                </div>
+                            </div>
+                            <button onclick="handleDeleteReview('${r.id}')" style="background:#ff4d4d22; color:#ff4d4d; border:1px solid #ff4d4d; padding:4px 10px; border-radius:8px; font-size:0.8rem; cursor:pointer;">حذف ✨</button>
+                        </div>
+                        <div style="margin-bottom:8px;">${'⭐'.repeat(r.rating || 0)}</div>
+                        <div style="font-size:0.9rem; line-height:1.5; color:#fff; background:rgba(255,255,255,0.02); padding:10px; border-radius:8px;">
+                            ${r.text || r.comment || 'بدون نص'}
+                        </div>
+                    </div>
+                `).join('');
+            });
+        }
+
+        window.handleDeleteReview = async (id) => {
+            if (!confirm("هل أنت متأكد من حذف هذا التعليق؟ لا يمكن التراجع عن هذا العمل.")) return;
+            const success = await deleteReview(id);
+            if (success) {
+                showToast("تم حذف التعليق بنجاح", "✅");
+            } else {
+                showToast("فشل حذف التعليق", "❌");
+            }
+        };
 
         window.toggleEarningsModal = () => {
             earningsModal.classList.toggle('visible');

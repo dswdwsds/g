@@ -43,3 +43,41 @@ export const listenToRecentReviews = (callback) => {
         callback(reviews);
     });
 };
+export const listenToAllReviews = (callback) => {
+    const q = query(
+        collection(db, "comments"),
+        orderBy("createdAt", "desc")
+    );
+    return onSnapshot(q, (snapshot) => {
+        const reviews = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        callback(reviews);
+    });
+};
+
+export const listenToRoles = (callback) => {
+    return onSnapshot(collection(db, "roles"), (snapshot) => {
+        const roles = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        callback(roles);
+    });
+};
+
+export const updateRoleData = async (roleId, data) => {
+    try {
+        const roleRef = doc(db, "roles", roleId);
+        await setDoc(roleRef, data, { merge: true });
+        return true;
+    } catch (error) {
+        console.error("Update Role Error:", error);
+        return false;
+    }
+};
+
+export const deleteRoleData = async (roleId) => {
+    try {
+        await deleteDoc(doc(db, "roles", roleId));
+        return true;
+    } catch (error) {
+        console.error("Delete Role Error:", error);
+        return false;
+    }
+};

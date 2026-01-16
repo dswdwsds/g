@@ -426,10 +426,31 @@ body::after {
     font-weight: bold;
 }
 
-.role-owner { color: #ffd700 !important; text-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
-.role-admin { color: #4facfe !important; }
-.role-staff { color: #00ff9d !important; }
-.role-client { color: var(--text-dim) !important; }
+.role-owner {
+    color: #ffd700 !important;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+.role-dev {
+    color: #bb86fc !important;
+    text-shadow: 0 0 10px rgba(187, 134, 252, 0.3);
+}
+
+.role-admin {
+    color: #4facfe !important;
+}
+
+.role-staff {
+    color: #00ff9d !important;
+}
+
+.role-creator {
+    color: #ffab40 !important;
+}
+
+.role-client {
+    color: var(--text-dim) !important;
+}
 
 .dropdown-menu a,
 .dropdown-btn {
@@ -1339,4 +1360,64 @@ footer {
     padding: 30px;
     color: var(--text-dim);
     font-size: 0.9rem;
+}
+
+/* Floating Support Button */
+.floating-support-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: #000;
+    box-shadow: 0 10px 25px rgba(0, 242, 254, 0.4);
+    z-index: 2000;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    text-align: center;
+}
+
+.floating-support-btn:hover {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 15px 35px rgba(0, 242, 254, 0.6);
+}
+
+.floating-support-btn span:first-child {
+    font-size: 1.8rem;
+    line-height: 1;
+}
+
+.floating-support-btn span:last-child {
+    font-size: 0.6rem;
+    font-weight: 800;
+    margin-top: 2px;
+    width: 100%;
+    padding: 0 5px;
+    line-height: 1.1;
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .floating-support-btn {
+        width: 60px;
+        height: 60px;
+        bottom: 20px;
+        right: 20px;
+    }
+
+    .floating-support-btn span:first-child {
+        font-size: 1.5rem;
+    }
+
+    .floating-support-btn span:last-child {
+        font-size: 0.5rem;
+    }
 }

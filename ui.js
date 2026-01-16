@@ -132,14 +132,24 @@ export const refreshUserUI = async () => {
         const isAdmin = role === 'admin';
         const isStaff = role === 'staff' || isAdmin || role === 'owner';
 
+        const rolesData = await import('./auth_service.js').then(m => m.getRolesData());
+
         userInfo.innerHTML = `
             <div class="user-dropdown">
                 <div class="user-trigger">
                     <div class="user-details">
                         <span class="user-name">${user.displayName}</span>
-                        <span class="user-role ${role === 'owner' ? 'role-owner' : (role === 'admin' ? 'role-admin' : (role === 'staff' ? 'role-staff' : 'role-client'))}">
-                            ${role === 'owner' ? '👑 المالك' : (role === 'admin' ? '🛡️ مدير النظام' : (role === 'staff' ? '🛠️ موظف' : '👤 عميل'))}
-                        </span>
+                        <div class="user-role" style="display: flex; gap: 5px; flex-wrap: wrap;">
+                            ${(role || 'client').split(',').map(r => {
+            const roleId = r.trim();
+            const rData = rolesData.find(rd => rd.id === roleId);
+            if (roleId === 'owner') return `<span class="role-owner">👑 المالك</span>`;
+            if (rData) {
+                return `<span style="color: ${rData.color || 'var(--primary)'}">${rData.icon || '🛡️'} ${rData.name}</span>`;
+            }
+            return `<span class="role-client">👤 عميل</span>`;
+        }).join('')}
+                        </div>
                     </div>
                     <img src="${user.photoURL}" class="user-avatar">
                 </div>
