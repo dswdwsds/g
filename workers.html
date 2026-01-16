@@ -234,7 +234,10 @@
                 <!-- Role Selector -->
                 <div id="roleSelector"
                     style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-bottom: 20px; border-bottom: 1px solid var(--glass-border); padding-bottom: 20px;">
-                    <!-- ستظهر الرتب هنا كأزرار سريعة -->
+                    <div onclick="resetRoleForm()"
+                        style="cursor: pointer; background: var(--primary); color: #000; padding: 15px; border-radius: 12px; text-align: center; font-weight: bold; border: 2px solid transparent; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.3s;">
+                        <span>جديد</span> <span style="font-size: 1.2rem;">+</span>
+                    </div>
                 </div>
 
                 <!-- Form to Add/Edit Role -->
@@ -288,10 +291,14 @@
                         style="width:100%; margin-top:5px; background:rgba(255,255,255,0.1);"
                         onclick="resetRoleForm()">إلغاء التعديل</button>
                 </div>
-
-                <!-- Hidden List (moved to selector) -->
-                <div id="allRolesList" class="hidden"></div>
+                <button id="cancelRoleEdit" class="auth-btn hidden"
+                    style="width:100%; margin-top:5px; background:rgba(255,255,255,0.1);"
+                    onclick="resetRoleForm()">إلغاء التعديل</button>
             </div>
+
+            <!-- Hidden List (moved to selector) -->
+            <div id="allRolesList" class="hidden"></div>
+        </div>
         </div>
 
         <!-- مودال تعديل رتب الموظف (Staff Multi-Role Edit) -->
