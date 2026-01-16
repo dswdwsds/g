@@ -449,7 +449,8 @@
         "name": "ياسوب - قناص الشعر الأحمر",
         "stars": 4,
         "role": "عداء",
-        "element": "أخضر"
+        "element": "أخضر",
+        "image": "4stars/yasopp.png"
     },
     {
         "id": "036",
@@ -463,14 +464,16 @@
         "name": "كايا - فتاة قرية سيروب",
         "stars": 4,
         "role": "مدافع",
-        "element": "أزرق"
+        "element": "أزرق",
+        "image": "4stars/kaya.png"
     },
     {
         "id": "038",
         "name": "ميهوك - أقوى سياف",
         "stars": 4,
         "role": "مهاجم",
-        "element": "أحمر"
+        "element": "أحمر",
+        "image": "4stars/mihawk.png"
     },
     {
         "id": "039",
@@ -498,21 +501,24 @@
         "name": "كروكودايل - أمير الصحراء",
         "stars": 4,
         "role": "مدافع",
-        "element": "أزرق"
+        "element": "أزرق",
+        "image": "4stars/croc_alabasta.png"
     },
     {
         "id": "043",
         "name": "إينيل - الإله (كامي)",
         "stars": 4,
         "role": "مهاجم",
-        "element": "أخضر"
+        "element": "أخضر",
+        "image": "4stars/enel.png"
     },
     {
         "id": "044",
         "name": "إدوارد نيوجيت - اللحية البيضاء",
         "stars": 4,
         "role": "مدافع",
-        "element": "أحمر"
+        "element": "أحمر",
+        "image": "4stars/whitebeard.png"
     },
     {
         "id": "045",
@@ -540,7 +546,8 @@
         "name": "زورو - أسلوب السيف الواحد",
         "stars": 4,
         "role": "مهاجم",
-        "element": "أخضر"
+        "element": "أخضر",
+        "image": "4stars/zoro_pre.png"
     },
     {
         "id": "049",
@@ -715,7 +722,8 @@
         "name": "نامي - نسخة البيكيني",
         "stars": 4,
         "role": "عداء",
-        "element": "أزرق"
+        "element": "أزرق",
+        "image": "4stars/nami_swimsuit.png"
     },
     {
         "id": "074",
@@ -743,7 +751,1096 @@
         "name": "كروكودايل - سجين إمبيل داون",
         "stars": 4,
         "role": "مدافع",
-        "element": "أخضر"
+        "element": "أخضر",
+        "image": "4stars/croc_prison.png"
+    },
+    {
+        "id": "079",
+        "name": "سوغيكينغ - ملك القناصين",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أحمر",
+        "image": "4stars/sogeking.png"
+    },
+    {
+        "id": "080",
+        "name": "كينيمون - كابتن غمد الثعلب",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أخضر",
+        "image": "4stars/kinemon.png"
+    },
+    {
+        "id": "081",
+        "name": "ترافلغار لاو - نسخة دريسروزا",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أحمر",
+        "image": "4stars/law_dressrosa.png"
+    },
+    {
+        "id": "082",
+        "name": "الآنسة غولدن ويك",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أزرق",
+        "image": "4stars/miss_goldenweek.png"
+    },
+    {
+        "id": "083",
+        "name": "توني توني تشوبر - هيئة الوحش",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أحمر",
+        "image": "4stars/chopper_monster.png"
+    },
+    {
+        "id": "084",
+        "name": "نيكو روبين - نسخة إنيس لوبي",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أخضر",
+        "image": "4stars/robin_enies.png"
+    },
+    {
+        "id": "085",
+        "name": "تشارلوت بيروسبيرو",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أخضر",
+        "image": "4stars/perospero.png"
+    },
+    {
+        "id": "086",
+        "name": "رورونوا زورو - نسخة جزيرة السماء",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أزرق",
+        "image": "4stars/zoro_skypiea.png"
+    },
+    {
+        "id": "087",
+        "name": "الجنرال فرانكي",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أزرق",
+        "image": "4stars/gen_franky.png"
+    },
+    {
+        "id": "088",
+        "name": "كانجورو - المساء الكئيب",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أحمر",
+        "image": "4stars/kanjuro.png"
+    },
+    {
+        "id": "089",
+        "name": "تشارلوت كاتاكوري",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أزرق",
+        "image": "4stars/katakuri.png"
+    },
+    {
+        "id": "090",
+        "name": "كينيمون - هيئة النار",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أحمر",
+        "image": "4stars/kinemon_v2.png"
+    },
+    {
+        "id": "091",
+        "name": "نيكوماموشي",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أخضر",
+        "image": "4stars/nekomamushi.png"
+    },
+    {
+        "id": "092",
+        "name": "مونكي دي لوفي - نسخة وانو",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أحمر",
+        "image": "4stars/luffy_haki.png"
+    },
+    {
+        "id": "093",
+        "name": "يوتار - نسخة فيلم ريد",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أحمر",
+        "image": "4stars/uta.png"
+    },
+    {
+        "id": "094",
+        "name": "سكر - نسخة دريسروزا",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أزرق",
+        "image": "4stars/sugar.png"
+    },
+    {
+        "id": "095",
+        "name": "كوين - الوباء",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أزرق",
+        "image": "4stars/queen.png"
+    },
+    {
+        "id": "096",
+        "name": "فوكسي - الثعلب الفضي",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أخضر",
+        "image": "4stars/foxy.png"
+    },
+    {
+        "id": "097",
+        "name": "فينسموك جادج",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أحمر",
+        "image": "4stars/judge.png"
+    },
+    {
+        "id": "098",
+        "name": "نامي - نسخة ستامبيد",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أزرق",
+        "image": "4stars/nami_stampede.png"
+    },
+    {
+        "id": "099",
+        "name": "فيغبونك - ستيلا",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "ضوء",
+        "image": "4stars/vegapunk.png"
+    },
+    {
+        "id": "100",
+        "name": "نيبتون - ملك جزيرة البرمائيين",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أزرق",
+        "image": "4stars/neptune.png"
+    },
+    {
+        "id": "101",
+        "name": "هودي جونز",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أحمر",
+        "image": "4stars/hody_jones.png"
+    },
+    {
+        "id": "102",
+        "name": "دون تشينجاو",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أزرق",
+        "image": "4stars/chinjao.png"
+    },
+    {
+        "id": "103",
+        "name": "إدوارد نيوجيت - نسخة اللحية البيضاء الشاب",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أزرق",
+        "image": "4stars/whitebeard_v2.png"
+    },
+    {
+        "id": "104",
+        "name": "مونكي دي لوفي - لوفيتارو",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أحمر",
+        "image": "4stars/luffytaro.png"
+    },
+    {
+        "id": "105",
+        "name": "باجي وان",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أزرق",
+        "image": "4stars/page_one.png"
+    },
+    {
+        "id": "106",
+        "name": "بارثولوميو كوما",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أزرق",
+        "image": "4stars/kuma.png"
+    },
+    {
+        "id": "107",
+        "name": "فينسموك سانجي - نسخة الزفاف",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أحمر",
+        "image": "4stars/sanji_wedding.png"
+    },
+    {
+        "id": "108",
+        "name": "سموكر وتاشيغي - نسخة ستامبيد",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أزرق",
+        "image": "4stars/smoker_tashigi.png"
+    },
+    {
+        "id": "109",
+        "name": "إكس دريك",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أزرق",
+        "image": "4stars/x_drake.png"
+    },
+    {
+        "id": "110",
+        "name": "يوسوب - يوساهاتشي",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أزرق",
+        "image": "4stars/usahachi.png"
+    },
+    {
+        "id": "111",
+        "name": "كافينديش - خيول الصحراء",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أزرق",
+        "image": "4stars/cavendish.png"
+    },
+    {
+        "id": "112",
+        "name": "يوستاس كيد - نسخة وانو",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أحمر",
+        "image": "4stars/kid_v2.png"
+    },
+    {
+        "id": "113",
+        "name": "إيس وماركو - نسخة التحالف",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أزرق",
+        "image": "4stars/ace_marco.png"
+    },
+    {
+        "id": "114",
+        "name": "نامي - أونامي",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أزرق",
+        "image": "4stars/onami.png"
+    },
+    {
+        "id": "115",
+        "name": "توني توني تشوبر - تشوبيرمون",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أزرق",
+        "image": "4stars/choppemon.png"
+    },
+    {
+        "id": "116",
+        "name": "إيس وماركو - نسخة التحالف (V2)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أزرق",
+        "image": "4stars/ace_marco_v2.png"
+    },
+    {
+        "id": "117",
+        "name": "كينغ - الحريق",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أحمر",
+        "image": "4stars/king.png"
+    },
+    {
+        "id": "118",
+        "name": "فينسموك ريجو - السم الوردي",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أزرق",
+        "image": "4stars/reiju.png"
+    },
+    {
+        "id": "119",
+        "name": "دون كيهوتي دوفلامينغو - الياكشا السماوي",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أحمر",
+        "image": "4stars/doflamingo.png"
+    },
+    {
+        "id": "120",
+        "name": "جوراكيل ميهوك - نسخة المارينفورد",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أخضر",
+        "image": "4stars/mihawk_v2.png"
+    },
+    {
+        "id": "121",
+        "name": "كاروت - نسخة قبيلة المنك",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أخضر",
+        "image": "4stars/carrot.png"
+    },
+    {
+        "id": "122",
+        "name": "ترافلغار لاو - لاوتارو",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أخضر",
+        "image": "4stars/law_wano.png"
+    },
+    {
+        "id": "123",
+        "name": "نيكو روبين - نسخة الكريسماس",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أحمر",
+        "image": "4stars/robin_santa.png"
+    },
+    {
+        "id": "124",
+        "name": "روب لوتشي - نسخة CP0",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أحمر",
+        "image": "4stars/lucci_cp0.png"
+    },
+    {
+        "id": "125",
+        "name": "جيسوس بورغيس",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أخضر",
+        "image": "4stars/burgess.png"
+    },
+    {
+        "id": "126",
+        "name": "سينيور بينك",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أخضر",
+        "image": "4stars/senor_pink.png"
+    },
+    {
+        "id": "127",
+        "name": "شارلوت لينلين - البيغ مام",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أزرق",
+        "image": "4stars/big_mom.png"
+    },
+    {
+        "id": "128",
+        "name": "إينواراشي",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أحمر",
+        "image": "4stars/inuarashi.png"
+    },
+    {
+        "id": "129",
+        "name": "بيرونا - نسخة عالم الأشباح",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أخضر",
+        "image": "4stars/perona_v2.png"
+    },
+    {
+        "id": "130",
+        "name": "بيل-مير",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أخضر",
+        "image": "4stars/bellemere.png"
+    },
+    {
+        "id": "131",
+        "name": "بينثام (مستر 2) - نسخة إمبيل داون",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أزرق",
+        "image": "4stars/bon_clay_v2.png"
+    },
+    {
+        "id": "132",
+        "name": "مونكي دي لوفي - سنيكمان",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أحمر",
+        "image": "4stars/luffy_snakeman.png"
+    },
+    {
+        "id": "133",
+        "name": "جوزو - الألماس",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أزرق",
+        "image": "4stars/jozu.png"
+    },
+    {
+        "id": "134",
+        "name": "نيكوماموشي - نسخة التحالف (V2)",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أخضر",
+        "image": "4stars/nekomamushi_v2.png"
+    },
+    {
+        "id": "135",
+        "name": "شينوبو",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أحمر",
+        "image": "4stars/shinobu.png"
+    },
+    {
+        "id": "136",
+        "name": "أوروج - الراهب المجنون",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أحمر",
+        "image": "4stars/urouge.png"
+    },
+    {
+        "id": "137",
+        "name": "مونكي دي لوفي - باونسمان",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أخضر",
+        "image": "4stars/luffy_bounceman.png"
+    },
+    {
+        "id": "138",
+        "name": "يوسوب - نسخة أرض وانو",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أخضر",
+        "image": "4stars/usopp_v2.png"
+    },
+    {
+        "id": "139",
+        "name": "بوا هانكوك - إمبراطورة القراصنة",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أزرق",
+        "image": "4stars/hancock.png"
+    },
+    {
+        "id": "140",
+        "name": "سكر - نسخة دريسروزا (V2)",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أحمر",
+        "image": "4stars/sugar_v2.png"
+    },
+    {
+        "id": "141",
+        "name": "توني توني تشوبر - هيئة القرن",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أحمر",
+        "image": "4stars/chopper_horn.png"
+    },
+    {
+        "id": "142",
+        "name": "ياسوب - نسخة فيلم ريد",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أزرق",
+        "image": "4stars/yasopp_v2.png"
+    },
+    {
+        "id": "143",
+        "name": "تشارلوت كراكر",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أزرق",
+        "image": "4stars/cracker.png"
+    },
+    {
+        "id": "144",
+        "name": "شيريو المطر",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أزرق",
+        "image": "4stars/shiryu.png"
+    },
+    {
+        "id": "145",
+        "name": "باجي وان - نسخة أرض وانو",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أخضر",
+        "image": "4stars/page_one_v2.png"
+    },
+    {
+        "id": "146",
+        "name": "كروكودايل - نسخة المارينفورد",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أحمر",
+        "image": "4stars/croc_marineford.png"
+    },
+    {
+        "id": "147",
+        "name": "رورونوا زورو - نسخة دريسروزا",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أزرق",
+        "image": "4stars/zoro_v3.png"
+    },
+    {
+        "id": "148",
+        "name": "تشارلوت كاتاكوري (V2)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أخضر",
+        "image": "4stars/katakuri_v2.png"
+    },
+    {
+        "id": "149",
+        "name": "بارثولوميو كوما (V2)",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أزرق",
+        "image": "4stars/kuma_v2.png"
+    },
+    {
+        "id": "150",
+        "name": "أوز الصغير الابن",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أحمر",
+        "image": "4stars/oars_jr.png"
+    },
+    {
+        "id": "151",
+        "name": "إليزابيلو الثاني",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أزرق",
+        "image": "4stars/elisabello.png"
+    },
+    {
+        "id": "152",
+        "name": "أرلونج - قراصنة أرلونج (V2)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أزرق",
+        "image": "4stars/arlong_v2.png"
+    },
+    {
+        "id": "153",
+        "name": "كوالا",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أخضر",
+        "image": "4stars/koala.png"
+    },
+    {
+        "id": "154",
+        "name": "مونكي دي غارب (V2)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أحمر",
+        "image": "4stars/garp_v2.png"
+    },
+    {
+        "id": "155",
+        "name": "بروك - نسخة جزيرة الكعكة الكاملة",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أخضر",
+        "image": "4stars/brook_wci.png"
+    },
+    {
+        "id": "156",
+        "name": "بورتغاس دي إيس - نسخة المارين",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أحمر",
+        "image": "4stars/ace_marine.png"
+    },
+    {
+        "id": "157",
+        "name": "سابو - نسخة ستامبيد",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أزرق",
+        "image": "4stars/sabo_stampede.png"
+    },
+    {
+        "id": "158",
+        "name": "كيروس - جندي الرعد",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أحمر",
+        "image": "4stars/kyros.png"
+    },
+    {
+        "id": "159",
+        "name": "فيستا - سيف الورد",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أزرق",
+        "image": "4stars/vista.png"
+    },
+    {
+        "id": "160",
+        "name": "وابول",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أحمر",
+        "image": "4stars/wapol.png"
+    },
+    {
+        "id": "161",
+        "name": "كافيندیش (V2)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أزرق",
+        "image": "4stars/cavendish_v2.png"
+    },
+    {
+        "id": "162",
+        "name": "بوا هانكوك (V2)",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أحمر",
+        "image": "4stars/hancock_v2.png"
+    },
+    {
+        "id": "163",
+        "name": "إيفانكوف",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أزرق",
+        "image": "4stars/ivankov.png"
+    },
+    {
+        "id": "164",
+        "name": "يوتا (V2)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أحمر",
+        "image": "4stars/uta_v2.png"
+    },
+    {
+        "id": "165",
+        "name": "كاروت (V2)",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أخضر",
+        "image": "4stars/carrot_v2.png"
+    },
+    {
+        "id": "166",
+        "name": "كورازون",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أزرق",
+        "image": "4stars/corazon.png"
+    },
+    {
+        "id": "167",
+        "name": "مونيه",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أحمر",
+        "image": "4stars/monet.png"
+    },
+    {
+        "id": "168",
+        "name": "بيلو بيتي",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أزرق",
+        "image": "4stars/belo_betty.png"
+    },
+    {
+        "id": "169",
+        "name": "فاندر ديكن التاسع",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أحمر",
+        "image": "4stars/vander_decken.png"
+    },
+    {
+        "id": "170",
+        "name": "شانكس - نسخة المارينفورد",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أزرق",
+        "image": "4stars/shanks_v2.png"
+    },
+    {
+        "id": "171",
+        "name": "لوفي ولاو - تحالف دريسروزا",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أزرق",
+        "image": "4stars/luffy_law.png"
+    },
+    {
+        "id": "172",
+        "name": "مونكي دي لوفي - أسطح القصور",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أزرق",
+        "image": "4stars/luffy_rooftop.png"
+    },
+    {
+        "id": "173",
+        "name": "بينثام (مستر 2)",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أزرق",
+        "image": "4stars/bon_clay.png"
+    },
+    {
+        "id": "174",
+        "name": "نامي - نسخة أرض وانو (V2)",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أخضر",
+        "image": "4stars/onami_v2.png"
+    },
+    {
+        "id": "175",
+        "name": "فرانكي - فراتوسوكي",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أزرق",
+        "image": "4stars/franosuke.png"
+    },
+    {
+        "id": "176",
+        "name": "ترافلجار لاو - نسخة أرض وانو (V2)",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أحمر",
+        "image": "4stars/law_wano_v2.png"
+    },
+    {
+        "id": "177",
+        "name": "كيلر - كامازو السفاح",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أخضر",
+        "image": "4stars/kamazo.png"
+    },
+    {
+        "id": "178",
+        "name": "تيفاري - نسخة ريفيري",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أزرق",
+        "image": "4stars/vivi_reverie.png"
+    },
+    {
+        "id": "179",
+        "name": "دينجيرو - كيوشيرو",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أزرق",
+        "image": "4stars/denjiro.png"
+    },
+    {
+        "id": "180",
+        "name": "هيلميبو (V2)",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أزرق",
+        "image": "4stars/helmeppo_v2.png"
+    },
+    {
+        "id": "181",
+        "name": "تشارلوت أوفين",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أحمر",
+        "image": "4stars/oven.png"
+    },
+    {
+        "id": "182",
+        "name": "أوز - قراصنة تريلر بارك",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أزرق",
+        "image": "4stars/oars.png"
+    },
+    {
+        "id": "183",
+        "name": "كوزان (V2)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أخضر",
+        "image": "4stars/kuzan_v2.png"
+    },
+    {
+        "id": "184",
+        "name": "سينتومارو",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أخضر",
+        "image": "4stars/sentomaru.png"
+    },
+    {
+        "id": "185",
+        "name": "روب لوتشي - CP0 (V2)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أحمر",
+        "image": "4stars/lucci_v2.png"
+    },
+    {
+        "id": "186",
+        "name": "كاواماتسو",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أخضر",
+        "image": "4stars/kawamatsu.png"
+    },
+    {
+        "id": "187",
+        "name": "ترافلجار لاو (V3)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أخضر",
+        "image": "4stars/law_v3.png"
+    },
+    {
+        "id": "188",
+        "name": "سابو - لوسي",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أحمر",
+        "image": "4stars/sabo_lucy.png"
+    },
+    {
+        "id": "189",
+        "name": "ليليث - بانك 06",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أحمر",
+        "image": "4stars/lilith.png"
+    },
+    {
+        "id": "190",
+        "name": "تشوبر - رجل الثلج",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أزرق",
+        "image": "4stars/chopper_snowman.png"
+    },
+    {
+        "id": "191",
+        "name": "تريبول",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أزرق",
+        "image": "4stars/trebol.png"
+    },
+    {
+        "id": "192",
+        "name": "إكس دريك (V2)",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أزرق",
+        "image": "4stars/x_drake_v2.png"
+    },
+    {
+        "id": "193",
+        "name": "نيكو روبين - أوروبي",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أحمر",
+        "image": "4stars/orobi.png"
+    },
+    {
+        "id": "194",
+        "name": "ساكازوكي (أكاينو)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أحمر",
+        "image": "4stars/akainu.png"
+    },
+    {
+        "id": "195",
+        "name": "كيلر (V2)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أخضر",
+        "image": "4stars/killer_v2.png"
+    },
+    {
+        "id": "196",
+        "name": "كوالا",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أزرق",
+        "image": "4stars/koala.png"
+    },
+    {
+        "id": "197",
+        "name": "كينيمون - نسخة أونيغاشيما",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أخضر",
+        "image": "4stars/kinemon_onigashima.png"
+    },
+    {
+        "id": "198",
+        "name": "ماركو - نسخة المارينفورد",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أزرق",
+        "image": "4stars/marco.png"
+    },
+    {
+        "id": "199",
+        "name": "ماجيلان",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أزرق",
+        "image": "4stars/magellan.png"
+    },
+    {
+        "id": "200",
+        "name": "بارتولوميو",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أخضر",
+        "image": "4stars/bartolomeo.png"
+    },
+    {
+        "id": "201",
+        "name": "بودينغ - فستان الزفاف",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أحمر",
+        "image": "4stars/pudding_wedding.png"
+    },
+    {
+        "id": "202",
+        "name": "كاكو - نسخة الزرافة",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أخضر",
+        "image": "4stars/kaku.png"
+    },
+    {
+        "id": "203",
+        "name": "بلاك ماريا",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أحمر",
+        "image": "4stars/black_maria.png"
+    },
+    {
+        "id": "204",
+        "name": "غيكو موريا",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أزرق",
+        "image": "4stars/moria.png"
+    },
+    {
+        "id": "205",
+        "name": "سموكر (V2)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أخضر",
+        "image": "4stars/smoker_v2.png"
+    },
+    {
+        "id": "206",
+        "name": "دراكول ميهوك - نسخة المارينفورد",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أحمر",
+        "image": "4stars/mihawk_marineford.png"
+    },
+    {
+        "id": "207",
+        "name": "تاشيغي (V2)",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أزرق",
+        "image": "4stars/tashigi_v2.png"
+    },
+    {
+        "id": "208",
+        "name": "نيكوماموشي - نسخة أرض وانو",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أخضر",
+        "image": "4stars/nekomamushi_wano.png"
+    },
+    {
+        "id": "209",
+        "name": "يوستاس كيد (V3)",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أحمر",
+        "image": "4stars/kid_v3.png"
+    },
+    {
+        "id": "210",
+        "name": "مستر 3 - جالديينو (V2)",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أزرق",
+        "image": "4stars/mr3_v2.png"
+    },
+    {
+        "id": "211",
+        "name": "رورونوا زورو - سيف إنما",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أخضر",
+        "image": "4stars/zoro_enma.png"
+    },
+    {
+        "id": "212",
+        "name": "ماركو - نسخة أرض وانو",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أخضر",
+        "image": "4stars/marco_wano.png"
+    },
+    {
+        "id": "213",
+        "name": "بوا هانكوك (V3)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أزرق",
+        "image": "4stars/hancock_v3.png"
+    },
+    {
+        "id": "214",
+        "name": "سابو (V2)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أحمر",
+        "image": "4stars/sabo_v2.png"
     },
     {
         "id": "ex_ace_yamato",
@@ -821,5 +1918,733 @@
         "stars": 5,
         "role": "عداء",
         "element": "ضوء"
+    },
+    {
+        "id": "215",
+        "name": "ياسوب (قراصنة الشعر الأحمر)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أزرق",
+        "image": "4stars/yasopp_v3.png"
+    },
+    {
+        "id": "216",
+        "name": "كاراسو (الجيش الثوري)",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أحمر",
+        "image": "4stars/karasu.png"
+    },
+    {
+        "id": "217",
+        "name": "إينواراشي (وانو/دوك)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أخضر",
+        "image": "4stars/inuarashi_v2.png"
+    },
+    {
+        "id": "218",
+        "name": "بيبي 5 (قراصنة دون كيهوتي)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أحمر",
+        "image": "4stars/baby_5.png"
+    },
+    {
+        "id": "219",
+        "name": "نامي (فستان الزفاف)",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أزرق",
+        "image": "4stars/nami_wedding.png"
+    },
+    {
+        "id": "220",
+        "name": "نامي (ستامبيد/جينرال)",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أزرق",
+        "image": "4stars/nami_v4.png"
+    },
+    {
+        "id": "221",
+        "name": "جوزو (الألماسي جوزو)",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أزرق",
+        "image": "4stars/jozu_v2.png"
+    },
+    {
+        "id": "222",
+        "name": "بيرونا (ما بعد السنتين)",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أخضر",
+        "image": "4stars/perona_v3.png"
+    },
+    {
+        "id": "223",
+        "name": "كوزان (أوكيجي - ما بعد السنتين)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أزرق",
+        "image": "4stars/kuzan_v3.png"
+    },
+    {
+        "id": "224",
+        "name": "كاكو (CP0/الزرافة)",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أحمر",
+        "image": "4stars/kaku_v2.png"
+    },
+    {
+        "id": "225",
+        "name": "فيفي (ألاباستا)",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أزرق",
+        "image": "4stars/vivi_v2.png"
+    },
+    {
+        "id": "226",
+        "name": "جينبي (وانو/أونيغاشيما)",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أخضر",
+        "image": "4stars/jinbe_v2.png"
+    },
+    {
+        "id": "227",
+        "name": "جينبي (جزيرة البرمائيين)",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أزرق",
+        "image": "4stars/jinbe_v3.png"
+    },
+    {
+        "id": "228",
+        "name": "زورو (وانو/رونين)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أخضر",
+        "image": "4stars/zoro_v4.png"
+    },
+    {
+        "id": "229",
+        "name": "إينيل (الإله إينيل)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أزرق",
+        "image": "4stars/enel_v2.png"
+    },
+    {
+        "id": "230",
+        "name": "نامي (أونامي/وانو)",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أحمر",
+        "image": "4stars/nami_v5.png"
+    },
+    {
+        "id": "231",
+        "name": "تشوبر (العالم الجديد)",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أزرق",
+        "image": "4stars/chopper_v2.png"
+    },
+    {
+        "id": "232",
+        "name": "إينواراشي (نسخة وانو)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أحمر",
+        "image": "4stars/dogstorm_v3.png"
+    },
+    {
+        "id": "233",
+        "name": "روبين (أوروبي/وانو)",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أزرق",
+        "image": "4stars/robin_v2.png"
+    },
+    {
+        "id": "234",
+        "name": "رايلي (العجوز/القياسي)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أخضر",
+        "image": "4stars/rayleigh_v2.png"
+    },
+    {
+        "id": "235",
+        "name": "لوفي (سنيكمان/المحرك الرابع)",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أحمر",
+        "image": "4stars/luffy_v4.png"
+    },
+    {
+        "id": "236",
+        "name": "جينبي (السيرابيم/إس-شارك)",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أزرق",
+        "image": "4stars/jinbe_v4.png"
+    },
+    {
+        "id": "237",
+        "name": "نامي (إيغ هيد/SSG)",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أزرق",
+        "image": "4stars/nami_v6.png"
+    },
+    {
+        "id": "238",
+        "name": "سيزار كلاون",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أخضر",
+        "image": "4stars/caesar_clown.png"
+    },
+    {
+        "id": "239",
+        "name": "باجي (كروز غيلد/الإمبراطور)",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أحمر",
+        "image": "4stars/buggy_v2.png"
+    },
+    {
+        "id": "240",
+        "name": "كوبي (البحرية/ما بعد التدريب)",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أزرق",
+        "image": "4stars/koby_v2.png"
+    },
+    {
+        "id": "241",
+        "name": "فوجيتورا (النيزك)",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أزرق",
+        "image": "4stars/fujitora_v2.png"
+    },
+    {
+        "id": "242",
+        "name": "أولتي (قراصنة الوحوش)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أزرق",
+        "image": "4stars/ulti.png"
+    },
+    {
+        "id": "243",
+        "name": "سينتومارو (مارينفورد/القياسي)",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أحمر",
+        "image": "4stars/sentomaru_v2.png"
+    },
+    {
+        "id": "244",
+        "name": "كوين (قراصنة الوحوش)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أخضر",
+        "image": "4stars/queen_v2.png"
+    },
+    {
+        "id": "245",
+        "name": "كيزارو (بورسالينو)",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أخضر",
+        "image": "4stars/kizaru_v2.png"
+    },
+    {
+        "id": "246",
+        "name": "غان فور (إله سكايبيا)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أخضر",
+        "image": "4stars/gan_fall.png"
+    },
+    {
+        "id": "247",
+        "name": "سكراتشمان آبو",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أخضر",
+        "image": "4stars/scratchmen_apoo.png"
+    },
+    {
+        "id": "248",
+        "name": "كابوس لوفي",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أزرق",
+        "image": "4stars/nightmare_luffy.png"
+    },
+    {
+        "id": "249",
+        "name": "نامي (بيكيني/القياسي)",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أزرق",
+        "image": "4stars/nami_v7.png"
+    },
+    {
+        "id": "250",
+        "name": "إيس (مارينفورد/القياسي)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أحمر",
+        "image": "4stars/ace_v2.png"
+    },
+    {
+        "id": "251",
+        "name": "أودين (وانو/القياسي)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أخضر",
+        "image": "4stars/oden_v2.png"
+    },
+    {
+        "id": "252",
+        "name": "لاو (وانو/السطح)",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أحمر",
+        "image": "4stars/law_v4.png"
+    },
+    {
+        "id": "253",
+        "name": "كينيمون (وانو/القياسي)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أخضر",
+        "image": "4stars/kinemon_v3.png"
+    },
+    {
+        "id": "254",
+        "name": "كاتاكوري (القياسي)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أزرق",
+        "image": "4stars/katakuri_v3.png"
+    },
+    {
+        "id": "255",
+        "name": "شانكس (فيلم ريد/القياسي)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أزرق",
+        "image": "4stars/shanks_v3.png"
+    },
+    {
+        "id": "256",
+        "name": "موريا (تريلر بارك)",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أخضر",
+        "image": "4stars/moria_v2.png"
+    },
+    {
+        "id": "257",
+        "name": "دوفلامينغو (القياسي)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أحمر",
+        "image": "4stars/doffy_v2.png"
+    },
+    {
+        "id": "258",
+        "name": "رايلي (الرجل العجوز)",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أزرق",
+        "image": "4stars/rayleigh_v3.png"
+    },
+    {
+        "id": "259",
+        "name": "إينواراشي (درع وانو)",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أخضر",
+        "image": "4stars/inuarashi_v4.png"
+    },
+    {
+        "id": "260",
+        "name": "أوكيكو (وانو)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أحمر",
+        "image": "4stars/kiku.png"
+    },
+    {
+        "id": "261",
+        "name": "كوزان (دراجة/ما بعد السنتين)",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أزرق",
+        "image": "4stars/kuzan_v4.png"
+    },
+    {
+        "id": "262",
+        "name": "سابو (الجيش الثوري)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أحمر",
+        "image": "4stars/sabo_v3.png"
+    },
+    {
+        "id": "263",
+        "name": "لوفي (إيغ هيد/تجهيز G5)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أبيض",
+        "image": "4stars/luffy_v5.png"
+    },
+    {
+        "id": "264",
+        "name": "بارتولوميو (دريسروزا)",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أخضر",
+        "image": "4stars/bartolomeo_v2.png"
+    },
+    {
+        "id": "265",
+        "name": "بودينغ (وانو)",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أحمر",
+        "image": "4stars/pudding.png"
+    },
+    {
+        "id": "266",
+        "name": "ياماتو (القياسية)",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أزرق",
+        "image": "4stars/yamato.png"
+    },
+    {
+        "id": "267",
+        "name": "شانكس (مارينفورد)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أحمر",
+        "image": "4stars/shanks_v4.png"
+    },
+    {
+        "id": "268",
+        "name": "كروكودايل (مارينفورد)",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أزرق",
+        "image": "4stars/croc_v2.png"
+    },
+    {
+        "id": "269",
+        "name": "تشوبر (شكل الوحش)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أحمر",
+        "image": "4stars/chopper_v3.png"
+    },
+    {
+        "id": "270",
+        "name": "كيلر (وانو/مقنع)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أخضر",
+        "image": "4stars/killer_v3.png"
+    },
+    {
+        "id": "271",
+        "name": "دينجيرو (كيوشيرو)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أزرق",
+        "image": "4stars/denjiro_v2.png"
+    },
+    {
+        "id": "272",
+        "name": "كينيمون (أونيغاشيما)",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أحمر",
+        "image": "4stars/kinemon_v4.png"
+    },
+    {
+        "id": "273",
+        "name": "سانجي (البذلة الجيرما)",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أزرق",
+        "image": "4stars/sanji_v2.png"
+    },
+    {
+        "id": "274",
+        "name": "لاو (دريسروزا)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أخضر",
+        "image": "4stars/law_v5.png"
+    },
+    {
+        "id": "275",
+        "name": "بلاك ماريا",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أخضر",
+        "image": "4stars/black_maria_v2.png"
+    },
+    {
+        "id": "276",
+        "name": "بروك (ملك الروح)",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أخضر",
+        "image": "4stars/brook_v2.png"
+    },
+    {
+        "id": "277",
+        "name": "لوفي (باونسمان/المحرك الرابع)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أخضر",
+        "image": "4stars/luffy_v6.png"
+    },
+    {
+        "id": "278",
+        "name": "موريا (القياسي)",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أزرق",
+        "image": "4stars/moria_v3.png"
+    },
+    {
+        "id": "279",
+        "name": "زورو (دريسروزا/البذلة)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أخضر",
+        "image": "4stars/zoro_v5.png"
+    },
+    {
+        "id": "280",
+        "name": "لوفي (السطح/وانو)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أزرق",
+        "image": "4stars/luffy_v7.png"
+    },
+    {
+        "id": "281",
+        "name": "هانكوك (القياسية)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أحمر",
+        "image": "4stars/hancock_v4.png"
+    },
+    {
+        "id": "282",
+        "name": "هانكوك (ملابس السباحة)",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أزرق",
+        "image": "4stars/hancock_v5.png"
+    },
+    {
+        "id": "283",
+        "name": "بين بيكمان",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أزرق",
+        "image": "4stars/beckman.png"
+    },
+    {
+        "id": "284",
+        "name": "إيس وماركو (كومبو)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أخضر",
+        "image": "4stars/ace_marco_v3.png"
+    },
+    {
+        "id": "285",
+        "name": "كافينديش (هاكوبا)",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أزرق",
+        "image": "4stars/cavendish_v3.png"
+    },
+    {
+        "id": "286",
+        "name": "لوفي (دريسروزا/القياسي)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أحمر",
+        "image": "4stars/luffy_v8.png"
+    },
+    {
+        "id": "287",
+        "name": "اللحية البيضاء (القياسي)",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أخضر",
+        "image": "4stars/whitebeard_v3.png"
+    },
+    {
+        "id": "288",
+        "name": "كايدو (تنين/هجين)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أزرق",
+        "image": "4stars/kaido.png"
+    },
+    {
+        "id": "289",
+        "name": "ريجو (جيرما 66)",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أرجواني",
+        "image": "4stars/reiju_v2.png"
+    },
+    {
+        "id": "290",
+        "name": "لاو (جزيرة الكعكة الكاملة/القياسي)",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أزرق",
+        "image": "4stars/law_v6.png"
+    },
+    {
+        "id": "291",
+        "name": "كينغ (قراصنة الوحوش)",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أخضر",
+        "image": "4stars/king_v2.png"
+    },
+    {
+        "id": "292",
+        "name": "سابو (فيلم ستامبيد)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أخضر",
+        "image": "4stars/sabo_v4.png"
+    },
+    {
+        "id": "293",
+        "name": "نيكوماموشي (القياسي)",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أحمر",
+        "image": "4stars/nekomamushi_v3.png"
+    },
+    {
+        "id": "294",
+        "name": "فرانكي (وانو/فرانسوكي)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أخضر",
+        "image": "4stars/frankymonosuke.png"
+    },
+    {
+        "id": "295",
+        "name": "كاروت (سولونغ)",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أبيض",
+        "image": "4stars/carrot_v3.png"
+    },
+    {
+        "id": "296",
+        "name": "غاربو (القيادي)",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أزرق",
+        "image": "4stars/garp.png"
+    },
+    {
+        "id": "297",
+        "name": "هودي جونز",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أخضر",
+        "image": "4stars/hody_v2.png"
+    },
+    {
+        "id": "298",
+        "name": "فوجيتورا (القياسي)",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أحمر",
+        "image": "4stars/fujitora_v3.png"
+    },
+    {
+        "id": "299",
+        "name": "بودينغ (عروس جزيرة الكعكة الكاملة)",
+        "stars": 4,
+        "role": "عداء",
+        "element": "أحمر",
+        "image": "4stars/pudding_v2.png"
+    },
+    {
+        "id": "300",
+        "name": "إينيل (القياسي)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أخضر",
+        "image": "4stars/enel_v3.png"
+    },
+    {
+        "id": "301",
+        "name": "أرلونغ (القياسي)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أزرق",
+        "image": "4stars/arlong.png"
+    },
+    {
+        "id": "302",
+        "name": "فرانكي (فرانسوكي/وانو) (V2)",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أحمر",
+        "image": "4stars/franosuke_v2.png"
+    },
+    {
+        "id": "303",
+        "name": "كامازو (كيلر/وانو) (V2)",
+        "stars": 4,
+        "role": "مهاجم",
+        "element": "أزرق",
+        "image": "4stars/kamazo_v2.png"
+    },
+    {
+        "id": "304",
+        "name": "بيلمير (V2)",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أخضر",
+        "image": "4stars/bellemere_v2.png"
+    },
+    {
+        "id": "305",
+        "name": "أوروج (V2)",
+        "stars": 4,
+        "role": "مدافع",
+        "element": "أزرق",
+        "image": "4stars/urouge_v2.png"
     }
 ]
