@@ -1,4 +1,4 @@
-import { db, collection, query, where, orderBy, onSnapshot, doc, limit, deleteDoc, getDocs } from './firebase-config.js';
+import { db, collection, query, where, orderBy, onSnapshot, doc, limit, deleteDoc, getDocs, setDoc } from './firebase-config.js';
 
 export const listenToStaffStats = (docId, callback) => {
     return onSnapshot(doc(db, "staff", docId), (doc) => {
@@ -54,12 +54,7 @@ export const listenToAllReviews = (callback) => {
     });
 };
 
-export const listenToRoles = (callback) => {
-    return onSnapshot(collection(db, "roles"), (snapshot) => {
-        const roles = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        callback(roles);
-    });
-};
+
 
 export const updateRoleData = async (roleId, data) => {
     try {
