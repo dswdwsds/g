@@ -481,7 +481,7 @@
     // Pagination State
     let currentFilteredChars = [];
     let currentRenderCount = 0;
-    const BATCH_SIZE = 50;
+    const BATCH_SIZE = 20;
 
     const openCharModal = () => {
       const CHARACTERS = getCharacters();
@@ -576,13 +576,12 @@
           loadMoreBtn.id = 'loadMoreBtn';
           loadMoreBtn.innerText = 'عرض المزيد ⬇️';
           loadMoreBtn.className = 'auth-btn';
-          loadMoreBtn.style.cssText = "grid-column: 1/-1; margin: 20px auto; width: fit-content; min-width: 200px;";
+          loadMoreBtn.style.cssText = "grid-column: 1/-1; margin: 10px auto; width: fit-content; min-width: 200px;";
           loadMoreBtn.onclick = renderNextBatch;
-          charGrid.parentElement.appendChild(loadMoreBtn); // Append after grid
-        } else {
-          loadMoreBtn.style.display = 'block';
-          // Move to end if needed, but it's outside grid so it stays at bottom
         }
+
+        loadMoreBtn.style.display = 'block';
+        charGrid.appendChild(loadMoreBtn); // Append (or move) to the end of the grid
       } else {
         if (loadMoreBtn) loadMoreBtn.remove();
       }
