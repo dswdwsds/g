@@ -4,105 +4,120 @@
         "name": "مونكي دي لوفي - قبطان قبعة القش",
         "stars": 2,
         "role": "مهاجم",
-        "element": "أحمر"
+        "element": "أحمر",
+        "image": "2stars/3333.png"
     },
     {
         "id": "002",
         "name": "رورونوا زورو - مقاتل قبعة القش",
         "stars": 2,
         "role": "مدافع",
-        "element": "أخضر"
+        "element": "أخضر",
+        "image": "2stars/441.png"
     },
     {
         "id": "003",
         "name": "يوسوب - قناص قبعة القش",
         "stars": 2,
         "role": "عداء",
-        "element": "أزرق"
+        "element": "أزرق",
+        "image": "2stars/66.png"
     },
     {
         "id": "004",
         "name": "سانجي - طباخ قبعة القش",
         "stars": 2,
         "role": "مهاجم",
-        "element": "أزرق"
+        "element": "أزرق",
+        "image": "2stars/1122.png"
     },
     {
         "id": "005",
         "name": "نامي - ملاحة قبعة القش",
         "stars": 2,
         "role": "عداء",
-        "element": "أخضر"
+        "element": "أخضر",
+        "image": "2stars/33.png"
     },
     {
         "id": "006",
         "name": "توني توني تشوبر - طبيب قبعة القش",
         "stars": 2,
         "role": "عداء",
-        "element": "أحمر"
+        "element": "أحمر",
+        "image": "2stars/22.png"
     },
     {
         "id": "007",
         "name": "نيكو روبين - عالمة آثار",
         "stars": 2,
         "role": "مهاجم",
-        "element": "أخضر"
+        "element": "أخضر",
+        "image": "2stars/4.png"
     },
     {
         "id": "008",
         "name": "بوتشي - حارس القط الأسود",
         "stars": 2,
         "role": "مدافع",
-        "element": "أزرق"
+        "element": "أزرق",
+        "image": "2stars/333.png"
     },
     {
         "id": "009",
         "name": "كوبي - فتى المهام",
         "stars": 2,
         "role": "مدافع",
-        "element": "أحمر"
+        "element": "أحمر",
+        "image": "2stars/5.png"
     },
     {
         "id": "010",
         "name": "هيلميبو - الابن الأبله",
         "stars": 2,
         "role": "عداء",
-        "element": "أخضر"
+        "element": "أخضر",
+        "image": "2stars/11.png"
     },
     {
         "id": "011",
         "name": "كاباجي - رئيس أركان باجي",
         "stars": 2,
-        "role": "عداء",
-        "element": "أخضر"
+        "role": "مهاجم",
+        "element": "أخضر",
+        "image": "2stars/112.png"
     },
     {
         "id": "012",
         "name": "ألفيدا - قائدة القراصنة",
         "stars": 2,
-        "role": "مدافع",
-        "element": "أخضر"
+        "role": "عداء",
+        "element": "أحمر",
+        "image": "2stars/image1.png"
     },
     {
         "id": "013",
         "name": "هيغوما الدب - زعيم قطاع الطرق",
         "stars": 2,
         "role": "مهاجم",
-        "element": "أحمر"
+        "element": "أحمر",
+        "image": "2stars/2.png"
     },
     {
         "id": "014",
         "name": "جوني - صائد مكافآت",
         "stars": 2,
         "role": "عداء",
-        "element": "أزرق"
+        "element": "أزرق",
+        "image": "2stars/23.png"
     },
     {
         "id": "015",
         "name": "مورغان - كابتن البحرية",
         "stars": 2,
         "role": "مدافع",
-        "element": "أزرق"
+        "element": "أحمر",
+        "image": "2stars/44.png"
     },
     {
         "id": "016",
@@ -115,22 +130,41 @@
         "id": "017",
         "name": "جانغو - قائد القط الأسود",
         "stars": 2,
-        "role": "مدافع",
-        "element": "أحمر"
+        "role": "عداء",
+        "element": "أزرق",
+        "image": "2stars/111.png"
     },
     {
         "id": "018",
         "name": "فرانكي - نجار السفينة",
         "stars": 2,
         "role": "مدافع",
-        "element": "أحمر"
+        "element": "أخضر",
+        "image": "2stars/3.png"
     },
     {
         "id": "019",
         "name": "بروك - موسيقار قبعة القش",
         "stars": 2,
         "role": "عداء",
-        "element": "أخضر"
+        "element": "أخضر",
+        "image": "2stars/21.png"
+    },
+    {
+        "id": "019b",
+        "name": "ديمارو بلاك - لوفي المزيف",
+        "stars": 2,
+        "role": "مهاجم",
+        "element": "أخضر",
+        "image": "2stars/11.png"
+    },
+    {
+        "id": "019c",
+        "name": "سانت تشارلوس - التنين السماوي",
+        "stars": 2,
+        "role": "مدافع",
+        "element": "أزرق",
+        "image": "2stars/image.png"
     },
     {
         "id": "020",

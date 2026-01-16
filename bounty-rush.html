@@ -505,17 +505,23 @@
           </div>
         `;
       } else {
-        charGrid.innerHTML = filteredChars.map(char => `
-          <div class="char-item" id="char-${char.id}" onclick="toggleChar('${char.id}')">
-            <div style="width:80px; height:80px; border-radius:50%; border:2px solid var(--glass-border); background: linear-gradient(135deg, var(--primary), var(--accent)); display:flex; align-items:center; justify-content:center; margin:0 auto 10px;">
-              <span style="font-size:1.5rem;">${char.stars === 5 ? '🌟' : '⭐'.repeat(char.stars)}</span>
+        charGrid.innerHTML = filteredChars.map(char => {
+          const imageHtml = char.image
+            ? `<img src="${char.image}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;" loading="lazy">`
+            : `<span style="font-size:1.5rem;">${char.stars === 5 ? '🌟' : '⭐'.repeat(char.stars)}</span>`;
+
+          return `
+          <div class="char-item ${selectedChars.has(char.id) ? 'selected' : ''}" id="char-${char.id}" onclick="toggleChar('${char.id}')">
+            <div style="width:80px; height:80px; border-radius:50%; border:2px solid var(--glass-border); background: linear-gradient(135deg, var(--primary), var(--accent)); display:flex; align-items:center; justify-content:center; margin:0 auto 10px; overflow:hidden;">
+              ${imageHtml}
             </div>
             <div class="char-info">
               <div class="char-name">${char.name}</div>
               <div class="char-meta">${char.stars}★ | ${char.role}</div>
             </div>
           </div>
-        `).join('');
+        `;
+        }).join('');
       }
       updateSelectionUI();
       charModal.classList.add('visible');
