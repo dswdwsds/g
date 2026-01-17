@@ -571,6 +571,10 @@
       document.getElementById('roleFilter').value = "";
       document.getElementById('elementFilter').value = "";
 
+      // Reset Pagination and Grid BEFORE filtering
+      currentRenderCount = 0;
+      charGrid.innerHTML = '';
+
       // Attach Filter Listeners (only once)
       if (!filtersAttached) {
         document.getElementById('charSearch').addEventListener('input', filterCharacters);
@@ -594,13 +598,6 @@
         banner.innerHTML = `🔥 <strong>عرض خاص:</strong> اختر بين 5 و 10 شخصيات ليصبح السعر <span style="color:#00f2fe; font-weight:bold;">${discountPrice} جنيه</span> للشخصية!`;
         charGrid.parentElement.insertBefore(banner, charGrid);
       }
-
-      // Reset Pagination
-      currentRenderCount = 0;
-      charGrid.innerHTML = '';
-
-      // Initial Render handled by filterCharacters -> renderNextBatch
-      // renderNextBatch();
 
       updateSelectionUI();
       charModal.classList.add('visible');
