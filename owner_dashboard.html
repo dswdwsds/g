@@ -450,6 +450,45 @@
             if (await setStaffRole(email, role)) { alert("تم!"); document.getElementById('newStaffEmail').value = ''; }
         };
 
+        window.handleEditStaff = (email, currentRole) => {
+            document.getElementById('editStaffEmail').innerText = email;
+            const roles = (currentRole || '').split(',');
+            const container = document.getElementById('editStaffRolesList');
+
+            // Re-render checkboxes based on available roles
+            import('./auth_service.js').then(m => m.listenToRoles(availableRoles => {
+                container.innerHTML = `
+                    <label style="display:flex; align-items:center; gap:8px;">
+                        <input type="checkbox" value="staff" ${roles.includes('staff') ? 'checked' : ''}> Staff 🛡️
+                    </label>
+                    <label style="display:flex; align-items:center; gap:8px;">
+                        <input type="checkbox" value="admin" ${roles.includes('admin') ? 'checked' : ''}> Admin 👑
+                    </label>
+                    ${availableRoles.map(r => `
+                        <label style="display:flex; align-items:center; gap:8px;">
+                            <input type="checkbox" value="${r.id}" ${roles.includes(r.id) ? 'checked' : ''}>
+                            <span style="color:${r.color}">${r.icon} ${r.name}</span>
+                        </label>
+                    `).join('')}
+                `;
+            }));
+
+            document.getElementById('staffEditModal').classList.add('visible');
+        };
+
+        window.closeStaffEditModal = () => document.getElementById('staffEditModal').classList.remove('visible');
+
+        window.saveStaffRoles = async () => {
+            const email = document.getElementById('editStaffEmail').innerText;
+            const checked = Array.from(document.querySelectorAll('#editStaffRolesList input:checked')).map(c => c.value);
+            const newRole = checked.join(',');
+
+            if (await setStaffRole(email, newRole)) {
+                alert("تم تحديث الرتب!");
+                window.closeStaffEditModal();
+            }
+        };
+
         window.handleDeleteStaff = async (id) => {
             if (confirm("حذف الموظف؟")) await deleteStaff(id);
         }

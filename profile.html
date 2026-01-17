@@ -289,11 +289,12 @@
                 };
                 await setDoc(doc(db, "users", user.uid), userData, { merge: true });
 
-                // 4. Update Staff Collection if worker to sync nicknames/avatars
+                // 4. Update Staff Collection if worker (Using UID as key now)
                 if (isWorker(user.email)) {
-                    await setDoc(doc(db, "staff", user.email), {
+                    await setDoc(doc(db, "staff", user.uid), {
                         displayName: displayNameInput.value,
-                        photoURL: photoURL
+                        photoURL: photoURL,
+                        email: user.email // Ensure email is always consistent
                     }, { merge: true });
                 }
 

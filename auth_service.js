@@ -40,9 +40,14 @@ export const getUserRole = (email) => {
     return staff ? staff.role : null;
 };
 
+
 export const setStaffRole = async (email, role) => {
     try {
-        const staffRef = doc(db, "staff", email);
+        // Check if there is already a staff record for this email (could be UID or Email ID)
+        const existingStaff = authorizedStaff.find(s => s.email === email);
+        const docId = existingStaff ? existingStaff.id : email;
+
+        const staffRef = doc(db, "staff", docId);
         await setDoc(staffRef, {
             email: email,
             role: role,
