@@ -144,8 +144,10 @@ export const refreshUserUI = async () => {
             const roleId = r.trim();
             const rData = rolesData.find(rd => rd.id === roleId);
             if (roleId === 'owner') return `<span class="role-owner">👑 المالك</span>`;
+            if (roleId === 'admin') return `<span class="role-admin" style="background:rgba(255,0,0,0.1); color:#ff4d4d; padding:2px 8px; border-radius:4px; border:1px solid rgba(255,0,0,0.3);">🛡️ أدمن</span>`;
+            if (roleId === 'staff') return `<span class="role-staff" style="background:rgba(187,134,252,0.1); color:#bb86fc; padding:2px 8px; border-radius:4px; border:1px solid rgba(187,134,252,0.3);">🛠️ موظف</span>`;
             if (rData) {
-                return `<span style="color: ${rData.color || 'var(--primary)'}">${rData.icon || '🛡️'} ${rData.name}</span>`;
+                return `<span style="color: ${rData.color || 'var(--primary)'}; background:rgba(255,255,255,0.05); padding:2px 8px; border-radius:4px; border:1px solid var(--glass-border);">${rData.icon || '🛡️'} ${rData.name}</span>`;
             }
             return `<span class="role-client">👤 عميل</span>`;
         }).join('')}

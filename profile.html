@@ -219,16 +219,38 @@
             document.getElementById('nicknamePreview').innerText = name;
             avatarPreview.src = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=00f2fe&color=000`;
 
-            // Load Firestore Data
+            // Load Firestore Data (Priority: Users -> Staff)
             try {
+                // Try fetching from users collection first
                 const userDoc = await getDoc(doc(db, "users", user.uid));
                 if (userDoc.exists()) {
                     const data = userDoc.data();
                     birthDateInput.value = data.birthDate || '';
                     bioInput.value = data.bio || '';
+                } else if (isWorker(user.email)) {
+                    // Fallback: Try fetching from staff collection if worker
+                    const staffDoc = await getDoc(doc(db, "staff", user.uid));
+                    if (staffDoc.exists()) {
+                        const data = staffDoc.data();
+                        birthDateInput.value = data.birthDate || '';
+                        bioInput.value = data.bio || '';
+                    }
                 }
             } catch (error) {
-                console.error("Profile Load Error:", error);
+                // Silently handle permission errors for non-admin users
+                if (error.code !== 'permission-denied') {
+                    console.warn("Profile Load Warning:", error);
+                } else if (isWorker(user.email)) {
+                    // If permission denied on users, try staff
+                    try {
+                        const staffDoc = await getDoc(doc(db, "staff", user.uid));
+                        if (staffDoc.exists()) {
+                            const data = staffDoc.data();
+                            birthDateInput.value = data.birthDate || '';
+                            bioInput.value = data.bio || '';
+                        }
+                    } catch (e) { /* Ignore */ }
+                }
             }
         });
 
@@ -289,7 +311,8 @@
                 try {
                     await setDoc(doc(db, "users", user.uid), userData, { merge: true });
                 } catch (dbError) {
-                    console.warn("Firestore User Sync Failed:", dbError);
+                    // Ignore permission errors silently
+                    if (dbError.code !== 'permission-denied') console.warn("Firestore User Sync Failed:", dbError);
                 }
 
                 // 4. Update Staff Collection if worker (Best Effort)
@@ -298,10 +321,13 @@
                         await setDoc(doc(db, "staff", user.uid), {
                             displayName: displayNameInput.value,
                             photoURL: photoURL,
+                            birthDate: birthDateInput.value,
+                            bio: bioInput.value,
                             email: user.email
                         }, { merge: true });
                     } catch (staffError) {
-                        console.warn("Staff Sync Failed:", staffError);
+                        // Ignore permission errors
+                        if (staffError.code !== 'permission-denied') console.warn("Staff Sync Failed:", staffError);
                     }
                 }
 
