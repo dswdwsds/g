@@ -101,11 +101,20 @@
   </section>
 
   <section class="character-tiers">
+    <div style="width: 100%; text-align: center; margin-bottom: 30px;">
+      <h2 style="font-size: 2.2rem; margin-bottom: 10px; color: #fff;">اختر مسارك نحو القمة 🏴‍☠️</h2>
+      <p style="color: var(--text-dim); font-size: 1.1rem;">باقات احترافية مصممة لتمنحك الأفضلية الساحقة في المعركة</p>
+    </div>
+
     <div class="tier-card">
       <span class="tier-stars">⭐⭐</span>
       <h3>Starter Tier</h3>
       <span class="tier-price">8<span class="tier-currency"> جنيه مصري</span></span>
-      <p>رفع سريع للمستوى الأساسي</p>
+      <p>انطلاقة قوية لتحسين مستواك الأساسي</p>
+      <div style="margin-top: 15px; background: rgba(0, 255, 157, 0.1); border-radius: 8px; padding: 8px;">
+        <p style="font-size: 0.75rem; color: #00ff9d; margin: 0;">🛡️ <strong>ضمان الموسم:</strong> حماية كاملة للتصنيف
+          + تعويض مجاني</p>
+      </div>
       <button class="auth-btn" style="margin-top:20px; width: 100%;" onclick="orderNow('Starter')">طلب هذه
         الفئة</button>
       <div class="offer-ribbon">عرض الافتتاح</div>
@@ -115,7 +124,11 @@
       <span class="tier-stars">⭐⭐⭐</span>
       <h3>Pro Tier</h3>
       <span class="tier-price">9<span class="tier-currency"> جنيه مصري</span></span>
-      <p>تحسين كبير لنقاط الشخصية</p>
+      <p>توازن مثالي بين السرعة والقوة</p>
+      <div style="margin-top: 15px; background: rgba(0, 255, 157, 0.1); border-radius: 8px; padding: 8px;">
+        <p style="font-size: 0.75rem; color: #00ff9d; margin: 0;">🛡️ <strong>ضمان الموسم:</strong> حماية كاملة للتصنيف
+          + تعويض مجاني</p>
+      </div>
       <button class="auth-btn" style="margin-top:20px; width: 100%;" onclick="orderNow('Pro')">طلب هذه الفئة</button>
       <div class="offer-ribbon">عرض الافتتاح</div>
     </div>
@@ -124,7 +137,11 @@
       <span class="tier-stars">⭐⭐⭐⭐</span>
       <h3>Ultimate Tier</h3>
       <span class="tier-price">10<span class="tier-currency"> جنيه مصري</span></span>
-      <p>الوصول للحد الأقصى من القوة</p>
+      <p>السيطرة المطلقة وتدمير الخصوم</p>
+      <div style="margin-top: 15px; background: rgba(0, 255, 157, 0.1); border-radius: 8px; padding: 8px;">
+        <p style="font-size: 0.75rem; color: #00ff9d; margin: 0;">🛡️ <strong>ضمان الموسم:</strong> حماية كاملة للتصنيف
+          + تعويض مجاني</p>
+      </div>
       <button class="auth-btn" style="margin-top:20px; width: 100%;" onclick="orderNow('Ultimate')">طلب هذه
         الفئة</button>
       <div class="offer-ribbon">عرض الافتتاح</div>
@@ -222,6 +239,26 @@
       <!-- Header -->
       <div style="border-bottom: 2px solid var(--glass-border); padding-bottom: 15px; margin-bottom: 20px;">
         <h3 style="margin: 0; font-size: 1.3rem;">اختر الشخصيات (<span id="modalStars"></span>) 🗡️</h3>
+      </div>
+
+      <!-- Filters -->
+      <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+        <input type="text" id="charSearch" placeholder="بحث باسم الشخصية..." class="review-input"
+          style="margin-bottom: 0; flex: 2; background: rgba(0,0,0,0.3);">
+        <select id="roleFilter" class="review-input"
+          style="margin-bottom: 0; flex: 1; background: rgba(0,0,0,0.3); padding-left: 5px;">
+          <option value="">كل الأدوار</option>
+          <option value="مهاجم">مهاجم</option>
+          <option value="مدافع">مدافع</option>
+          <option value="عداء">عداء</option>
+        </select>
+        <select id="elementFilter" class="review-input"
+          style="margin-bottom: 0; flex: 1; background: rgba(0,0,0,0.3); padding-left: 5px;">
+          <option value="">كل العناصر</option>
+          <option value="أحمر">أحمر</option>
+          <option value="أخضر">أخضر</option>
+          <option value="أزرق">أزرق</option>
+        </select>
       </div>
 
       <!-- Character Grid -->
@@ -476,7 +513,55 @@
       selectedChars.clear();
 
       openCharModal();
+      openCharModal();
     };
+
+    // Filter Logic
+    const filterCharacters = () => {
+      const CHARACTERS = getCharacters();
+      const starsCriteria = TIER_STARS[selectedTier];
+      const searchText = document.getElementById('charSearch').value.toLowerCase();
+      const roleFilter = document.getElementById('roleFilter').value;
+      const elementFilter = document.getElementById('elementFilter').value;
+
+      // 1. Filter by Tier (Stars)
+      let filtered = [];
+      if (Array.isArray(starsCriteria)) {
+        filtered = CHARACTERS.filter(char => starsCriteria.includes(char.stars));
+      } else {
+        filtered = CHARACTERS.filter(char => char.stars === starsCriteria);
+      }
+
+      // 2. Filter by Name
+      if (searchText) {
+        filtered = filtered.filter(char => char.name.toLowerCase().includes(searchText));
+      }
+
+      // 3. Filter by Role
+      if (roleFilter) {
+        filtered = filtered.filter(char => char.role === roleFilter);
+      }
+
+      // 4. Filter by Element
+      if (elementFilter) {
+        filtered = filtered.filter(char => char.element === elementFilter);
+      }
+
+      currentFilteredChars = filtered;
+
+      // Update Title Count if needed or just reset grid
+      // document.getElementById('modalStars') ... (remains static or update count?)
+
+      // Reset Pagination and Render
+      currentRenderCount = 0;
+      charGrid.innerHTML = '';
+      renderNextBatch();
+    };
+
+    // Attach Filter Listeners
+    document.getElementById('charSearch').addEventListener('input', filterCharacters);
+    document.getElementById('roleFilter').addEventListener('change', filterCharacters);
+    document.getElementById('elementFilter').addEventListener('change', filterCharacters);
 
     // Pagination State
     let currentFilteredChars = [];
@@ -491,14 +576,21 @@
       let titleChars = "";
 
       if (Array.isArray(starsCriteria)) {
-        currentFilteredChars = CHARACTERS.filter(char => starsCriteria.includes(char.stars));
+        // currentFilteredChars set initially by filterCharacters
         titleChars = starsCriteria.map(s => s + ' نجوم').join(' و ');
       } else {
-        currentFilteredChars = CHARACTERS.filter(char => char.stars === starsCriteria);
         titleChars = starsCriteria + ' نجوم';
       }
 
       document.getElementById('modalStars').innerText = titleChars;
+
+      // Reset Inputs
+      document.getElementById('charSearch').value = "";
+      document.getElementById('roleFilter').value = "";
+      document.getElementById('elementFilter').value = "";
+
+      // Trigger Initial Filter (which renders the grid)
+      filterCharacters();
 
       // Inject Offer Banner if applicable
       const offerBanner = document.getElementById('offerBanner');
@@ -517,8 +609,8 @@
       currentRenderCount = 0;
       charGrid.innerHTML = '';
 
-      // Initial Render
-      renderNextBatch();
+      // Initial Render handled by filterCharacters -> renderNextBatch
+      // renderNextBatch();
 
       updateSelectionUI();
       charModal.classList.add('visible');
