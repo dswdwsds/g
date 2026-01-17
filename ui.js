@@ -10,6 +10,19 @@ export const injectNavbar = () => {
     header.className = 'nav-bar';
     header.innerHTML = `
         <div class="user-info" id="userInfo"></div>
+        <div class="notification-bell" id="notificationBell" style="position: relative; cursor: pointer; margin-left: 20px;">
+            <span style="font-size: 1.5rem;">🔔</span>
+            <span id="notificationBadge" class="notification-badge" style="display: none;">0</span>
+            <div id="notificationDropdown" class="notification-dropdown" style="display: none;">
+                <div class="notification-header">
+                    <h4 style="margin: 0; font-size: 0.9rem;">الإشعارات</h4>
+                    <button id="markAllRead" class="mark-all-btn">تمييز الكل كمقروء</button>
+                </div>
+                <div id="notificationList" class="notification-list">
+                    <div class="notification-empty">لا توجد إشعارات</div>
+                </div>
+            </div>
+        </div>
         <a href="index.html" class="logo" style="text-decoration: none; font-family: var(--font-en); font-weight: 800; color: var(--primary);">TEAM GS</a>
     `;
 };
@@ -176,7 +189,113 @@ export const initSharedUI = () => {
     injectNavbar();
     injectSharedModals();
     listenToWorkers(() => refreshUserUI());
-    onAuthStateChanged(auth, () => refreshUserUI());
+    onAuthStateChanged(auth, (user) => {
+        refreshUserUI();
+        if (user) {
+            initNotificationSystem();
+        }
+    });
+
+    // Setup notification bell click handler
+    setupNotificationHandlers();
+};
+
+// Initialize notification system
+const initNotificationSystem = async () => {
+    try {
+        const { listenToNotifications, markAsRead, markAllAsRead } = await import('./notifications_service.js');
+
+        listenToNotifications((notifications, unreadCount) => {
+            renderNotifications(notifications);
+        });
+    } catch (error) {
+        console.error('[UI] Error initializing notifications:', error);
+    }
+};
+
+// Setup notification handlers
+const setupNotificationHandlers = () => {
+    const bell = document.getElementById('notificationBell');
+    const dropdown = document.getElementById('notificationDropdown');
+    const markAllBtn = document.getElementById('markAllRead');
+
+    if (bell && dropdown) {
+        bell.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isVisible = dropdown.style.display === 'block';
+            dropdown.style.display = isVisible ? 'none' : 'block';
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!bell.contains(e.target)) {
+                dropdown.style.display = 'none';
+            }
+        });
+    }
+
+    if (markAllBtn) {
+        markAllBtn.addEventListener('click', async () => {
+            const { markAllAsRead } = await import('./notifications_service.js');
+            await markAllAsRead();
+        });
+    }
+};
+
+// Render notifications
+const renderNotifications = (notifications) => {
+    const list = document.getElementById('notificationList');
+    if (!list) return;
+
+    if (notifications.length === 0) {
+        list.innerHTML = '<div class="notification-empty">لا توجد إشعارات</div>';
+        return;
+    }
+
+    list.innerHTML = notifications.map(notif => {
+        const timeAgo = getTimeAgo(notif.timestamp);
+        const unreadClass = notif.read ? '' : 'unread';
+
+        return `
+            <div class="notification-item ${unreadClass}" data-id="${notif.id}" onclick="handleNotificationClick('${notif.id}', '${notif.orderId || ''}')">
+                <div class="notification-icon" style="background: ${notif.color}20; color: ${notif.color};">
+                    ${notif.icon}
+                </div>
+                <div class="notification-content">
+                    <div class="notification-title">${notif.title}</div>
+                    <div class="notification-message">${notif.message}</div>
+                    <div class="notification-time">${timeAgo}</div>
+                </div>
+                ${!notif.read ? '<div class="notification-dot"></div>' : ''}
+            </div>
+        `;
+    }).join('');
+};
+
+// Handle notification click
+window.handleNotificationClick = async (notifId, orderId) => {
+    const { markAsRead } = await import('./notifications_service.js');
+    await markAsRead(notifId);
+
+    // Navigate to order if orderId exists
+    if (orderId) {
+        window.location.href = `history.html?order=${orderId}`;
+    }
+};
+
+// Get time ago string
+const getTimeAgo = (timestamp) => {
+    if (!timestamp) return 'الآن';
+
+    const now = new Date();
+    const time = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+    const diff = Math.floor((now - time) / 1000); // seconds
+
+    if (diff < 60) return 'الآن';
+    if (diff < 3600) return `منذ ${Math.floor(diff / 60)} دقيقة`;
+    if (diff < 86400) return `منذ ${Math.floor(diff / 3600)} ساعة`;
+    if (diff < 604800) return `منذ ${Math.floor(diff / 86400)} يوم`;
+    return time.toLocaleDateString('ar-EG');
 };
 
 export const initNavbar = initSharedUI; // Alias for backward compatibility

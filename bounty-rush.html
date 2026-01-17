@@ -77,6 +77,7 @@
       resize: none;
     }
   </style>
+  <script src="cache-init.js" defer></script>
 </head>
 
 <body>
@@ -481,7 +482,7 @@
         btn.disabled = true;
 
         const hasPurchased = await hasUserPurchasedOffer(auth.currentUser.uid, tier);
-        
+
         btn.innerText = originalText;
         btn.disabled = false;
 
@@ -541,15 +542,13 @@
       renderNextBatch();
     };
 
-    // Attach Filter Listeners
-    document.getElementById('charSearch').addEventListener('input', filterCharacters);
-    document.getElementById('roleFilter').addEventListener('change', filterCharacters);
-    document.getElementById('elementFilter').addEventListener('change', filterCharacters);
+    // Event listeners will be attached inside openCharModal
 
     // Pagination State
     let currentFilteredChars = [];
     let currentRenderCount = 0;
     const BATCH_SIZE = 20;
+    let filtersAttached = false; // Flag to prevent duplicate listeners
 
     const openCharModal = () => {
       const CHARACTERS = getCharacters();
@@ -571,6 +570,14 @@
       document.getElementById('charSearch').value = "";
       document.getElementById('roleFilter').value = "";
       document.getElementById('elementFilter').value = "";
+
+      // Attach Filter Listeners (only once)
+      if (!filtersAttached) {
+        document.getElementById('charSearch').addEventListener('input', filterCharacters);
+        document.getElementById('roleFilter').addEventListener('change', filterCharacters);
+        document.getElementById('elementFilter').addEventListener('change', filterCharacters);
+        filtersAttached = true;
+      }
 
       // Trigger Initial Filter (which renders the grid)
       filterCharacters();
