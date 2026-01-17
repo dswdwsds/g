@@ -3,23 +3,25 @@ import { db, doc, getDoc, updateDoc, serverTimestamp } from './firebase-config.j
 const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1395038941110866010/MucgrT_399C44lfUVL79HcqR4cfwNbJlL5iG1qPmxdBF47GGbTbmkokZK6YnslmJ63wL";
 
 export const sendToDiscord = async (orderData) => {
-    const charNames = Array.isArray(orderData.characters)
-        ? orderData.characters.map(c => c.name).join('، ')
-        : orderData.charName;
+    const charNamesFull = Array.isArray(orderData.characters)
+        ? orderData.characters.map(c => c.name).filter(Boolean).join('، ')
+        : (orderData.charName || "غير محدد");
+
+    // Discord Field value limit is 1024
+    const charNames = charNamesFull.length > 1000 ? charNamesFull.substring(0, 1000) + "..." : charNamesFull;
 
     const payload = {
-        content: `📦 **طلب جديد من ${orderData.userName}!**`,
+        content: `📦 **طلب جديد من ${orderData.userName || "عميل"}!**`,
         embeds: [{
             title: "🚀 وصل طلب تلفيل جديد!",
             color: 0x00f2fe,
             fields: [
-                { name: "👤 اسم العميل", value: orderData.userName, inline: true },
-                { name: "🗡️ الشخصيات", value: charNames, inline: true },
-                { name: "💎 الفئة (Tier)", value: orderData.tier, inline: true },
-                { name: "🆔 رقم الطلب", value: `\`${orderData.orderId}\`` },
+                { name: "👤 اسم العميل", value: orderData.userName || "مجهول", inline: true },
+                { name: "🗡️ الشخصيات", value: charNames || "غير محدد", inline: true },
+                { name: "💎 الفئة (Tier)", value: orderData.tier || "غير محدد", inline: true },
+                { name: "🆔 رقم الطلب", value: `\`${orderData.orderId || "مجهول"}\`` },
                 { name: "⏳ الحالة الحالية", value: "بانتظار الدفع أو البدء... ⏳" }
             ],
-            thumbnail: { url: orderData.characters?.[0]?.image || orderData.charImage || orderData.userAvatar },
             footer: { text: "نظام TEAM GS لإدارة الطلبات" },
             timestamp: new Date().toISOString()
         }],
@@ -43,6 +45,11 @@ export const sendToDiscord = async (orderData) => {
             }
         ]
     };
+
+    const thumbUrl = orderData.characters?.[0]?.image || orderData.charImage || orderData.userAvatar;
+    if (thumbUrl && thumbUrl.startsWith('http')) {
+        payload.embeds[0].thumbnail = { url: thumbUrl };
+    }
 
     const response = await fetch(DISCORD_WEBHOOK + "?wait=true", {
         method: 'POST',
@@ -68,7 +75,7 @@ export const updateDiscordMessage = async (orderData, newStatus) => {
         color = 0x00ff00;
         title = "🔔 الطلب جاهز للتنفيذ";
     } else if (newStatus === 'working') {
-        statusText = `🔥 جارِ العمل بواسطة: ${orderData.workerName}`;
+        statusText = `🔥 جارِ العمل بواسطة: ${orderData.workerName || "موظف"}`;
         color = 0x4facfe;
         title = "⚡ جاري تنفيذ الطلب الآن!";
     } else if (newStatus === 'done') {
@@ -82,36 +89,54 @@ export const updateDiscordMessage = async (orderData, newStatus) => {
     }
 
     const charNames = Array.isArray(orderData.characters)
-        ? orderData.characters.map(c => c.name).join('، ')
-        : orderData.charName;
+        ? orderData.characters.map(c => c.name).filter(Boolean).join('، ')
+        : (orderData.charName || "غير محدد");
 
-    const payload = {
-        embeds: [{
-            title: title,
-            color: color,
-            fields: [
-                { name: "👤 اسم العميل", value: orderData.userName, inline: true },
-                { name: " الفئة/النوع", value: orderData.tier, inline: true },
-                { name: " السعر", value: `${orderData.totalPrice || 0} ج.م`, inline: true },
-                { name: "🗡️ الشخصيات", value: charNames },
-                { name: "⏳ الحالة الحالية", value: statusText }
-            ],
-            thumbnail: { url: orderData.characters?.[0]?.image || orderData.userAvatar },
-            image: orderData.receiptUrl ? { url: orderData.receiptUrl } : null,
-            footer: { text: "TEAM GS - نظام التلفيل الآلي" },
-            timestamp: new Date().toISOString()
-        }]
+    const embed = {
+        title: title,
+        color: color,
+        fields: [
+            { name: "👤 اسم العميل", value: orderData.userName || "مجهول", inline: true },
+            { name: " الفئة/النوع", value: orderData.tier || "غير محدد", inline: true },
+            { name: " السعر", value: `${orderData.totalPrice || 0} ج.م`, inline: true },
+            { name: "🗡️ الشخصيات", value: charNames || "غير محدد" },
+            { name: "⏳ الحالة الحالية", value: statusText }
+        ],
+        footer: { text: "TEAM GS - نظام التلفيل الآلي" },
+        timestamp: new Date().toISOString()
     };
+
+    // Safe thumbnail
+    const thumbUrl = orderData.characters?.[0]?.image || orderData.userAvatar;
+    if (thumbUrl && thumbUrl.startsWith('http')) {
+        embed.thumbnail = { url: thumbUrl };
+    }
+
+    // Safe image (receipt)
+    if (orderData.receiptUrl && orderData.receiptUrl.startsWith('http')) {
+        embed.image = { url: orderData.receiptUrl };
+    }
+
+    const payload = { embeds: [embed] };
 
     if (newStatus === 'done' || newStatus === 'rejected') {
         payload.components = [];
     }
 
-    await fetch(`${DISCORD_WEBHOOK}/messages/${orderData.discordMessageId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-    });
+    try {
+        const response = await fetch(`${DISCORD_WEBHOOK}/messages/${orderData.discordMessageId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error(`[Discord] PATCH failed (${response.status}):`, errorText);
+        }
+    } catch (error) {
+        console.error("[Discord] Network error during PATCH:", error);
+    }
 };
 
 export const sendPaymentProofToDiscord = async (orderId, file, orderData, senderWallet) => {
@@ -122,9 +147,11 @@ export const sendPaymentProofToDiscord = async (orderId, file, orderData, sender
         const snapshot = await getDoc(orderRef);
         const serverOrderData = snapshot.exists() ? snapshot.data() : {};
 
-        const charNames = Array.isArray(orderData.characters)
+        const charNamesFull = Array.isArray(orderData.characters)
             ? orderData.characters.map(c => c.name).join('، ')
-            : (serverOrderData.characters?.map(c => c.name).join('، ') || orderData.charName);
+            : (serverOrderData.characters?.map(c => c.name).join('، ') || orderData.charName || "غير محدد");
+
+        const charNames = charNamesFull.length > 1000 ? charNamesFull.substring(0, 1000) + "..." : charNamesFull;
 
         const steamInfo = serverOrderData.steamData ? (
             serverOrderData.steamData.method === 'credentials'
@@ -141,8 +168,8 @@ export const sendPaymentProofToDiscord = async (orderId, file, orderData, sender
                     { name: "👤 العميل", value: orderData.userName || serverOrderData.userName || "مجهول", inline: true },
                     { name: "💎 الفئة", value: orderData.tier || serverOrderData.tier || "غير محدد", inline: true },
                     { name: "💵 السعر", value: `${orderData.totalPrice || serverOrderData.totalPrice || 0} جنيه`, inline: true },
-                    { name: "💳 رقم المحول", value: `\`${senderWallet}\``, inline: true },
-                    { name: "🗡️ الشخصيات", value: charNames || "لا يوجد" },
+                    { name: "💳 رقم المحول", value: `\`${senderWallet || "غير معروف"}\``, inline: true },
+                    { name: "🗡️ الشخصيات", value: charNames },
                     { name: "🔐 بيانات الدخول", value: steamInfo },
                     { name: "🆔 رقم الطلب", value: `\`${orderId}\`` }
                 ],
