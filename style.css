@@ -1602,3 +1602,71 @@ footer {
         right: -50px;
     }
 }
+
+/* Progressive Image Loading & Lazy Loading Styles */
+.char-item img {
+    transition: opacity 0.3s ease-in-out, filter 0.3s ease-in-out;
+}
+
+/* Placeholder blur effect */
+.char-item img[data-loading="true"] {
+    filter: blur(10px);
+    opacity: 0.6;
+}
+
+/* Loaded state */
+.char-item img[data-loading="false"] {
+    filter: blur(0);
+    opacity: 1;
+}
+
+/* Lazy loading skeleton */
+.char-item .img-placeholder {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    background: linear-gradient(90deg,
+            rgba(255, 255, 255, 0.05) 25%,
+            rgba(255, 255, 255, 0.1) 50%,
+            rgba(255, 255, 255, 0.05) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 10px;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+/* Fade in animation for loaded images */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.char-item img.loaded {
+    animation: fadeIn 0.4s ease-out;
+}
+
+/* Blur placeholder SVG background */
+.blur-placeholder {
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    filter: blur(20px);
+    opacity: 0.3;
+}
