@@ -1,5 +1,5 @@
 // Notifications Service
-import { db, doc, collection, query, where, orderBy, limit, onSnapshot, updateDoc, addDoc, serverTimestamp } from './firebase-config.js';
+import { db, doc, collection, query, where, orderBy, limit, onSnapshot, updateDoc, addDoc, serverTimestamp, getDoc, getDocs, writeBatch } from './firebase-config.js';
 import { auth } from './firebase-config.js';
 
 let unreadCount = 0;

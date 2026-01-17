@@ -9,12 +9,16 @@ export const injectNavbar = () => {
     }
     header.className = 'nav-bar';
     header.innerHTML = `
-        <div class="user-info" id="userInfo"></div>
+        <div class="nav-controls" style="display: flex; align-items: center; gap: 15px;">
+            <div class="user-info" id="userInfo"></div>
+            <div id="notificationBellPlaceholder"></div>
+        </div>
         <a href="index.html" class="logo" style="text-decoration: none; font-family: var(--font-en); font-weight: 800; color: var(--primary);">TEAM GS</a>
     `;
 };
 
 export const injectSharedModals = () => {
+    // ... (no changes here, keeping it for context)
     let container = document.getElementById('shared-modals-placeholder') || document.getElementById('shared-modals-container');
     if (!container) {
         container = document.createElement('div');
@@ -124,15 +128,11 @@ export const injectSharedModals = () => {
 // --- User Interface Refresh (Shared) ---
 export const refreshUserUI = async () => {
     const userInfo = document.getElementById('userInfo');
+    const bellPlaceholder = document.getElementById('notificationBellPlaceholder');
     if (!userInfo) return;
 
     const user = auth.currentUser;
     if (user) {
-        userInfo.style.display = 'flex';
-        userInfo.style.alignItems = 'center';
-        userInfo.style.flexDirection = 'row';
-        userInfo.style.gap = '15px';
-
         const rolesData = await import('./auth_service.js').then(m => m.getRolesData());
         const isStaff = await isWorker(user.email);
         const userRoles = (getUserRole(user.email) || 'client').split(',').map(r => r.trim());
@@ -140,19 +140,6 @@ export const refreshUserUI = async () => {
             userRoles.some(r => ['owner', 'admin', 'dev', 'creator'].includes(r));
 
         userInfo.innerHTML = `
-            <div class="notification-bell" id="notificationBell" style="position: relative; cursor: pointer;">
-                <span style="font-size: 1.5rem;">🔔</span>
-                <span id="notificationBadge" class="notification-badge" style="display: none;">0</span>
-                <div id="notificationDropdown" class="notification-dropdown" style="display: none;">
-                    <div class="notification-header">
-                        <h4 style="margin: 0; font-size: 0.9rem;">الإشعارات</h4>
-                        <button id="markAllRead" class="mark-all-btn">تمييز الكل كمقروء</button>
-                    </div>
-                    <div id="notificationList" class="notification-list">
-                        <div class="notification-empty">لا توجد إشعارات</div>
-                    </div>
-                </div>
-            </div>
             <div class="user-dropdown">
                 <div class="user-trigger">
                     <div class="user-details">
@@ -183,10 +170,30 @@ export const refreshUserUI = async () => {
                 </div>
             </div>
         `;
+
+        if (bellPlaceholder) {
+            bellPlaceholder.innerHTML = `
+                <div class="notification-bell" id="notificationBell" style="position: relative; cursor: pointer;">
+                    <span style="font-size: 1.5rem;">🔔</span>
+                    <span id="notificationBadge" class="notification-badge" style="display: none;">0</span>
+                    <div id="notificationDropdown" class="notification-dropdown" style="display: none;">
+                        <div class="notification-header">
+                            <h4 style="margin: 0; font-size: 0.9rem;">الإشعارات</h4>
+                            <button id="markAllRead" class="mark-all-btn">تمييز الكل كمقروء</button>
+                        </div>
+                        <div id="notificationList" class="notification-list">
+                            <div class="notification-empty">لا توجد إشعارات</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            setupNotificationHandlers();
+        }
     } else {
         userInfo.innerHTML = `
             <button onclick="handleLogin()" class="auth-btn">تسجيل الدخول 👋</button>
         `;
+        if (bellPlaceholder) bellPlaceholder.innerHTML = '';
     }
 };
 
@@ -200,9 +207,6 @@ export const initSharedUI = () => {
             initNotificationSystem();
         }
     });
-
-    // Setup notification bell click handler
-    setupNotificationHandlers();
 };
 
 // Initialize notification system
