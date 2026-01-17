@@ -20,6 +20,10 @@ const IMAGE_PATTERNS = [
     /\/IMAGE\//
 ];
 
+// Counter for cached images served
+let cachedImagesCount = 0;
+let lastLogTime = Date.now();
+
 // Install Event - Cache static assets
 self.addEventListener('install', (event) => {
     console.log('[Service Worker] Installing...');
@@ -65,7 +69,16 @@ self.addEventListener('fetch', (event) => {
             caches.open(IMAGE_CACHE).then(cache => {
                 return cache.match(request).then(cachedResponse => {
                     if (cachedResponse) {
-                        console.log('[Service Worker] Serving from cache:', url.pathname);
+                        // Increment counter
+                        cachedImagesCount++;
+
+                        // Log summary every 3 seconds instead of logging each image
+                        const now = Date.now();
+                        if (now - lastLogTime >= 3000) {
+                            console.log(`[Service Worker] Serving from cache: ${cachedImagesCount} صورة`);
+                            lastLogTime = now;
+                        }
+
                         return cachedResponse;
                     }
 
