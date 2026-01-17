@@ -122,6 +122,32 @@ export const updateOrderStatus = async (orderId, newStatus) => {
                 }, { merge: true });
             }
 
+            // 1. Add App Notification for the user first (Most important)
+            try {
+                const { createNotification } = await import('./notifications_service.js');
+                let notifType = 'SYSTEM';
+                let notifMsg = `تم تحديث حالة طلبك #${orderId} إلى: ${newStatus}`;
+
+                if (newStatus === 'waiting') {
+                    notifType = 'PAYMENT_VERIFIED';
+                    notifMsg = `✅ تم تأكيد دفع طلبك #${orderId}! الطلب الآن بانتظار استلام الموظف.`;
+                } else if (newStatus === 'working') {
+                    notifType = 'ORDER_CONFIRMED';
+                    notifMsg = `🚀 بدأ العمل على طلبك #${orderId} بواسطة ${orderData.workerName || 'أحد الموظفين'}.`;
+                } else if (newStatus === 'done') {
+                    notifType = 'ORDER_COMPLETED';
+                    notifMsg = `🎉 مبروك! تم الانتهاء من طلبك #${orderId} بنجاح.`;
+                } else if (newStatus === 'rejected') {
+                    notifType = 'ORDER_REJECTED';
+                    notifMsg = `❌ نعتذر، تم رفض طلبك #${orderId}. يرجى مراجعة الدعم الفني.`;
+                }
+
+                await createNotification(orderData.uid, notifType, notifMsg, { orderId: orderId });
+            } catch (err) {
+                console.error("[OrderService] Error creating user notification:", err);
+            }
+
+            // 2. Update Discord (May fail but shouldn't block)
             await updateDiscordMessage(orderData, newStatus);
         }
     } catch (error) {

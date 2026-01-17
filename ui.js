@@ -9,9 +9,9 @@ export const injectNavbar = () => {
     }
     header.className = 'nav-bar';
     header.innerHTML = `
-        <div class="nav-controls" style="display: flex; align-items: center; gap: 15px;">
-            <div class="user-info" id="userInfo"></div>
+        <div class="nav-controls" style="display: flex; align-items: center; gap: 15px; flex-direction: row-reverse;">
             <div id="notificationBellPlaceholder"></div>
+            <div class="user-info" id="userInfo"></div>
         </div>
         <a href="index.html" class="logo" style="text-decoration: none; font-family: var(--font-en); font-weight: 800; color: var(--primary);">TEAM GS</a>
     `;
