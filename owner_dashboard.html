@@ -347,11 +347,20 @@
                 const list = document.getElementById('staffList');
                 list.innerHTML = staff.map(s => {
                     const roles = (s.role || 'staff').split(',').map(r => r.trim());
-                    // Logic to render chips... (simplified for brevity in this create action)
+                    // Enhanced Role Rendering in Admin Panel
+                    const roleChips = roles.map(r => {
+                        if (r === 'owner') return '👑 المالك';
+                        if (r === 'admin') return '🛡️ أدمن';
+                        if (r === 'staff') return '🛠️ موظف';
+                        // Try to find dynamic role name if available, otherwise just ID
+                        // (Note: in this scope we might not have 'cachedRoles' handy easily unless we imported rolesData. 
+                        //  But at least fix the core system roles)
+                        return `🎨 ${r}`;
+                    }).join(', ');
                     return `<div style="padding:10px; border:1px solid var(--glass-border); background:rgba(255,255,255,0.05); border-radius:10px; display:flex; justify-content:space-between; align-items:center;">
                         <div>
-                           <strong>${s.displayName || s.email}</strong>
-                           <div style="font-size:0.8rem; color:var(--text-dim);">${roles.join(', ')}</div>
+                            <strong>${s.displayName || s.email}</strong>
+                           <div style="font-size:0.8rem; color:var(--text-dim);">${roleChips}</div>
                         </div>
                         <div style="display:flex; gap:5px;">
                             <button onclick="handleEditStaff('${s.email}', '${s.role}')" class="auth-btn" style="font-size:0.8rem;">تعديل</button>

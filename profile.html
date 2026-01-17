@@ -235,7 +235,10 @@
         displayNameInput.addEventListener('input', () => {
             const name = displayNameInput.value || 'User';
             document.getElementById('nicknamePreview').innerText = name;
-            if (!selectedAvatarBase64) {
+
+            // Fix: Only update avatar if no custom file selected AND current image is a generated one
+            const isGenerated = avatarPreview.src.includes('ui-avatars.com');
+            if (!selectedAvatarBase64 && isGenerated) {
                 avatarPreview.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=00f2fe&color=000`;
             }
         });
@@ -262,24 +265,19 @@
             try {
                 let photoURL = user.photoURL;
 
-                // 1. If new avatar selected, upload to ImgBB (or similar) through chat_service or use base64 (if small)
-                // For simplicity here, we'll use base64 if it's small or just stay with old if no upload service
-                // But wait, it's better to use an upload service.
-                // The current app uses ImgBB in chat_service.
-
                 if (selectedAvatarBase64) {
                     const { uploadToImgBB } = await import('./chat_service.js');
                     const uploadResult = await uploadToImgBB(avatarInput.files[0]);
                     if (uploadResult) photoURL = uploadResult;
                 }
 
-                // 2. Update Firebase Auth
+                // 2. Update Firebase Auth (Primary Source of Truth)
                 await updateProfile(user, {
                     displayName: displayNameInput.value,
                     photoURL: photoURL
                 });
 
-                // 3. Update Firestore Users Collection
+                // 3. Update Firestore Users Collection (Best Effort)
                 const userData = {
                     displayName: displayNameInput.value,
                     photoURL: photoURL,
@@ -287,15 +285,24 @@
                     bio: bioInput.value,
                     updatedAt: new Date()
                 };
-                await setDoc(doc(db, "users", user.uid), userData, { merge: true });
 
-                // 4. Update Staff Collection if worker (Using UID as key now)
+                try {
+                    await setDoc(doc(db, "users", user.uid), userData, { merge: true });
+                } catch (dbError) {
+                    console.warn("Firestore User Sync Failed:", dbError);
+                }
+
+                // 4. Update Staff Collection if worker (Best Effort)
                 if (isWorker(user.email)) {
-                    await setDoc(doc(db, "staff", user.uid), {
-                        displayName: displayNameInput.value,
-                        photoURL: photoURL,
-                        email: user.email // Ensure email is always consistent
-                    }, { merge: true });
+                    try {
+                        await setDoc(doc(db, "staff", user.uid), {
+                            displayName: displayNameInput.value,
+                            photoURL: photoURL,
+                            email: user.email
+                        }, { merge: true });
+                    } catch (staffError) {
+                        console.warn("Staff Sync Failed:", staffError);
+                    }
                 }
 
                 showToast("تم تحديث ملفك الشخصي بنجاح!", "✅");
