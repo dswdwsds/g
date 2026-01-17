@@ -84,15 +84,54 @@ export const listenToRoles = (callback) => {
 };
 
 // Start roles listener when auth state changes if possible
-onAuthStateChanged(auth, (user) => {
+
+// Start roles listener and merge staff profile when auth state changes
+onAuthStateChanged(auth, async (user) => {
     if (user) {
         listenToRoles();
+        await syncWorkerProfile(user);
     } else {
         if (rolesUnsubscribe) rolesUnsubscribe();
         rolesUnsubscribe = null;
         availableRoles = [];
     }
 });
+
+export const syncWorkerProfile = async (user) => {
+    // 1. Check for legacy/invite doc (ID == Email)
+    const emailDocRef = doc(db, "staff", user.email);
+    // 2. Check for UID doc
+    const uidDocRef = doc(db, "staff", user.uid);
+
+    try {
+        const [emailDocSnap, uidDocSnap] = await Promise.all([
+            import('./firebase-config.js').then(m => m.getDoc(emailDocRef)),
+            import('./firebase-config.js').then(m => m.getDoc(uidDocRef))
+        ]);
+
+        // If email doc exists (meaning user was invited by email)
+        if (emailDocSnap.exists()) {
+            const inviteData = emailDocSnap.data();
+
+            // Merge invite data into UID doc
+            await setDoc(uidDocRef, {
+                ...inviteData,
+                email: user.email,
+                uid: user.uid,
+                name: user.displayName || inviteData.name,
+                // Keep existing stats if UID doc already existed, otherwise start fresh
+                totalEarnings: uidDocSnap.exists() ? (uidDocSnap.data().totalEarnings || 0) : 0,
+                lastActive: serverTimestamp()
+            }, { merge: true });
+
+            // Delete the duplicate email doc
+            await deleteDoc(emailDocRef);
+            console.log("Team GS: Staff profile migrated to UID.");
+        }
+    } catch (e) {
+        console.error("Profile Sync Error:", e);
+    }
+};
 
 export const hasPermission = (email, permission) => {
     const staff = authorizedStaff.find(s => s.email === email || s.id === email);
