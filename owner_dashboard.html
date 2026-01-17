@@ -118,6 +118,11 @@
                 onclick="toggleReviewsPanel()">
                 💬 إدارة التعليقات
             </button>
+            <button id="createTestOrderBtn" class="auth-btn"
+                style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; font-size: 1.2rem; font-weight: bold;"
+                onclick="createTestOrder()">
+                🧪 إنشاء طلب تجريبي
+            </button>
         </div>
 
         <div id="accessDenied" class="hidden" style="text-align:center; padding: 50px;">
@@ -516,6 +521,85 @@
         window.deleteReview = async (id) => {
             if (confirm("حذف التعليق؟")) await deleteReview(id);
         }
+
+        // Create Test Order Function
+        window.createTestOrder = async () => {
+            const btn = document.getElementById('createTestOrderBtn');
+            const originalText = btn.innerText;
+            btn.innerText = "جاري الإنشاء...";
+            btn.disabled = true;
+
+            try {
+                const { db, collection, addDoc, serverTimestamp } = await import('./firebase-config.js');
+                const { loadCharacters, getCharacters } = await import('./app.js');
+
+                // Load characters if not already loaded
+                await loadCharacters();
+                const allChars = getCharacters();
+
+                // Select random characters (3-5 characters)
+                const numChars = Math.floor(Math.random() * 3) + 3; // 3 to 5
+                const selectedChars = [];
+                const availableChars = [...allChars];
+
+                for (let i = 0; i < numChars && availableChars.length > 0; i++) {
+                    const randomIndex = Math.floor(Math.random() * availableChars.length);
+                    selectedChars.push(availableChars.splice(randomIndex, 1)[0]);
+                }
+
+                // Random tier
+                const tiers = ['Starter', 'Pro', 'Ultimate'];
+                const randomTier = tiers[Math.floor(Math.random() * tiers.length)];
+
+                // Create test order
+                const testOrder = {
+                    userId: auth.currentUser.uid,
+                    userEmail: auth.currentUser.email,
+                    userName: auth.currentUser.displayName || 'Test User',
+                    tier: randomTier,
+                    characters: selectedChars.map(c => ({
+                        id: c.id,
+                        name: c.name,
+                        stars: c.stars,
+                        role: c.role
+                    })),
+                    totalPrice: selectedChars.length * (randomTier === 'Starter' ? 8 : randomTier === 'Pro' ? 9 : 10),
+                    steamUsername: 'test_user_' + Math.floor(Math.random() * 1000),
+                    steamPassword: '***HIDDEN***',
+                    loginMethod: 'credentials',
+                    paymentProof: 'https://via.placeholder.com/400x300/667eea/ffffff?text=Test+Receipt',
+                    senderWallet: '0101234567' + Math.floor(Math.random() * 10),
+                    status: 'pending',
+                    timestamp: serverTimestamp(),
+                    isTestOrder: true, // Mark as test order
+                    testOrderNote: '🧪 هذا طلب تجريبي تم إنشاؤه من لوحة الإدارة'
+                };
+
+                const docRef = await addDoc(collection(db, 'orders'), testOrder);
+
+                btn.innerText = "✅ تم الإنشاء!";
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                }, 2000);
+
+                // Show success message
+                if (window.showToast) {
+                    window.showToast(`تم إنشاء طلب تجريبي برقم: ${docRef.id.substring(0, 8)}...`, "✅");
+                } else {
+                    alert(`تم إنشاء طلب تجريبي بنجاح!\nرقم الطلب: ${docRef.id}`);
+                }
+
+            } catch (error) {
+                console.error('Error creating test order:', error);
+                btn.innerText = "❌ فشل الإنشاء";
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                }, 2000);
+                alert('حدث خطأ أثناء إنشاء الطلب التجريبي: ' + error.message);
+            }
+        };
 
     </script>
 </body>
