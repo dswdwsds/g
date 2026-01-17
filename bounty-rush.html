@@ -368,8 +368,11 @@
       <div class="upload-section">
         <div style="margin-bottom: 20px;">
           <p style="font-size: 0.9rem; margin-bottom: 10px;">رقم المحفظة الذي قمت بالتحويل منه:</p>
-          <input type="text" id="senderWalletInput" placeholder="رقم المحول (مثال: 010...)"
-            style="width: 100%; padding: 12px; border-radius: 8px; background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); color: white; outline: none;">
+          <input type="tel" id="senderWalletInput" placeholder="01xxxxxxxxx" maxlength="11"
+            style="width: 100%; padding: 12px; border-radius: 8px; background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); color: white; outline: none; font-family: monospace; letter-spacing: 1px;">
+          <div id="walletError" style="color: #ff4d4d; font-size: 0.8rem; margin-top: 5px; display: none;"></div>
+          <div id="walletSuccess" style="color: #00ff9d; font-size: 0.8rem; margin-top: 5px; display: none;">✓ رقم صحيح
+          </div>
         </div>
         <p style="font-size: 0.9rem; margin-bottom: 10px;">قم برفع صورة إيصال الدفع (Screenshot):</p>
         <label class="custom-upload">
@@ -447,6 +450,83 @@
       'BulkMix': [2, 3], // Mix of 2 and 3 stars
       'BulkUltimate': 4
     };
+
+    // دالة التحقق من الرقم المصري
+    const validateEgyptianPhone = (phone) => {
+      // إزالة المسافات والرموز
+      const cleaned = phone.replace(/[\s\-\(\)]/g, '');
+
+      // التحقق من أن الرقم يحتوي على أرقام فقط
+      if (!/^\d+$/.test(cleaned)) {
+        return false;
+      }
+
+      // التحقق من الطول (11 رقم)
+      if (cleaned.length !== 11) {
+        return false;
+      }
+
+      // التحقق من أن الرقم يبدأ بـ 010, 011, 012, أو 015
+      const validPrefixes = ['010', '011', '012', '015'];
+      const prefix = cleaned.substring(0, 3);
+
+      return validPrefixes.includes(prefix);
+    };
+
+    // إعداد التحقق الفوري من رقم المحفظة
+    const setupWalletValidation = () => {
+      const walletInput = document.getElementById('senderWalletInput');
+      const errorDiv = document.getElementById('walletError');
+      const successDiv = document.getElementById('walletSuccess');
+
+      if (!walletInput) return;
+
+      walletInput.addEventListener('input', (e) => {
+        const value = e.target.value.trim();
+
+        // إذا كان الحقل فارغاً، إخفاء الرسائل
+        if (!value) {
+          errorDiv.style.display = 'none';
+          successDiv.style.display = 'none';
+          walletInput.style.borderColor = 'var(--glass-border)';
+          return;
+        }
+
+        // التحقق من الرقم
+        if (validateEgyptianPhone(value)) {
+          errorDiv.style.display = 'none';
+          successDiv.style.display = 'block';
+          walletInput.style.borderColor = '#00ff9d';
+        } else {
+          successDiv.style.display = 'none';
+          errorDiv.style.display = 'block';
+          walletInput.style.borderColor = '#ff4d4d';
+
+          // رسائل خطأ مخصصة
+          const cleaned = value.replace(/[\s\-\(\)]/g, '');
+          if (!/^\d+$/.test(cleaned)) {
+            errorDiv.textContent = '❌ يجب أن يحتوي على أرقام فقط';
+          } else if (cleaned.length < 11) {
+            errorDiv.textContent = `⚠️ الرقم قصير جداً (${cleaned.length}/11)`;
+          } else if (cleaned.length > 11) {
+            errorDiv.textContent = '❌ الرقم طويل جداً (11 رقم فقط)';
+          } else {
+            const prefix = cleaned.substring(0, 3);
+            errorDiv.textContent = `❌ الرقم يجب أن يبدأ بـ 010, 011, 012, أو 015 (حالياً: ${prefix})`;
+          }
+        }
+      });
+
+      // منع إدخال أحرف غير رقمية
+      walletInput.addEventListener('keypress', (e) => {
+        if (!/\d/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete' && e.key !== 'Tab') {
+          e.preventDefault();
+        }
+      });
+    };
+
+    // استدعاء الإعداد عند تحميل الصفحة
+    window.addEventListener('load', setupWalletValidation);
 
     // Load characters on page load
     loadCharacters().then(() => {
@@ -853,10 +933,19 @@
 
     submitPayment.onclick = async () => {
       const wallet = document.getElementById('senderWalletInput').value.trim();
+
+      // التحقق من وجود الرقم
       if (!wallet) {
         showToast("يرجى إدخال رقم المحفظة المحول منه!", "⚠️");
         return;
       }
+
+      // التحقق من صحة الرقم المصري
+      if (!validateEgyptianPhone(wallet)) {
+        showToast("رقم المحفظة غير صحيح! يجب أن يكون رقم مصري يبدأ بـ 010, 011, 012, أو 015", "❌");
+        return;
+      }
+
       if (receiptInput.files.length === 0) {
         showToast("يرجى رفع صورة الإيصال أولاً!", "⚠️");
         return;

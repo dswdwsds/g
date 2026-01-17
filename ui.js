@@ -10,19 +10,6 @@ export const injectNavbar = () => {
     header.className = 'nav-bar';
     header.innerHTML = `
         <div class="user-info" id="userInfo"></div>
-        <div class="notification-bell" id="notificationBell" style="position: relative; cursor: pointer; margin-left: 20px;">
-            <span style="font-size: 1.5rem;">🔔</span>
-            <span id="notificationBadge" class="notification-badge" style="display: none;">0</span>
-            <div id="notificationDropdown" class="notification-dropdown" style="display: none;">
-                <div class="notification-header">
-                    <h4 style="margin: 0; font-size: 0.9rem;">الإشعارات</h4>
-                    <button id="markAllRead" class="mark-all-btn">تمييز الكل كمقروء</button>
-                </div>
-                <div id="notificationList" class="notification-list">
-                    <div class="notification-empty">لا توجد إشعارات</div>
-                </div>
-            </div>
-        </div>
         <a href="index.html" class="logo" style="text-decoration: none; font-family: var(--font-en); font-weight: 800; color: var(--primary);">TEAM GS</a>
     `;
 };
@@ -167,6 +154,19 @@ export const refreshUserUI = async () => {
                         </div>
                     </div>
                     <img src="${user.photoURL}" class="user-avatar">
+                </div>
+                <div class="notification-bell" id="notificationBell" style="position: relative; cursor: pointer; margin-left: 15px;">
+                    <span style="font-size: 1.5rem;">🔔</span>
+                    <span id="notificationBadge" class="notification-badge" style="display: none;">0</span>
+                    <div id="notificationDropdown" class="notification-dropdown" style="display: none;">
+                        <div class="notification-header">
+                            <h4 style="margin: 0; font-size: 0.9rem;">الإشعارات</h4>
+                            <button id="markAllRead" class="mark-all-btn">تمييز الكل كمقروء</button>
+                        </div>
+                        <div id="notificationList" class="notification-list">
+                            <div class="notification-empty">لا توجد إشعارات</div>
+                        </div>
+                    </div>
                 </div>
                 <div class="dropdown-menu">
                     <a href="profile.html">👤 ملفي الشخصي</a>
