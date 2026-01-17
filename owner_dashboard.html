@@ -302,24 +302,35 @@
         });
 
         // Initialize Page
-        onAuthStateChanged(auth, async (user) => {
-            if (user && await isWorker(user.email)) {
-                // Check Owner Dashboard Permission
-                const authorized = hasPermission(user.email, 'access_owner_dashboard') ||
-                    // Fallback for current owners/admins until they update roles
-                    ['owner', 'dev', 'admin', 'creator'].some(r => (getUserRole(user.email) || '').includes(r));
+        // Initialize Page
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // Wait for staff list to load to avoid race conditions
+                listenToWorkers(async (staff) => {
+                    // Check if user is in the staff list using the fresh data
+                    const workerRecord = staff.find(s => s.email === user.email || s.id === user.email);
 
-                if (authorized) {
-                    accessDenied.classList.add('hidden');
-                    statsContainer.classList.remove('hidden');
-                    loadEarnings(user.email, user.uid);
-                    renderStaffList();
-                    renderAllReview();
-                    renderAllRoles();
-                } else {
-                    accessDenied.classList.remove('hidden');
-                    statsContainer.classList.add('hidden');
-                }
+                    if (workerRecord && workerRecord.role) {
+                        // Check Owner Dashboard Permission
+                        const authorized = hasPermission(user.email, 'access_owner_dashboard') ||
+                            ['owner', 'dev', 'admin', 'creator'].some(r => (workerRecord.role || '').includes(r));
+
+                        if (authorized) {
+                            accessDenied.classList.add('hidden');
+                            statsContainer.classList.remove('hidden');
+                            loadEarnings(user.email, user.uid);
+                            renderStaffList();
+                            renderAllReview();
+                            renderAllRoles();
+                        } else {
+                            accessDenied.classList.remove('hidden');
+                            statsContainer.classList.add('hidden');
+                        }
+                    } else {
+                        // Not a worker at all -> Redirect
+                        window.location.href = 'index.html';
+                    }
+                });
             } else {
                 window.location.href = 'index.html';
             }
