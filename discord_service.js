@@ -1,6 +1,6 @@
 import { db, doc, getDoc, updateDoc, serverTimestamp } from './firebase-config.js';
 
-const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1395038941110866010/MucgrT_399C44lfUVL79HcqR4cfwNbJlL5iG1qPmxdBF47GGbTbmkokZK6YnslmJ63wL";
+const DISCORD_WEBHOOK = "https://discord.gg/6CyPRdwKQn";
 
 export const sendToDiscord = async (orderData) => {
     const charNamesFull = Array.isArray(orderData.characters)
@@ -239,3 +239,4 @@ export const sendPaymentProofToDiscord = async (orderId, file, orderData, sender
         return false;
     }
 };
+
